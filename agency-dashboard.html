@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EnviroMonitor - Monitoring Agency Panel</title>
+
+  
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="top-navbar">
+    <div class="navbar-left">EnviroMonitor – Monitoring Agency Panel</div>
+    <div class="navbar-right">
+      <span class="agency-name" id="agencyNameDisplay">Monitoring Agency</span>
+      <button class="btn btn-logout" id="logoutBtn" type="button">Logout</button>
+    </div>
+  </header>
+
+  
+  <div class="dashboard-layout">
+    
+    <aside class="sidebar" aria-label="Sidebar Navigation">
+      <nav>
+        <ul class="nav-list">
+          <li class="nav-item active" data-target="section-industry">Select Industry</li>
+          <li class="nav-item" data-target="section-air">Enter Air Quality Data</li>
+          <li class="nav-item" data-target="section-report">Generate Report</li>
+          <li class="nav-item" data-target="section-submitted">Submitted Reports</li>
+          <li class="nav-item" data-target="section-settings">Settings</li>
+        </ul>
+      </nav>
+    </aside>
+
+   
+    <main class="main-content">
+     
+      <section class="card section-anchor" id="section-industry" aria-labelledby="industry-selection-heading">
+        <h2 id="industry-selection-heading">Industry Selection</h2>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="industryName">Industry Name</label>
+            <select id="industryName" name="industryName">
+              <option value="">-- Select Industry --</option>
+              <option value="green-steel">Green Steel Pvt Ltd</option>
+              <option value="river-chemicals">River Chemicals Ltd</option>
+              <option value="sunrise-cement">Sunrise Cement Works</option>
+              <option value="eco-textiles">Eco Textiles Unit</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="industryLocation">Location</label>
+            <input id="industryLocation" name="industryLocation" type="text" readonly placeholder="Auto-filled based on selected industry" />
+          </div>
+
+          <div class="form-group">
+            <label for="monitoringDate">Monitoring Date</label>
+            <input id="monitoringDate" name="monitoringDate" type="date" />
+          </div>
+        </div>
+      </section>
+
+      
+      <section class="card section-anchor" id="section-air" aria-labelledby="air-quality-heading">
+        <h2 id="air-quality-heading">Air Quality Data Entry</h2>
+
+        <div class="table-wrapper">
+          <table class="aq-table">
+            <thead>
+              <tr>
+                <th>Parameter</th>
+                <th>Input Field</th>
+                <th>Unit</th>
+                <th>Permissible Limit</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+             
+              <tr class="group-row"><td colspan="5">Particulate Matter</td></tr>
+              <tr>
+                <td>PM<sub>10</sub><br/><small>Particulate Matter ≤ 10 µm</small></td>
+                <td><input type="number" min="0" step="0.01" class="param-input" data-param="PM10" /></td>
+                <td>µg/m³</td>
+                <td id="limit-PM10">--</td>
+                <td><span class="status-badge" id="status-PM10">Pending</span></td>
+              </tr>
+              <tr>
+                <td>PM<sub>2.5</sub><br/><small>Particulate Matter ≤ 2.5 µm</small></td>
+                <td><input type="number" min="0" step="0.01" class="param-input" data-param="PM2.5" /></td>
+                <td>µg/m³</td>
+                <td id="limit-PM2.5">--</td>
+                <td><span class="status-badge" id="status-PM2.5">Pending</span></td>
+              </tr>
+
+            
+              <tr class="group-row"><td colspan="5">Gaseous Pollutants</td></tr>
+              <tr>
+                <td>SO<sub>2</sub><br/><small>Sulphur Dioxide</small></td>
+                <td><input type="number" min="0" step="0.01" class="param-input" data-param="SO2" /></td>
+                <td>µg/m³</td>
+                <td id="limit-SO2">--</td>
+                <td><span class="status-badge" id="status-SO2">Pending</span></td>
+              </tr>
+              <tr>
+                <td>NO<sub>2</sub><br/><small>Nitrogen Dioxide</small></td>
+                <td><input type="number" min="0" step="0.01" class="param-input" data-param="NO2" /></td>
+                <td>µg/m³</td>
+                <td id="limit-NO2">--</td>
+                <td><span class="status-badge" id="status-NO2">Pending</span></td>
+              </tr>
+              <tr>
+                <td>O<sub>3</sub><br/><small>Ozone</small></td>
+                <td><input type="number" min="0" step="0.01" class="param-input" data-param="O3" /></td>
+                <td>µg/m³</td>
+                <td id="limit-O3">--</td>
+                <td><span class="status-badge" id="status-O3">Pending</span></td>
+              </tr>
+              <tr>
+                <td>CO<br/><small>Carbon Monoxide</small></td>
+                <td><input type="number" min="0" step="0.01" class="param-input" data-param="CO" /></td>
+                <td>mg/m³</td>
+                <td id="limit-CO">--</td>
+                <td><span class="status-badge" id="status-CO">Pending</span></td>
+              </tr>
+              <tr>
+                <td>NH<sub>3</sub><br/><small>Ammonia</small></td>
+                <td><input type="number" min="0" step="0.01" class="param-input" data-param="NH3" /></td>
+                <td>µg/m³</td>
+                <td id="limit-NH3">--</td>
+                <td><span class="status-badge" id="status-NH3">Pending</span></td>
+              </tr>
+
+             
+              <tr class="group-row"><td colspan="5">Heavy Metals</td></tr>
+              <tr>
+                <td>Pb<br/><small>Lead</small></td>
+                <td><input type="number" min="0" step="0.01" class="param-input" data-param="Pb" /></td>
+                <td>µg/m³</td>
+                <td id="limit-Pb">--</td>
+                <td><span class="status-badge" id="status-Pb">Pending</span></td>
+              </tr>
+              <tr>
+                <td>Ni<br/><small>Nickel</small></td>
+                <td><input type="number" min="0" step="0.01" class="param-input" data-param="Ni" /></td>
+                <td>µg/m³</td>
+                <td id="limit-Ni">--</td>
+                <td><span class="status-badge" id="status-Ni">Pending</span></td>
+              </tr>
+              <tr>
+                <td>As<br/><small>Arsenic</small></td>
+                <td><input type="number" min="0" step="0.01" class="param-input" data-param="As" /></td>
+                <td>µg/m³</td>
+                <td id="limit-As">--</td>
+                <td><span class="status-badge" id="status-As">Pending</span></td>
+              </tr>
+              <tr>
+                <td>Cd<br/><small>Cadmium</small></td>
+                <td><input type="number" min="0" step="0.01" class="param-input" data-param="Cd" /></td>
+                <td>µg/m³</td>
+                <td id="limit-Cd">--</td>
+                <td><span class="status-badge" id="status-Cd">Pending</span></td>
+              </tr>
+              <tr>
+                <td>C<sub>6</sub>H<sub>6</sub><br/><small>Benzene</small></td>
+                <td><input type="number" min="0" step="0.01" class="param-input" data-param="C6H6" /></td>
+                <td>µg/m³</td>
+                <td id="limit-C6H6">--</td>
+                <td><span class="status-badge" id="status-C6H6">Pending</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      
+      <section class="action-row section-anchor" id="section-report" aria-label="Actions">
+        <button type="button" class="btn btn-calculate" id="calculateBtn">Calculate AQI</button>
+        <button type="button" class="btn btn-save" id="saveBtn">Save Data</button>
+        <button type="button" class="btn btn-report" id="reportBtn">Generate Report</button>
+      </section>
+
+    
+      <section class="card aqi-result-card hidden" id="aqiResultCard" aria-live="polite">
+        <h2>AQI Result Summary</h2>
+        <div class="aqi-grid">
+          <div>
+            <p class="result-label">AQI Value</p>
+            <p class="result-value" id="aqiValue">--</p>
+          </div>
+          <div>
+            <p class="result-label">Category</p>
+            <p class="result-value" id="aqiCategory">--</p>
+          </div>
+          <div>
+            <p class="result-label">Dominant Pollutant</p>
+            <p class="result-value" id="dominantPollutant">--</p>
+          </div>
+        </div>
+      </section>
+
+      
+      <section class="card section-anchor" id="section-submitted" aria-labelledby="submitted-reports-heading">
+        <h2 id="submitted-reports-heading">Submitted Reports</h2>
+        <p class="result-label">Previously submitted reports list will be displayed in this section with filters and download options.</p>
+      </section>
+
+     
+      <section class="card section-anchor" id="section-settings" aria-labelledby="settings-heading">
+        <h2 id="settings-heading">Settings</h2>
+        <p class="result-label">Profile preferences, alert settings, and agency-level configuration controls will be available here.</p>
+      </section>
+    </main>
+  </div>
+
+
+  <script src="script.js"></script>
+</body>
+</html>

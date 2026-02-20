@@ -1,18 +1,9 @@
-/* --------------------------------------------------
-   Environmental Monitoring Panel Script
-   - Modular AQI calculation logic
-   - Input validation and status updates
-  - Login/logout flow with protected dashboard access
-  - Placeholder actions for backend integration
--------------------------------------------------- */
-
-/* Local storage keys for frontend-only authentication */
 const AUTH_KEY = "enviroMonitorAuth";
 const AGENCY_NAME_KEY = "enviroMonitorAgencyName";
 const ROLE_KEY = "enviroMonitorRole";
 const USERS_KEY = "enviroMonitorUsers";
 
-/* Permissible limits object (can be replaced by API values later) */
+
 const permissibleLimits = {
   PM10: 100,
   "PM2.5": 60,
@@ -28,7 +19,7 @@ const permissibleLimits = {
   C6H6: 5
 };
 
-/* Dummy industry-location map (to be replaced by backend data fetch) */
+
 const industryLocations = {
   "green-steel": "Industrial Zone A, Mumbai",
   "river-chemicals": "Chemical Cluster, Vadodara",
@@ -36,7 +27,7 @@ const industryLocations = {
   "eco-textiles": "Textile Hub, Surat"
 };
 
-/* Cached DOM elements */
+
 const industrySelect = document.getElementById("industryName");
 const locationInput = document.getElementById("industryLocation");
 const dateInput = document.getElementById("monitoringDate");
@@ -316,9 +307,7 @@ function initializeAgencyNameDisplay() {
   agencyNameDisplay.textContent = localStorage.getItem(AGENCY_NAME_KEY) || "Monitoring Agency";
 }
 
-/* --------------------------------------------------
-   Initialization helpers
--------------------------------------------------- */
+
 
 function initializeLimitsInTable() {
   Object.keys(permissibleLimits).forEach((parameter) => {
@@ -364,9 +353,7 @@ function initializeSidebarScrollNavigation() {
   });
 }
 
-/* --------------------------------------------------
-   Required modular functions
--------------------------------------------------- */
+
 
 function validateInputs() {
   let isValid = true;
@@ -526,9 +513,7 @@ function getCategory(aqiValue) {
   return "Poor";
 }
 
-/* --------------------------------------------------
-   UI rendering logic
--------------------------------------------------- */
+
 
 function renderAQIResult(aqiValue, category, dominantPollutant) {
   if (!resultCard || !aqiValueEl || !aqiCategoryEl || !dominantPollutantEl) {
@@ -550,9 +535,7 @@ function renderAQIResult(aqiValue, category, dominantPollutant) {
   }
 }
 
-/* --------------------------------------------------
-   Event bindings
--------------------------------------------------- */
+
 
 if (calculateBtn) {
   calculateBtn.addEventListener("click", () => {
@@ -574,21 +557,19 @@ if (calculateBtn) {
 
 if (saveBtn) {
   saveBtn.addEventListener("click", () => {
-    /* Placeholder for future Servlet + MySQL integration */
+    
     alert("Save Data clicked. Backend integration can be added here.");
   });
 }
 
 if (reportBtn) {
   reportBtn.addEventListener("click", () => {
-    /* Placeholder for future report generation endpoint */
+   
     alert("Generate Report clicked. Backend integration can be added here.");
   });
 }
 
-/* --------------------------------------------------
-   Initial setup on page load
--------------------------------------------------- */
+
 if (initializeAuthRouting()) {
   initializeLoginHandler();
   initializeSignupHandler();
@@ -602,3 +583,4 @@ if (initializeAuthRouting()) {
     initializeSidebarScrollNavigation();
   }
 }
+

@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EnviroMonitor - Industry Dashboard</title>
-
- 
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
- 
+
   <header class="top-navbar">
     <div class="navbar-left">EnviroMonitor – Industry Dashboard</div>
     <div class="navbar-right">
@@ -19,18 +16,273 @@
     </div>
   </header>
 
-  
   <div class="dashboard-layout">
-    <main class="main-content main-content-full">
-      <!-- Professional placeholder card for industry role -->
-      <section class="card" aria-labelledby="industry-dashboard-heading">
-        <h2 id="industry-dashboard-heading">Industry Dashboard</h2>
-        <p class="result-label">Welcome to the industry panel. </p>
+
+    <aside class="sidebar" aria-label="Sidebar Navigation">
+      <nav>
+        <ul class="nav-list" id="industryNav">
+          <li class="nav-item active" data-target="section-profile">Industry Profile</li>
+          <li class="nav-item" data-target="section-contact">Contact Information</li>
+          <li class="nav-item" data-target="section-compliance">Compliance &amp; Notifications</li>
+        </ul>
+      </nav>
+
+      <!-- Profile completeness indicator -->
+      <div class="profile-completeness">
+        <p class="completeness-label">Profile Completeness</p>
+        <div class="completeness-bar-track">
+          <div class="completeness-bar-fill" id="completenessBar" style="width: 0%"></div>
+        </div>
+        <p class="completeness-value" id="completenessValue">0%</p>
+      </div>
+    </aside>
+
+    <main class="main-content">
+
+      <!-- ── Section 1: Industry Details ── -->
+      <section class="card section-anchor" id="section-profile" aria-labelledby="heading-profile">
+        <h2 id="heading-profile">Industry Details</h2>
+        <div class="form-grid form-grid-2">
+
+          <div class="form-group">
+            <label for="indName">Industry Name <span class="req-star">*</span></label>
+            <input id="indName" name="indName" type="text" placeholder="e.g. Green Steel Pvt Ltd" autocomplete="organization" />
+            <span class="field-error" id="err-indName"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="indType">Industry Type <span class="req-star">*</span></label>
+            <select id="indType" name="indType">
+              <option value="">-- Select Type --</option>
+              <option value="manufacturing">Manufacturing</option>
+              <option value="chemical">Chemical</option>
+              <option value="cement">Cement &amp; Construction</option>
+              <option value="steel">Steel &amp; Metallurgy</option>
+              <option value="textile">Textile</option>
+              <option value="paper">Paper &amp; Pulp</option>
+              <option value="pharmaceutical">Pharmaceutical</option>
+              <option value="power">Power Generation</option>
+              <option value="other">Other</option>
+            </select>
+            <span class="field-error" id="err-indType"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="indRegNo">Industry ID / Registration Number <span class="req-star">*</span></label>
+            <input id="indRegNo" name="indRegNo" type="text" placeholder="e.g. MH-IND-2024-00123" />
+            <span class="field-error" id="err-indRegNo"></span>
+          </div>
+
+          <div class="form-group form-group-full">
+            <label for="indAddress">Location / Address <span class="req-star">*</span></label>
+            <textarea id="indAddress" name="indAddress" rows="3" placeholder="Full address including city, state and PIN"></textarea>
+            <span class="field-error" id="err-indAddress"></span>
+          </div>
+
+        </div>
       </section>
+
+      <!-- ── Section 2: Contact Information ── -->
+      <section class="card section-anchor" id="section-contact" aria-labelledby="heading-contact">
+        <h2 id="heading-contact">Contact Information</h2>
+        <div class="form-grid form-grid-2">
+
+          <div class="form-group">
+            <label for="contactName">Contact Person Name <span class="req-star">*</span></label>
+            <input id="contactName" name="contactName" type="text" placeholder="Full name" autocomplete="name" />
+            <span class="field-error" id="err-contactName"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="contactRole">Role / Designation <span class="req-star">*</span></label>
+            <input id="contactRole" name="contactRole" type="text" placeholder="e.g. Environmental Officer" />
+            <span class="field-error" id="err-contactRole"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="contactEmail">Email ID <span class="req-star">*</span></label>
+            <input id="contactEmail" name="contactEmail" type="email" placeholder="contact@company.com" autocomplete="email" />
+            <span class="field-error" id="err-contactEmail"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="contactPhone">Primary Phone Number <span class="req-star">*</span></label>
+            <input id="contactPhone" name="contactPhone" type="tel" placeholder="+91 XXXXX XXXXX" autocomplete="tel" maxlength="15" />
+            <span class="field-error" id="err-contactPhone"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="contactPhoneAlt">Alternate Phone Number</label>
+            <input id="contactPhoneAlt" name="contactPhoneAlt" type="tel" placeholder="+91 XXXXX XXXXX" autocomplete="tel" maxlength="15" />
+            <span class="field-error" id="err-contactPhoneAlt"></span>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ── Section 3: Compliance & Notifications ── -->
+      <section class="card section-anchor" id="section-compliance" aria-labelledby="heading-compliance">
+        <h2 id="heading-compliance">Compliance &amp; Notifications</h2>
+        <div class="form-grid form-grid-2">
+
+          <div class="form-group">
+            <label for="monitorFreq">AQI Monitoring Frequency <span class="req-star">*</span></label>
+            <select id="monitorFreq" name="monitorFreq">
+              <option value="">-- Select Frequency --</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+            <span class="field-error" id="err-monitorFreq"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="notifPref">Notification Preference <span class="req-star">*</span></label>
+            <select id="notifPref" name="notifPref">
+              <option value="">-- Select Preference --</option>
+              <option value="email">Email</option>
+              <option value="sms">SMS</option>
+              <option value="both">Both (Email &amp; SMS)</option>
+            </select>
+            <span class="field-error" id="err-notifPref"></span>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ── Action Row ── -->
+      <div class="action-row">
+        <button type="button" class="btn btn-save" id="indSaveBtn">Save Profile</button>
+        <button type="button" class="btn btn-calculate" id="indSubmitBtn">Submit for Review</button>
+        <span class="form-save-msg hidden" id="formSaveMsg">Profile saved successfully.</span>
+      </div>
+
     </main>
   </div>
 
-  
   <script src="script.js"></script>
+  <script>
+    /* ── Industry profile form logic ── */
+
+    const REQUIRED_FIELDS = [
+      "indName", "indType", "indRegNo", "indAddress",
+      "contactName", "contactRole", "contactEmail", "contactPhone",
+      "monitorFreq", "notifPref"
+    ];
+
+    const ALL_FIELDS = [...REQUIRED_FIELDS, "contactPhoneAlt"];
+
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const PHONE_RE = /^\+?[\d\s\-]{7,15}$/;
+
+    function getField(id) {
+      return document.getElementById(id);
+    }
+
+    function showError(id, msg) {
+      const el = document.getElementById("err-" + id);
+      const field = getField(id);
+      if (el) el.textContent = msg;
+      if (field) field.classList.toggle("field-invalid", Boolean(msg));
+    }
+
+    function clearError(id) {
+      showError(id, "");
+    }
+
+    function validateField(id) {
+      const field = getField(id);
+      if (!field) return true;
+
+      const value = field.value.trim();
+      const isRequired = REQUIRED_FIELDS.includes(id);
+
+      if (isRequired && !value) {
+        showError(id, "This field is required.");
+        return false;
+      }
+
+      if (id === "contactEmail" && value && !EMAIL_RE.test(value)) {
+        showError(id, "Enter a valid email address.");
+        return false;
+      }
+
+      if ((id === "contactPhone" || id === "contactPhoneAlt") && value && !PHONE_RE.test(value)) {
+        showError(id, "Enter a valid phone number.");
+        return false;
+      }
+
+      clearError(id);
+      return true;
+    }
+
+    function validateAll() {
+      return ALL_FIELDS.map(validateField).every(Boolean);
+    }
+
+    function updateCompleteness() {
+      const filled = REQUIRED_FIELDS.filter(id => {
+        const f = getField(id);
+        return f && f.value.trim() !== "";
+      }).length;
+      const pct = Math.round((filled / REQUIRED_FIELDS.length) * 100);
+      const bar = document.getElementById("completenessBar");
+      const label = document.getElementById("completenessValue");
+      if (bar) {
+        bar.style.width = pct + "%";
+        bar.style.background = pct === 100
+          ? "var(--safe-green)"
+          : pct >= 50
+            ? "var(--primary-blue-light)"
+            : "var(--moderate-yellow)";
+      }
+      if (label) label.textContent = pct + "%";
+    }
+
+    /* Live validation and completeness on every change */
+    ALL_FIELDS.forEach(id => {
+      const field = getField(id);
+      if (!field) return;
+      field.addEventListener("input", () => { validateField(id); updateCompleteness(); });
+      field.addEventListener("change", () => { validateField(id); updateCompleteness(); });
+    });
+
+    /* Save button — validates and shows save message */
+    const saveBtn = document.getElementById("indSaveBtn");
+    const submitBtn = document.getElementById("indSubmitBtn");
+    const saveMsg = document.getElementById("formSaveMsg");
+
+    if (saveBtn) {
+      saveBtn.addEventListener("click", () => {
+        if (validateAll()) {
+          if (saveMsg) {
+            saveMsg.classList.remove("hidden");
+            setTimeout(() => saveMsg.classList.add("hidden"), 3000);
+          }
+        }
+      });
+    }
+
+    if (submitBtn) {
+      submitBtn.addEventListener("click", () => {
+        if (validateAll()) {
+          alert("Profile submitted for review. The monitoring agency will be notified.");
+        }
+      });
+    }
+
+    /* Sidebar smooth scroll navigation */
+    document.querySelectorAll("#industryNav .nav-item[data-target]").forEach(item => {
+      item.addEventListener("click", () => {
+        document.querySelectorAll("#industryNav .nav-item").forEach(n => n.classList.remove("active"));
+        item.classList.add("active");
+        const target = document.getElementById(item.dataset.target);
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+
+    /* Initial completeness render */
+    updateCompleteness();
+  </script>
 </body>
 </html>

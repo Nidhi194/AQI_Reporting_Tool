@@ -451,6 +451,106 @@ html {
   width: 100%;
 }
 
+/* ──────────────────────────────────────
+   Industry Profile Form
+────────────────────────────────────── */
+
+/* 2-column grid variant for the profile form */
+.form-grid-2 {
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+}
+
+/* Full-width field (textarea row) */
+.form-group-full {
+  grid-column: 1 / -1;
+}
+
+.form-group textarea {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 9px 10px;
+  font-size: 0.92rem;
+  background: #fff;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-group textarea:focus {
+  outline: 2px solid rgba(31, 92, 168, 0.25);
+  border-color: var(--primary-blue-light);
+}
+
+/* Required field star */
+.req-star {
+  color: var(--danger-red);
+  margin-left: 2px;
+}
+
+/* Inline field error text */
+.field-error {
+  font-size: 0.78rem;
+  color: var(--danger-red);
+  min-height: 14px;
+  display: block;
+}
+
+/* Invalid field highlight */
+.field-invalid {
+  border-color: var(--danger-red) !important;
+  background: #fff5f5 !important;
+}
+
+/* Save confirmation message */
+.form-save-msg {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--safe-green);
+  background: #e8f7ee;
+  border: 1px solid #b6e4c8;
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  align-self: center;
+}
+
+/* Profile completeness widget in sidebar */
+.profile-completeness {
+  margin-top: 28px;
+  padding: 12px 10px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.completeness-label {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.completeness-bar-track {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.completeness-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--primary-blue-light);
+  transition: width 0.35s ease, background 0.35s ease;
+}
+
+.completeness-value {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 700;
+  margin-top: 6px;
+  text-align: right;
+}
+
 
 @media (max-width: 900px) {
   .sidebar {
@@ -472,7 +572,8 @@ html {
   }
 
   .form-grid,
-  .aqi-grid {
+  .aqi-grid,
+  .form-grid-2 {
     grid-template-columns: 1fr;
   }
 

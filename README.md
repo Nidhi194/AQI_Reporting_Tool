@@ -1,6 +1,6 @@
 # EnviroMonitor System
 
-A frontend-only environmental monitoring mini project with role-based login flow and dashboard routing.
+An environmental monitoring project designed to grow into a full-fledged platform with role-based access, compliance workflows, and report management.
 
 ## Project Overview
 
@@ -12,13 +12,12 @@ This project provides a web interface for:
 - AQI calculation with category and dominant pollutant summary
 
 Authentication and user records are currently stored in browser localStorage for demo/testing.
+The current version focuses on core workflow screens and logic, with backend integration planned as the next stage.
 
 ## Tech Stack
 
-- HTML5
-- CSS3
-- Vanilla JavaScript (ES6)
-- Browser localStorage (temporary frontend auth storage)
+- Current: HTML5, CSS3, Vanilla JavaScript (ES6)
+- Planned: Backend API, persistent database, secure authentication, and reporting services
 
 ## Project Structure
 
@@ -39,7 +38,7 @@ In the Monitoring Agency air quality table:
 
 ## How to Run
 
-Because this is a static frontend project, no backend server is required.
+In the current phase, you can run and test the UI and client logic directly.
 
 ### Option 1: Open directly
 1. Open login.html in a browser.
@@ -61,13 +60,13 @@ Because this is a static frontend project, no backend server is required.
 
 ## Notes and Limitations
 
-- This is frontend-only and not secure for production authentication.
-- Passwords are stored in localStorage for demonstration purposes.
-- Save Data and Generate Report buttons are placeholders for future backend integration.
+- Authentication in this phase uses localStorage and is not production-ready.
+- Password handling and role data should be moved to secure backend services in the next phase.
+- Save Data and Generate Report are ready extension points for API integration.
 
 ## Future Improvements
 
-- Integrate backend authentication and database (for example Java Servlet + MySQL)
+- Integrate backend authentication and database (for example Java Servlet + MySQL, or Python API stack)
 - Add report persistence and download/export
 - Add water quality monitoring section
 - Add role-specific profile management and settings

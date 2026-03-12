@@ -1,2 +1,3 @@
-# This project is frontend-only (HTML/CSS/JavaScript).
-# No Python packages are required.
+# EnviroMonitor - starter backend dependencies for expansion phase
+# Install with: pip install -r requirements.txt
+

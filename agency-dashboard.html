@@ -73,7 +73,13 @@
               <tr>
                 <th>Parameter</th>
                 <th>Input Field</th>
-                <th>Unit</th>
+                <th>
+                  Unit
+                  <select id="globalUnitSelect" name="globalUnitSelect">
+                    <option value="ug/m3" selected>ug/m3</option>
+                    <option value="mg/m3">mg/m3</option>
+                  </select>
+                </th>
                 <th>Permissible Limit</th>
                 <th>Status</th>
               </tr>
@@ -84,14 +90,14 @@
               <tr>
                 <td>PM<sub>10</sub><br/><small>Particulate Matter ≤ 10 µm</small></td>
                 <td><input type="number" min="0" step="0.01" class="param-input" data-param="PM10" /></td>
-                <td>µg/m³</td>
+                <td><span class="unit-display" id="unit-PM10">ug/m3</span></td>
                 <td id="limit-PM10">--</td>
                 <td><span class="status-badge" id="status-PM10">Pending</span></td>
               </tr>
               <tr>
                 <td>PM<sub>2.5</sub><br/><small>Particulate Matter ≤ 2.5 µm</small></td>
                 <td><input type="number" min="0" step="0.01" class="param-input" data-param="PM2.5" /></td>
-                <td>µg/m³</td>
+                <td><span class="unit-display" id="unit-PM2.5">ug/m3</span></td>
                 <td id="limit-PM2.5">--</td>
                 <td><span class="status-badge" id="status-PM2.5">Pending</span></td>
               </tr>
@@ -101,35 +107,35 @@
               <tr>
                 <td>SO<sub>2</sub><br/><small>Sulphur Dioxide</small></td>
                 <td><input type="number" min="0" step="0.01" class="param-input" data-param="SO2" /></td>
-                <td>µg/m³</td>
+                <td><span class="unit-display" id="unit-SO2">ug/m3</span></td>
                 <td id="limit-SO2">--</td>
                 <td><span class="status-badge" id="status-SO2">Pending</span></td>
               </tr>
               <tr>
                 <td>NO<sub>2</sub><br/><small>Nitrogen Dioxide</small></td>
                 <td><input type="number" min="0" step="0.01" class="param-input" data-param="NO2" /></td>
-                <td>µg/m³</td>
+                <td><span class="unit-display" id="unit-NO2">ug/m3</span></td>
                 <td id="limit-NO2">--</td>
                 <td><span class="status-badge" id="status-NO2">Pending</span></td>
               </tr>
               <tr>
                 <td>O<sub>3</sub><br/><small>Ozone</small></td>
                 <td><input type="number" min="0" step="0.01" class="param-input" data-param="O3" /></td>
-                <td>µg/m³</td>
+                <td><span class="unit-display" id="unit-O3">ug/m3</span></td>
                 <td id="limit-O3">--</td>
                 <td><span class="status-badge" id="status-O3">Pending</span></td>
               </tr>
               <tr>
                 <td>CO<br/><small>Carbon Monoxide</small></td>
                 <td><input type="number" min="0" step="0.01" class="param-input" data-param="CO" /></td>
-                <td>mg/m³</td>
+                <td><span class="unit-display" id="unit-CO">ug/m3</span></td>
                 <td id="limit-CO">--</td>
                 <td><span class="status-badge" id="status-CO">Pending</span></td>
               </tr>
               <tr>
                 <td>NH<sub>3</sub><br/><small>Ammonia</small></td>
                 <td><input type="number" min="0" step="0.01" class="param-input" data-param="NH3" /></td>
-                <td>µg/m³</td>
+                <td><span class="unit-display" id="unit-NH3">ug/m3</span></td>
                 <td id="limit-NH3">--</td>
                 <td><span class="status-badge" id="status-NH3">Pending</span></td>
               </tr>
@@ -139,35 +145,35 @@
               <tr>
                 <td>Pb<br/><small>Lead</small></td>
                 <td><input type="number" min="0" step="0.01" class="param-input" data-param="Pb" /></td>
-                <td>µg/m³</td>
+                <td><span class="unit-display" id="unit-Pb">ug/m3</span></td>
                 <td id="limit-Pb">--</td>
                 <td><span class="status-badge" id="status-Pb">Pending</span></td>
               </tr>
               <tr>
                 <td>Ni<br/><small>Nickel</small></td>
                 <td><input type="number" min="0" step="0.01" class="param-input" data-param="Ni" /></td>
-                <td>µg/m³</td>
+                <td><span class="unit-display" id="unit-Ni">ug/m3</span></td>
                 <td id="limit-Ni">--</td>
                 <td><span class="status-badge" id="status-Ni">Pending</span></td>
               </tr>
               <tr>
                 <td>As<br/><small>Arsenic</small></td>
                 <td><input type="number" min="0" step="0.01" class="param-input" data-param="As" /></td>
-                <td>µg/m³</td>
+                <td><span class="unit-display" id="unit-As">ug/m3</span></td>
                 <td id="limit-As">--</td>
                 <td><span class="status-badge" id="status-As">Pending</span></td>
               </tr>
               <tr>
                 <td>Cd<br/><small>Cadmium</small></td>
                 <td><input type="number" min="0" step="0.01" class="param-input" data-param="Cd" /></td>
-                <td>µg/m³</td>
+                <td><span class="unit-display" id="unit-Cd">ug/m3</span></td>
                 <td id="limit-Cd">--</td>
                 <td><span class="status-badge" id="status-Cd">Pending</span></td>
               </tr>
               <tr>
                 <td>C<sub>6</sub>H<sub>6</sub><br/><small>Benzene</small></td>
                 <td><input type="number" min="0" step="0.01" class="param-input" data-param="C6H6" /></td>
-                <td>µg/m³</td>
+                <td><span class="unit-display" id="unit-C6H6">ug/m3</span></td>
                 <td id="limit-C6H6">--</td>
                 <td><span class="status-badge" id="status-C6H6">Pending</span></td>
               </tr>

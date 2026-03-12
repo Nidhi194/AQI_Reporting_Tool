@@ -1,25 +1,38 @@
+/* --------------------------------------------------
+   Environmental Monitoring Panel Script
+   - Modular AQI calculation logic
+   - Input validation and status updates
+  - Login/logout flow with protected dashboard access
+  - Placeholder actions for backend integration
+-------------------------------------------------- */
+
+/* Local storage keys for frontend-only authentication */
 const AUTH_KEY = "enviroMonitorAuth";
 const AGENCY_NAME_KEY = "enviroMonitorAgencyName";
 const ROLE_KEY = "enviroMonitorRole";
 const USERS_KEY = "enviroMonitorUsers";
 
-
-const permissibleLimits = {
-  PM10: 100,
-  "PM2.5": 60,
-  SO2: 80,
-  NO2: 80,
-  O3: 100,
-  CO: 4,
-  NH3: 400,
-  Pb: 1,
-  Ni: 0.02,
-  As: 0.006,
-  Cd: 0.005,
-  C6H6: 5
+/* Base permissible limits plus metadata for unit conversion */
+const pollutantConfig = {
+  PM10: { baseLimit: 100, baseUnit: "ug/m3", molecularWeight: null },
+  "PM2.5": { baseLimit: 60, baseUnit: "ug/m3", molecularWeight: null },
+  SO2: { baseLimit: 80, baseUnit: "ug/m3", molecularWeight: 64.066 },
+  NO2: { baseLimit: 80, baseUnit: "ug/m3", molecularWeight: 46.0055 },
+  O3: { baseLimit: 100, baseUnit: "ug/m3", molecularWeight: 48.0 },
+  CO: { baseLimit: 4, baseUnit: "mg/m3", molecularWeight: 28.01 },
+  NH3: { baseLimit: 400, baseUnit: "ug/m3", molecularWeight: 17.031 },
+  Pb: { baseLimit: 1, baseUnit: "ug/m3", molecularWeight: null },
+  Ni: { baseLimit: 0.02, baseUnit: "ug/m3", molecularWeight: null },
+  As: { baseLimit: 0.006, baseUnit: "ug/m3", molecularWeight: null },
+  Cd: { baseLimit: 0.005, baseUnit: "ug/m3", molecularWeight: null },
+  C6H6: { baseLimit: 5, baseUnit: "ug/m3", molecularWeight: 78.11 }
 };
 
+const permissibleLimits = Object.fromEntries(
+  Object.entries(pollutantConfig).map(([parameter, config]) => [parameter, config.baseLimit])
+);
 
+/* Dummy industry-location map (to be replaced by backend data fetch) */
 const industryLocations = {
   "green-steel": "Industrial Zone A, Mumbai",
   "river-chemicals": "Chemical Cluster, Vadodara",
@@ -27,7 +40,7 @@ const industryLocations = {
   "eco-textiles": "Textile Hub, Surat"
 };
 
-
+/* Cached DOM elements */
 const industrySelect = document.getElementById("industryName");
 const locationInput = document.getElementById("industryLocation");
 const dateInput = document.getElementById("monitoringDate");
@@ -35,6 +48,7 @@ const calculateBtn = document.getElementById("calculateBtn");
 const saveBtn = document.getElementById("saveBtn");
 const reportBtn = document.getElementById("reportBtn");
 const inputFields = document.querySelectorAll(".param-input");
+const globalUnitSelect = document.getElementById("globalUnitSelect");
 
 const resultCard = document.getElementById("aqiResultCard");
 const aqiValueEl = document.getElementById("aqiValue");
@@ -54,6 +68,110 @@ const signupRoleInput = document.getElementById("signupRole");
 const signupError = document.getElementById("signupError");
 const logoutBtn = document.getElementById("logoutBtn");
 const agencyNameDisplay = document.getElementById("agencyNameDisplay");
+
+function getSelectedUnit(parameter) {
+  if (globalUnitSelect && globalUnitSelect.value) {
+    return globalUnitSelect.value;
+  }
+
+  return pollutantConfig[parameter]?.baseUnit;
+}
+
+function convertValueFromBase(parameter, targetUnit, valueInBase) {
+  const config = pollutantConfig[parameter];
+
+  if (!config || typeof valueInBase !== "number" || Number.isNaN(valueInBase)) {
+    return null;
+  }
+
+  if (targetUnit === config.baseUnit) {
+    return valueInBase;
+  }
+
+  const valueInMgPerM3 = config.baseUnit === "ug/m3" ? valueInBase / 1000 : valueInBase;
+
+  if (targetUnit === "ug/m3") {
+    return valueInMgPerM3 * 1000;
+  }
+
+  if (targetUnit === "mg/m3") {
+    return valueInMgPerM3;
+  }
+
+  if (!config.molecularWeight) {
+    return null;
+  }
+
+  if (targetUnit === "ppm") {
+    return (valueInMgPerM3 * 24.45) / config.molecularWeight;
+  }
+
+  if (targetUnit === "ppb") {
+    return ((valueInMgPerM3 * 24.45) / config.molecularWeight) * 1000;
+  }
+
+  return null;
+}
+
+function convertValueToBase(parameter, sourceUnit, value) {
+  const config = pollutantConfig[parameter];
+
+  if (!config || typeof value !== "number" || Number.isNaN(value)) {
+    return null;
+  }
+
+  if (sourceUnit === config.baseUnit) {
+    return value;
+  }
+
+  let valueInMgPerM3;
+
+  if (sourceUnit === "ug/m3") {
+    valueInMgPerM3 = value / 1000;
+  } else if (sourceUnit === "mg/m3") {
+    valueInMgPerM3 = value;
+  } else if (sourceUnit === "ppm") {
+    if (!config.molecularWeight) {
+      return null;
+    }
+    valueInMgPerM3 = (value * config.molecularWeight) / 24.45;
+  } else if (sourceUnit === "ppb") {
+    if (!config.molecularWeight) {
+      return null;
+    }
+    valueInMgPerM3 = (value * config.molecularWeight) / 24450;
+  } else {
+    return null;
+  }
+
+  if (config.baseUnit === "ug/m3") {
+    return valueInMgPerM3 * 1000;
+  }
+
+  return valueInMgPerM3;
+}
+
+function formatLimitValue(value) {
+  if (value === null || typeof value !== "number" || Number.isNaN(value)) {
+    return "--";
+  }
+
+  return value.toFixed(6).replace(/\.0+$/, "").replace(/(\.\d*?)0+$/, "$1");
+}
+
+function updateLimitCell(parameter) {
+  const limitCell = document.getElementById(`limit-${parameter}`);
+
+  if (!limitCell) {
+    return;
+  }
+
+  const selectedUnit = getSelectedUnit(parameter);
+  const baseLimit = permissibleLimits[parameter];
+  const convertedLimit = convertValueFromBase(parameter, selectedUnit, baseLimit);
+
+  limitCell.textContent = formatLimitValue(convertedLimit);
+}
 
 /* --------------------------------------------------
    Page and auth helpers
@@ -307,14 +425,42 @@ function initializeAgencyNameDisplay() {
   agencyNameDisplay.textContent = localStorage.getItem(AGENCY_NAME_KEY) || "Monitoring Agency";
 }
 
-
+/* --------------------------------------------------
+   Initialization helpers
+-------------------------------------------------- */
 
 function initializeLimitsInTable() {
+  Object.keys(permissibleLimits).forEach((parameter) => updateLimitCell(parameter));
+}
+
+function updateDisplayedUnits() {
+  const selectedUnit = getSelectedUnit("PM10") || "ug/m3";
+
   Object.keys(permissibleLimits).forEach((parameter) => {
-    const limitCell = document.getElementById(`limit-${parameter}`);
-    if (limitCell) {
-      limitCell.textContent = permissibleLimits[parameter];
+    const unitDisplay = document.getElementById(`unit-${parameter}`);
+
+    if (unitDisplay) {
+      unitDisplay.textContent = selectedUnit;
     }
+  });
+}
+
+function initializeUnitChangeHandler() {
+  if (!globalUnitSelect) {
+    return;
+  }
+
+  globalUnitSelect.addEventListener("change", () => {
+    updateDisplayedUnits();
+
+    Object.keys(permissibleLimits).forEach((parameter) => {
+      const inputElement = document.querySelector(`.param-input[data-param="${parameter}"]`);
+      updateLimitCell(parameter);
+
+      if (inputElement) {
+        updateSingleStatus(parameter, inputElement.value);
+      }
+    });
   });
 }
 
@@ -353,7 +499,9 @@ function initializeSidebarScrollNavigation() {
   });
 }
 
-
+/* --------------------------------------------------
+   Required modular functions
+-------------------------------------------------- */
 
 function validateInputs() {
   let isValid = true;
@@ -412,14 +560,23 @@ function validateInputs() {
 function updateStatus(values) {
   Object.entries(values).forEach(([parameter, enteredValue]) => {
     const limit = permissibleLimits[parameter];
+    const selectedUnit = getSelectedUnit(parameter);
+    const enteredValueInBase = convertValueToBase(parameter, selectedUnit, enteredValue);
     const statusElement = document.getElementById(`status-${parameter}`);
-    const inputElement = document.querySelector(`[data-param="${parameter}"]`);
+    const inputElement = document.querySelector(`.param-input[data-param="${parameter}"]`);
 
     if (!statusElement || !inputElement) {
       return;
     }
 
-    const exceeds = enteredValue > limit;
+    if (enteredValueInBase === null || typeof limit !== "number") {
+      statusElement.textContent = "Pending";
+      statusElement.classList.remove("status-safe", "status-exceeds");
+      inputElement.classList.remove("input-exceeds");
+      return;
+    }
+
+    const exceeds = enteredValueInBase > limit;
 
     statusElement.textContent = exceeds ? "Exceeds" : "Safe";
     statusElement.classList.remove("status-safe", "status-exceeds");
@@ -431,7 +588,7 @@ function updateStatus(values) {
 
 function updateSingleStatus(parameter, rawValue) {
   const statusElement = document.getElementById(`status-${parameter}`);
-  const inputElement = document.querySelector(`[data-param="${parameter}"]`);
+  const inputElement = document.querySelector(`.param-input[data-param="${parameter}"]`);
 
   if (!statusElement || !inputElement) {
     return;
@@ -456,7 +613,17 @@ function updateSingleStatus(parameter, rawValue) {
   }
 
   const limit = permissibleLimits[parameter];
-  const exceeds = numericValue > limit;
+  const selectedUnit = getSelectedUnit(parameter);
+  const numericValueInBase = convertValueToBase(parameter, selectedUnit, numericValue);
+
+  if (numericValueInBase === null || typeof limit !== "number") {
+    statusElement.textContent = "Pending";
+    statusElement.classList.remove("status-safe", "status-exceeds");
+    inputElement.classList.remove("input-exceeds");
+    return;
+  }
+
+  const exceeds = numericValueInBase > limit;
 
   statusElement.textContent = exceeds ? "Exceeds" : "Safe";
   statusElement.classList.remove("status-safe", "status-exceeds");
@@ -480,12 +647,14 @@ function calculateAQI(values) {
 
   Object.entries(values).forEach(([parameter, enteredValue]) => {
     const limit = permissibleLimits[parameter];
+    const selectedUnit = getSelectedUnit(parameter);
+    const enteredValueInBase = convertValueToBase(parameter, selectedUnit, enteredValue);
 
-    if (!limit) {
+    if (typeof limit !== "number" || enteredValueInBase === null) {
       return;
     }
 
-    const subIndex = (enteredValue / limit) * 100;
+    const subIndex = (enteredValueInBase / limit) * 100;
     subIndexSum += subIndex;
 
     if (subIndex > maxSubIndex) {
@@ -513,7 +682,9 @@ function getCategory(aqiValue) {
   return "Poor";
 }
 
-
+/* --------------------------------------------------
+   UI rendering logic
+-------------------------------------------------- */
 
 function renderAQIResult(aqiValue, category, dominantPollutant) {
   if (!resultCard || !aqiValueEl || !aqiCategoryEl || !dominantPollutantEl) {
@@ -535,7 +706,9 @@ function renderAQIResult(aqiValue, category, dominantPollutant) {
   }
 }
 
-
+/* --------------------------------------------------
+   Event bindings
+-------------------------------------------------- */
 
 if (calculateBtn) {
   calculateBtn.addEventListener("click", () => {
@@ -557,19 +730,21 @@ if (calculateBtn) {
 
 if (saveBtn) {
   saveBtn.addEventListener("click", () => {
-    
+    /* Placeholder for future Servlet + MySQL integration */
     alert("Save Data clicked. Backend integration can be added here.");
   });
 }
 
 if (reportBtn) {
   reportBtn.addEventListener("click", () => {
-   
+    /* Placeholder for future report generation endpoint */
     alert("Generate Report clicked. Backend integration can be added here.");
   });
 }
 
-
+/* --------------------------------------------------
+   Initial setup on page load
+-------------------------------------------------- */
 if (initializeAuthRouting()) {
   initializeLoginHandler();
   initializeSignupHandler();
@@ -577,10 +752,11 @@ if (initializeAuthRouting()) {
   initializeAgencyNameDisplay();
 
   if (isDashboardPage()) {
+    updateDisplayedUnits();
     initializeLimitsInTable();
+    initializeUnitChangeHandler();
     initializeIndustryChangeHandler();
     initializeLiveStatusUpdates();
     initializeSidebarScrollNavigation();
   }
 }
-

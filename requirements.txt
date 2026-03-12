@@ -1,0 +1,2 @@
+# This project is frontend-only (HTML/CSS/JavaScript).
+# No Python packages are required.

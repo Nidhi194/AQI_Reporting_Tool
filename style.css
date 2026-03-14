@@ -28,6 +28,7 @@ body {
   background: var(--page-bg);
   color: var(--text-dark);
   line-height: 1.4;
+  overflow-x: hidden;
 }
 
 html {
@@ -55,12 +56,15 @@ html {
   font-size: 1rem;
   font-weight: 700;
   color: var(--primary-blue);
+  max-width: 70%;
 }
 
 .navbar-right {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .agency-name {
@@ -157,6 +161,7 @@ html {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .form-group label {
@@ -167,6 +172,7 @@ html {
 
 .form-group input,
 .form-group select,
+.form-group textarea,
 .aq-table input,
 .aq-table select {
   border: 1px solid var(--border-light);
@@ -174,6 +180,7 @@ html {
   padding: 9px 10px;
   font-size: 0.92rem;
   background: #fff;
+  width: 100%;
 }
 
 .form-group input:focus,
@@ -553,21 +560,35 @@ html {
 
 
 @media (max-width: 900px) {
+  .top-navbar {
+    padding: 0 14px;
+  }
+
+  .navbar-left {
+    font-size: 0.92rem;
+    max-width: 58%;
+  }
+
+  .navbar-right {
+    gap: 8px;
+  }
+
   .sidebar {
     position: fixed;
-    width: 76px;
+    width: 92px;
     padding: 16px 8px;
   }
 
   .nav-item {
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     text-align: center;
     padding: 10px 6px;
+    line-height: 1.2;
   }
 
   .main-content {
-    margin-left: 76px;
-    width: calc(100% - 76px);
+    margin-left: 92px;
+    width: calc(100% - 92px);
     padding: 16px;
   }
 
@@ -585,41 +606,125 @@ html {
   .login-form-panel {
     padding: 22px;
   }
+
+  .aq-table {
+    min-width: 720px;
+  }
 }
 
 @media (max-width: 640px) {
   .top-navbar {
-    flex-direction: column;
-    height: auto;
-    align-items: flex-start;
+    position: sticky;
+    flex-wrap: wrap;
+    min-height: 64px;
+    align-items: center;
+    justify-content: space-between;
     gap: 8px;
-    padding: 10px 14px;
+    padding: 10px 12px;
   }
 
   .dashboard-layout {
-    padding-top: 90px;
+    padding-top: 0;
+    flex-direction: column;
   }
 
   .sidebar {
-    top: 90px;
+    top: 0;
     width: 100%;
     height: auto;
     position: relative;
-    display: block;
+    padding: 12px;
   }
 
   .nav-list {
     flex-direction: row;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+
+  .nav-item {
+    flex: 0 0 auto;
+    min-width: 140px;
+    text-align: center;
   }
 
   .main-content {
     margin-left: 0;
+    width: 100%;
+    padding: 12px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  .action-row {
+    width: 100%;
+  }
+
+  .action-row .btn {
     width: 100%;
   }
 
   .login-brand-panel,
   .login-form-panel {
     padding: 18px;
+  }
+
+  .profile-completeness {
+    margin-top: 12px;
+  }
+
+  .aq-table {
+    min-width: 620px;
+  }
+
+  .navbar-left {
+    max-width: 100%;
+    font-size: 0.9rem;
+  }
+
+  .navbar-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 420px) {
+  .top-navbar {
+    padding: 10px;
+  }
+
+  .navbar-left {
+    font-size: 0.84rem;
+  }
+
+  .agency-name {
+    font-size: 0.82rem;
+  }
+
+  .btn {
+    padding: 9px 12px;
+    font-size: 0.86rem;
+  }
+
+  .login-card h1 {
+    font-size: 1.2rem;
+  }
+
+  .login-form-title {
+    font-size: 1.05rem;
+  }
+
+  .form-grid,
+  .form-grid-2,
+  .aqi-grid {
+    gap: 10px;
+  }
+
+  .aq-table {
+    min-width: 560px;
   }
 }

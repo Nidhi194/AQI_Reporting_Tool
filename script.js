@@ -11,6 +11,7 @@ const AUTH_KEY = "enviroMonitorAuth";
 const AGENCY_NAME_KEY = "enviroMonitorAgencyName";
 const ROLE_KEY = "enviroMonitorRole";
 const USERS_KEY = "enviroMonitorUsers";
+const REPORTS_KEY = "enviroMonitorReports";
 
 /* Base permissible limits plus metadata for unit conversion */
 const pollutantConfig = {
@@ -46,7 +47,7 @@ const locationInput = document.getElementById("industryLocation");
 const dateInput = document.getElementById("monitoringDate");
 const calculateBtn = document.getElementById("calculateBtn");
 const saveBtn = document.getElementById("saveBtn");
-const reportBtn = document.getElementById("reportBtn");
+const reportBtn = document.getElementById("generateReportBtn");
 const inputFields = document.querySelectorAll(".param-input");
 const globalUnitSelect = document.getElementById("globalUnitSelect");
 
@@ -68,6 +69,7 @@ const signupRoleInput = document.getElementById("signupRole");
 const signupError = document.getElementById("signupError");
 const logoutBtn = document.getElementById("logoutBtn");
 const agencyNameDisplay = document.getElementById("agencyNameDisplay");
+const submittedReportsContainer = document.getElementById("submittedReportsContainer");
 
 function getSelectedUnit(parameter) {
   if (globalUnitSelect && globalUnitSelect.value) {
@@ -707,6 +709,239 @@ function renderAQIResult(aqiValue, category, dominantPollutant) {
 }
 
 /* --------------------------------------------------
+   Report PDF generation + submitted list
+-------------------------------------------------- */
+
+function buildReportDataFromInputs(values) {
+  const industryId = industrySelect ? industrySelect.value : "";
+  const industryLabel = industrySelect
+    ? industrySelect.options[industrySelect.selectedIndex]?.text || ""
+    : "";
+  const location = locationInput ? locationInput.value : "";
+  const monitoringDateValue = dateInput ? dateInput.value : "";
+
+  const parameters = Object.entries(values).map(([parameter, enteredValue]) => {
+    const limit = permissibleLimits[parameter];
+    const unit = getSelectedUnit(parameter);
+
+    return {
+      parameter,
+      enteredValue,
+      unit,
+      limit,
+      exceeds: null
+    };
+  });
+
+  return {
+    industryId,
+    industryName: industryLabel,
+    location,
+    monitoringDate: monitoringDateValue,
+    aqiValue: "",
+    aqiCategory: "",
+    dominantPollutant: "",
+    parameters
+  };
+}
+
+async function generateReportPdfBlob(reportData) {
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    alert("PDF library is not loaded. Please check your internet connection.");
+    throw new Error("jsPDF not available");
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("p", "mm", "a4");
+
+  let cursorY = 15;
+
+  const companyName = localStorage.getItem(AGENCY_NAME_KEY) || "EnviroMonitor";
+
+  doc.setFontSize(16);
+  doc.text(companyName, 105, cursorY, { align: "center" });
+  cursorY += 7;
+  doc.setFontSize(13);
+  doc.text("Ambient Air Observation (Raw Data) Report", 105, cursorY, { align: "center" });
+  cursorY += 10;
+
+  doc.setFontSize(10);
+  doc.text(`Location Name: ${reportData.location || "-"}`, 14, cursorY);
+  cursorY += 5;
+  doc.text(`Industry: ${reportData.industryName || "-"}`, 14, cursorY);
+  cursorY += 5;
+  doc.text(`Monitoring Date: ${reportData.monitoringDate || "-"}`, 14, cursorY);
+  cursorY += 5;
+  const aqiLine =
+    reportData.aqiValue && reportData.aqiCategory
+      ? `AQI Value: ${reportData.aqiValue} (${reportData.aqiCategory})`
+      : "AQI Value: ____________________";
+  doc.text(aqiLine, 14, cursorY);
+  cursorY += 5;
+  const dominantLine = reportData.dominantPollutant
+    ? `Dominant Pollutant: ${reportData.dominantPollutant}`
+    : "Dominant Pollutant: ____________________";
+  doc.text(dominantLine, 14, cursorY);
+  cursorY += 8;
+
+  const pmRows = reportData.parameters
+    .filter((row) => row.parameter === "PM10" || row.parameter === "PM2.5")
+    .map((row) => [
+      row.parameter,
+      String(row.enteredValue),
+      row.unit || "",
+      typeof row.limit === "number" ? String(row.limit) : "",
+      row.exceeds === null ? "" : row.exceeds ? "Exceeds" : "Safe"
+    ]);
+
+  if (pmRows.length && doc.autoTable) {
+    doc.setFontSize(11);
+    doc.text("A) Particulate Matter (PM10 / PM2.5)", 14, cursorY);
+    cursorY += 4;
+
+    doc.autoTable({
+      startY: cursorY,
+      head: [["Parameter", "Observed Value", "Unit", "Permissible Limit", "Status"]],
+      body: pmRows,
+      styles: { fontSize: 9 },
+      theme: "grid"
+    });
+
+    cursorY = doc.lastAutoTable.finalY + 8;
+  }
+
+  const gasRows = reportData.parameters
+    .filter((row) => ["SO2", "NO2", "O3", "CO", "NH3"].includes(row.parameter))
+    .map((row) => [
+      row.parameter,
+      String(row.enteredValue),
+      row.unit || "",
+      typeof row.limit === "number" ? String(row.limit) : "",
+      row.exceeds === null ? "" : row.exceeds ? "Exceeds" : "Safe"
+    ]);
+
+  if (gasRows.length && doc.autoTable) {
+    doc.setFontSize(11);
+    doc.text("B) Gaseous Pollutants", 14, cursorY);
+    cursorY += 4;
+
+    doc.autoTable({
+      startY: cursorY,
+      head: [["Parameter", "Observed Value", "Unit", "Permissible Limit", "Status"]],
+      body: gasRows,
+      styles: { fontSize: 9 },
+      theme: "grid"
+    });
+
+    cursorY = doc.lastAutoTable.finalY + 12;
+  }
+
+  doc.setFontSize(10);
+  doc.text("Tested By: ____________________", 14, cursorY);
+  doc.text("Checked By: ____________________", 120, cursorY);
+
+  const blob = doc.output("blob");
+  return blob;
+}
+
+function addSubmittedReportEntry(reportData, blobUrl) {
+  if (!submittedReportsContainer) {
+    return;
+  }
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "submitted-report-row";
+
+  const title = document.createElement("span");
+  const labelParts = [];
+
+  if (reportData.industryName) {
+    labelParts.push(reportData.industryName);
+  }
+
+  if (reportData.location) {
+    labelParts.push(reportData.location);
+  }
+
+  if (reportData.monitoringDate) {
+    labelParts.push(reportData.monitoringDate);
+  }
+
+  title.textContent = labelParts.join(" | ") || "AQI Report";
+
+  const link = document.createElement("a");
+  if (blobUrl) {
+    link.href = blobUrl;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+  } else {
+    link.href = "#";
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      generateReportPdfBlob(reportData)
+        .then((blob) => {
+          const regeneratedUrl = URL.createObjectURL(blob);
+          const viewer = window.open(regeneratedUrl, "_blank", "noopener,noreferrer");
+          if (!viewer) {
+            alert("Please allow popups to view the PDF report.");
+          }
+        })
+        .catch(() => {
+          alert("Could not open the PDF report. Please try again.");
+        });
+    });
+  }
+
+  link.textContent = "View PDF";
+  link.className = "btn btn-link";
+
+  wrapper.appendChild(title);
+  wrapper.appendChild(document.createTextNode(" "));
+  wrapper.appendChild(link);
+
+  submittedReportsContainer.appendChild(wrapper);
+}
+
+function getStoredReports() {
+  const raw = localStorage.getItem(REPORTS_KEY);
+
+  if (!raw) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function persistSubmittedReport(reportData) {
+  const existing = getStoredReports();
+  const now = new Date().toISOString();
+  const entry = {
+    ...reportData,
+    storedAt: now
+  };
+
+  existing.push(entry);
+  localStorage.setItem(REPORTS_KEY, JSON.stringify(existing));
+}
+
+function initializeSubmittedReportsFromStorage() {
+  if (!submittedReportsContainer) {
+    return;
+  }
+
+  const reports = getStoredReports();
+
+  reports.forEach((report) => {
+    addSubmittedReportEntry(report, null);
+  });
+}
+
+/* --------------------------------------------------
    Event bindings
 -------------------------------------------------- */
 
@@ -737,8 +972,45 @@ if (saveBtn) {
 
 if (reportBtn) {
   reportBtn.addEventListener("click", () => {
-    /* Placeholder for future report generation endpoint */
-    alert("Generate Report clicked. Backend integration can be added here.");
+    const validation = validateInputs();
+
+    if (!validation.isValid) {
+      alert(validation.errorMessage);
+      return;
+    }
+
+    const reportData = buildReportDataFromInputs(validation.values);
+
+    generateReportPdfBlob(reportData)
+      .then((blob) => {
+        const fileNameParts = [];
+
+        if (reportData.industryName) {
+          fileNameParts.push(reportData.industryName.replace(/\s+/g, "_"));
+        }
+
+        if (reportData.monitoringDate) {
+          fileNameParts.push(reportData.monitoringDate);
+        }
+
+        const fileNameBase = fileNameParts.join("_") || "AQI_Report";
+        const blobUrl = URL.createObjectURL(blob);
+
+        const downloadLink = document.createElement("a");
+        downloadLink.href = blobUrl;
+        downloadLink.download = `${fileNameBase}.pdf`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+
+        addSubmittedReportEntry(reportData, blobUrl);
+        persistSubmittedReport(reportData);
+      })
+      .catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error("Failed to generate PDF report", error);
+        alert("Could not generate PDF report. Please try again.");
+      });
   });
 }
 
@@ -758,5 +1030,6 @@ if (initializeAuthRouting()) {
     initializeIndustryChangeHandler();
     initializeLiveStatusUpdates();
     initializeSidebarScrollNavigation();
+    initializeSubmittedReportsFromStorage();
   }
 }

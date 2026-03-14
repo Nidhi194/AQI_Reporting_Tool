@@ -3,7 +3,7 @@
   --primary-blue: #0b3a78;
   --primary-blue-light: #1f5ca8;
   --sidebar-blue: #082d63;
-  --page-bg: #f4f7fb;
+  --page-bg: #e9f1ff;
   --card-bg: #ffffff;
   --text-dark: #1b2a3a;
   --text-muted: #637182;
@@ -25,7 +25,7 @@
 
 body {
   font-family: "Segoe UI", Arial, sans-serif;
-  background: var(--page-bg);
+  background: radial-gradient(circle at top left, #f7fbff 0%, var(--page-bg) 40%, #dde7fb 85%);
   color: var(--text-dark);
   line-height: 1.4;
   overflow-x: hidden;
@@ -42,9 +42,9 @@ html {
   left: 0;
   right: 0;
   height: 64px;
-  background: var(--card-bg);
-  border-bottom: 1px solid var(--border-light);
-  box-shadow: var(--shadow-soft);
+  background: linear-gradient(90deg, #0b3a78 0%, #1f5ca8 45%, #5a3aa8 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 24px rgba(3, 24, 56, 0.35);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -53,9 +53,10 @@ html {
 }
 
 .navbar-left {
-  font-size: 1rem;
+  font-size: 1.02rem;
   font-weight: 700;
-  color: var(--primary-blue);
+  letter-spacing: 0.02em;
+  color: #ffffff;
   max-width: 70%;
 }
 
@@ -69,7 +70,7 @@ html {
 
 .agency-name {
   font-weight: 600;
-  color: var(--text-dark);
+  color: #f2f6ff;
 }
 
 
@@ -86,7 +87,7 @@ html {
   left: 0;
   width: 250px;
   height: calc(100vh - 64px);
-  background: var(--sidebar-blue);
+  background: radial-gradient(circle at top left, #1f5ca8 0%, #082d63 45%, #050f2c 100%);
   color: #fff;
   padding: 20px 12px;
   overflow-y: auto;
@@ -104,15 +105,16 @@ html {
   border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 0.95rem;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.12s ease;
 }
 
 .nav-item:hover {
   background: rgba(255, 255, 255, 0.12);
+  transform: translateX(2px);
 }
 
 .nav-item.active {
-  background: #ffffff;
+  background: linear-gradient(90deg, #ffffff 0%, #eaf1fb 60%);
   color: var(--sidebar-blue);
   font-weight: 700;
 }
@@ -121,7 +123,7 @@ html {
 .main-content {
   margin-left: 250px;
   width: calc(100% - 250px);
-  padding: 22px;
+  padding: 24px 26px 26px;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -135,15 +137,27 @@ html {
 .card {
   background: var(--card-bg);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-soft);
-  padding: 18px;
+  box-shadow: 0 6px 18px rgba(11, 58, 120, 0.14);
+  padding: 20px;
   border: 1px solid var(--border-light);
+  position: relative;
+  overflow: hidden;
 }
 
 .card h2 {
   font-size: 1.1rem;
   margin-bottom: 14px;
   color: var(--primary-blue);
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  border-top: 3px solid rgba(31, 92, 168, 0.2);
+  background: linear-gradient(135deg, rgba(11, 58, 120, 0.03), rgba(90, 58, 168, 0.02));
 }
 
 .section-anchor {
@@ -287,6 +301,40 @@ html {
   background: var(--purple);
 }
 
+.btn-link {
+  background: transparent;
+  color: var(--primary-blue-light);
+  padding: 0;
+  border-radius: 0;
+  font-weight: 600;
+}
+
+.btn-link:hover {
+  transform: none;
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.submitted-report-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  border: 1px dashed rgba(9, 46, 96, 0.14);
+  background: linear-gradient(90deg, rgba(11, 58, 120, 0.02), rgba(11, 58, 120, 0));
+  font-size: 0.88rem;
+  color: var(--text-dark);
+}
+
+.submitted-report-row + .submitted-report-row {
+  margin-top: 8px;
+}
+
+.submitted-report-row span {
+  font-weight: 600;
+}
+
 .hidden {
   display: none;
 }
@@ -331,7 +379,7 @@ html {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: linear-gradient(135deg, #eef4ff 0%, #f8fbff 55%, #ffffff 100%);
+  background: radial-gradient(circle at top left, #172b4d 0%, #0b3a78 32%, #1f5ca8 60%, #f7fbff 100%);
 }
 
 .login-card {
@@ -341,8 +389,14 @@ html {
   overflow: hidden;
   background: var(--card-bg);
   border: 1px solid var(--border-light);
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 18px 45px rgba(5, 18, 40, 0.45);
   border-radius: var(--radius-md);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.login-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 55px rgba(5, 18, 40, 0.6);
 }
 
 .login-brand-panel {

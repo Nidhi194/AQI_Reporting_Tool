@@ -335,6 +335,25 @@ html {
   font-weight: 600;
 }
 
+.report-preview-frame-wrap {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  background: #fff;
+  overflow: hidden;
+}
+
+.report-preview-frame {
+  display: block;
+  width: 100%;
+  min-height: 560px;
+  border: 0;
+  background: #fff;
+}
+
+.report-preview-actions {
+  margin-top: 12px;
+}
+
 .hidden {
   display: none;
 }
@@ -664,6 +683,10 @@ html {
   .aq-table {
     min-width: 720px;
   }
+
+  .report-preview-frame {
+    min-height: 460px;
+  }
 }
 
 @media (max-width: 640px) {
@@ -733,6 +756,10 @@ html {
 
   .aq-table {
     min-width: 620px;
+  }
+
+  .report-preview-frame {
+    min-height: 360px;
   }
 
   .navbar-left {

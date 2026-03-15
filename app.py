@@ -2,9 +2,10 @@ import os
 import sqlite3
 from datetime import datetime, timezone
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
 
 def create_app():
@@ -13,6 +14,8 @@ def create_app():
 
     base_dir = os.path.dirname(os.path.abspath(__file__))
     db_path = os.path.join(base_dir, "enviro.db")
+    reports_dir = os.path.join(base_dir, "reports")
+    os.makedirs(reports_dir, exist_ok=True)
 
     def get_conn():
         conn = sqlite3.connect(db_path)
@@ -378,6 +381,31 @@ def create_app():
             msg, code = error
             return jsonify({"ok": False, "error": msg}), code
         return jsonify({"ok": True, **result})
+
+    @app.get("/api/reports/pdf/<report_name>")
+    def get_pdf_report(report_name):
+        safe_name = secure_filename(report_name)
+
+        if not safe_name or not safe_name.lower().endswith(".pdf"):
+            return jsonify({"ok": False, "error": "Invalid report name."}), 400
+
+        report_path = os.path.join(reports_dir, safe_name)
+
+        if not os.path.isfile(report_path):
+            return jsonify({"ok": False, "error": "Report not found."}), 404
+
+        download = str(request.args.get("download", "false")).strip().lower() in (
+            "1",
+            "true",
+            "yes",
+        )
+
+        return send_file(
+            report_path,
+            mimetype="application/pdf",
+            as_attachment=download,
+            download_name=safe_name,
+        )
 
     return app
 

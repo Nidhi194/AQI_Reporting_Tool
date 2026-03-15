@@ -47,7 +47,7 @@ const locationInput = document.getElementById("industryLocation");
 const dateInput = document.getElementById("monitoringDate");
 const calculateBtn = document.getElementById("calculateBtn");
 const saveBtn = document.getElementById("saveBtn");
-const reportBtn = document.getElementById("generateReportBtn");
+const reportBtn = document.getElementById("generateReportBtn") || document.getElementById("reportBtn");
 const inputFields = document.querySelectorAll(".param-input");
 const globalUnitSelect = document.getElementById("globalUnitSelect");
 
@@ -70,6 +70,11 @@ const signupError = document.getElementById("signupError");
 const logoutBtn = document.getElementById("logoutBtn");
 const agencyNameDisplay = document.getElementById("agencyNameDisplay");
 const submittedReportsContainer = document.getElementById("submittedReportsContainer");
+const reportPreviewSection = document.getElementById("reportPreviewSection");
+const reportPreviewFrame = document.getElementById("reportPreviewFrame");
+const downloadReportBtn = document.getElementById("downloadReportBtn");
+
+let currentPreviewBlobUrl = null;
 
 function getSelectedUnit(parameter) {
   if (globalUnitSelect && globalUnitSelect.value) {
@@ -844,6 +849,46 @@ async function generateReportPdfBlob(reportData) {
   return blob;
 }
 
+function buildReportFileName(reportData) {
+  const fileNameParts = [];
+
+  if (reportData.industryName) {
+    fileNameParts.push(reportData.industryName.replace(/\s+/g, "_"));
+  }
+
+  if (reportData.monitoringDate) {
+    fileNameParts.push(reportData.monitoringDate);
+  }
+
+  const fileNameBase = fileNameParts.join("_") || "AQI_Report";
+  return `${fileNameBase}.pdf`;
+}
+
+function updatePreviewWithBlob(blob, fileName) {
+  if (!reportPreviewSection || !reportPreviewFrame) {
+    return null;
+  }
+
+  if (currentPreviewBlobUrl) {
+    URL.revokeObjectURL(currentPreviewBlobUrl);
+    currentPreviewBlobUrl = null;
+  }
+
+  const blobUrl = URL.createObjectURL(blob);
+  currentPreviewBlobUrl = blobUrl;
+
+  reportPreviewFrame.src = blobUrl;
+  reportPreviewSection.classList.remove("hidden");
+
+  if (downloadReportBtn) {
+    downloadReportBtn.href = blobUrl;
+    downloadReportBtn.download = fileName || "AQI_Report.pdf";
+  }
+
+  reportPreviewSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  return blobUrl;
+}
+
 function addSubmittedReportEntry(reportData, blobUrl) {
   if (!submittedReportsContainer) {
     return;
@@ -870,27 +915,35 @@ function addSubmittedReportEntry(reportData, blobUrl) {
   title.textContent = labelParts.join(" | ") || "AQI Report";
 
   const link = document.createElement("a");
-  if (blobUrl) {
-    link.href = blobUrl;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-  } else {
-    link.href = "#";
-    link.addEventListener("click", (event) => {
-      event.preventDefault();
-      generateReportPdfBlob(reportData)
-        .then((blob) => {
-          const regeneratedUrl = URL.createObjectURL(blob);
-          const viewer = window.open(regeneratedUrl, "_blank", "noopener,noreferrer");
-          if (!viewer) {
-            alert("Please allow popups to view the PDF report.");
-          }
-        })
-        .catch(() => {
-          alert("Could not open the PDF report. Please try again.");
-        });
-    });
-  }
+  link.href = "#";
+
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+
+    if (blobUrl) {
+      if (reportPreviewFrame && reportPreviewSection) {
+        reportPreviewFrame.src = blobUrl;
+        reportPreviewSection.classList.remove("hidden");
+      }
+      if (downloadReportBtn) {
+        downloadReportBtn.href = blobUrl;
+        downloadReportBtn.download = buildReportFileName(reportData);
+      }
+      if (reportPreviewSection) {
+        reportPreviewSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      return;
+    }
+
+    generateReportPdfBlob(reportData)
+      .then((blob) => {
+        const fileName = buildReportFileName(reportData);
+        updatePreviewWithBlob(blob, fileName);
+      })
+      .catch(() => {
+        alert("Could not open the PDF report. Please try again.");
+      });
+  });
 
   link.textContent = "View PDF";
   link.className = "btn btn-link";
@@ -983,25 +1036,8 @@ if (reportBtn) {
 
     generateReportPdfBlob(reportData)
       .then((blob) => {
-        const fileNameParts = [];
-
-        if (reportData.industryName) {
-          fileNameParts.push(reportData.industryName.replace(/\s+/g, "_"));
-        }
-
-        if (reportData.monitoringDate) {
-          fileNameParts.push(reportData.monitoringDate);
-        }
-
-        const fileNameBase = fileNameParts.join("_") || "AQI_Report";
-        const blobUrl = URL.createObjectURL(blob);
-
-        const downloadLink = document.createElement("a");
-        downloadLink.href = blobUrl;
-        downloadLink.download = `${fileNameBase}.pdf`;
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
+        const fileName = buildReportFileName(reportData);
+        const blobUrl = updatePreviewWithBlob(blob, fileName);
 
         addSubmittedReportEntry(reportData, blobUrl);
         persistSubmittedReport(reportData);

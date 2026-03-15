@@ -189,6 +189,20 @@
         <button type="button" class="btn btn-report" id="generateReportBtn">Generate Report</button>
       </section>
 
+      <section class="card hidden" id="reportPreviewSection" aria-live="polite">
+        <h2>Report Preview</h2>
+        <div class="report-preview-frame-wrap">
+          <iframe
+            id="reportPreviewFrame"
+            class="report-preview-frame"
+            title="Generated PDF Report Preview"
+          ></iframe>
+        </div>
+        <div class="action-row report-preview-actions">
+          <a href="#" class="btn btn-save" id="downloadReportBtn" download="AQI_Report.pdf">Download PDF</a>
+        </div>
+      </section>
+
     
       <section class="card aqi-result-card hidden" id="aqiResultCard" aria-live="polite">
         <h2>AQI Result Summary</h2>

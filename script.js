@@ -660,6 +660,110 @@ function initializeLiveStatusUpdates() {
   });
 }
 
+function getFocusableSamplingInputs() {
+  return Array.from(document.querySelectorAll(".sampling-table input.sampling-input, .sampling-table input.param-input"))
+    .filter((input) => !input.disabled && input.type !== "hidden");
+}
+
+function findAdjacentInputByDirection(currentInput, direction) {
+  const allInputs = getFocusableSamplingInputs();
+
+  if (!allInputs.length) {
+    return null;
+  }
+
+  const currentRect = currentInput.getBoundingClientRect();
+  const currentCenterX = currentRect.left + (currentRect.width / 2);
+  const currentCenterY = currentRect.top + (currentRect.height / 2);
+
+  let bestMatch = null;
+  let bestScore = Number.POSITIVE_INFINITY;
+
+  allInputs.forEach((candidate) => {
+    if (candidate === currentInput) {
+      return;
+    }
+
+    const candidateRect = candidate.getBoundingClientRect();
+    const candidateCenterX = candidateRect.left + (candidateRect.width / 2);
+    const candidateCenterY = candidateRect.top + (candidateRect.height / 2);
+    const dx = candidateCenterX - currentCenterX;
+    const dy = candidateCenterY - currentCenterY;
+
+    let primaryDistance;
+    let secondaryDistance;
+
+    if (direction === "ArrowUp") {
+      if (dy >= 0) {
+        return;
+      }
+      primaryDistance = Math.abs(dy);
+      secondaryDistance = Math.abs(dx);
+    } else if (direction === "ArrowDown") {
+      if (dy <= 0) {
+        return;
+      }
+      primaryDistance = Math.abs(dy);
+      secondaryDistance = Math.abs(dx);
+    } else if (direction === "ArrowLeft") {
+      if (dx >= 0) {
+        return;
+      }
+      primaryDistance = Math.abs(dx);
+      secondaryDistance = Math.abs(dy);
+    } else if (direction === "ArrowRight") {
+      if (dx <= 0) {
+        return;
+      }
+      primaryDistance = Math.abs(dx);
+      secondaryDistance = Math.abs(dy);
+    } else {
+      return;
+    }
+
+    const score = (primaryDistance * 1000) + secondaryDistance;
+
+    if (score < bestScore) {
+      bestScore = score;
+      bestMatch = candidate;
+    }
+  });
+
+  return bestMatch;
+}
+
+function initializeInputArrowNavigation() {
+  document.addEventListener("keydown", (event) => {
+    if (!["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
+      return;
+    }
+
+    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+      return;
+    }
+
+    const target = event.target;
+
+    if (!(target instanceof HTMLInputElement)) {
+      return;
+    }
+
+    if (!target.matches(".sampling-table input.sampling-input, .sampling-table input.param-input")) {
+      return;
+    }
+
+    const nextInput = findAdjacentInputByDirection(target, event.key);
+
+    if (!nextInput) {
+      return;
+    }
+
+    event.preventDefault();
+    nextInput.focus();
+    nextInput.select();
+  });
+}
+
 function calculateAQI(values) {
   let dominantPollutant = "";
   let maxSubIndex = -Infinity;
@@ -1079,6 +1183,7 @@ if (initializeAuthRouting()) {
     initializeIndustryChangeHandler();
     syncSamplingLocationFields();
     initializeLiveStatusUpdates();
+    initializeInputArrowNavigation();
     initializeSidebarScrollNavigation();
     initializeSubmittedReportsFromStorage();
   }

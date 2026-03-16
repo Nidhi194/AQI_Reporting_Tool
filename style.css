@@ -31,6 +31,26 @@ body {
   overflow-x: hidden;
 }
 
+/* Hide browser translation widgets on the industry page only. */
+body.industry-page .goog-te-banner-frame,
+body.industry-page .goog-te-gadget,
+body.industry-page .goog-te-balloon-frame,
+body.industry-page #goog-gt-tt,
+body.industry-page .skiptranslate,
+body.industry-page [id*="google_translate"],
+body.industry-page [class*="google-translate"],
+body.industry-page iframe[src*="translate"],
+body.industry-page iframe[src*="google.com/translate"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+body.industry-page {
+  top: 0 !important;
+}
+
 html {
   scroll-behavior: smooth;
 }

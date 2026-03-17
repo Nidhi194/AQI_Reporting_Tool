@@ -497,9 +497,35 @@ function syncSamplingLocationFields() {
 
 function initializeSidebarScrollNavigation() {
   const sidebarItems = document.querySelectorAll(".sidebar .nav-item[data-target]");
+  const submittedSectionId = "section-submitted";
+  const settingsSectionId = "section-settings";
+  const singleViewSectionIds = [submittedSectionId, settingsSectionId];
+  const managedSections = Array.from(document.querySelectorAll(".main-content .section-anchor"));
+
+  function setSectionCollapsedState(section, isCollapsed) {
+    section.classList.toggle("section-collapsed", isCollapsed);
+    section.setAttribute("aria-hidden", isCollapsed ? "true" : "false");
+  }
+
+  function restoreDefaultLayout() {
+    managedSections.forEach((section) => {
+      const shouldCollapseByDefault = singleViewSectionIds.includes(section.id);
+      setSectionCollapsedState(section, shouldCollapseByDefault);
+    });
+  }
+
+  function showSingleSection(sectionId) {
+    managedSections.forEach((section) => {
+      setSectionCollapsedState(section, section.id !== sectionId);
+    });
+  }
 
   if (!sidebarItems.length) {
     return;
+  }
+
+  if (managedSections.length) {
+    restoreDefaultLayout();
   }
 
   sidebarItems.forEach((item) => {
@@ -513,6 +539,12 @@ function initializeSidebarScrollNavigation() {
 
       sidebarItems.forEach((navItem) => navItem.classList.remove("active"));
       item.classList.add("active");
+
+      if (managedSections.length && singleViewSectionIds.includes(targetId)) {
+        showSingleSection(targetId);
+      } else if (managedSections.length) {
+        restoreDefaultLayout();
+      }
 
       targetSection.scrollIntoView({ behavior: "smooth", block: "start" });
     });

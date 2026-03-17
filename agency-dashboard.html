@@ -36,6 +36,15 @@
 
    
     <main class="main-content">
+      <section class="card form-progress-card" id="reportProgressCard" aria-live="polite" aria-label="Report completion progress">
+        <div class="form-progress-header">
+          <h2>Report Completion</h2>
+          <span class="form-progress-value" id="reportProgressText">0%</span>
+        </div>
+        <div class="form-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Report completion percentage">
+          <div class="form-progress-fill" id="reportProgressFill"></div>
+        </div>
+      </section>
      
       <section class="card section-anchor" id="section-industry" aria-labelledby="industry-selection-heading">
         <h2 id="industry-selection-heading">Industry Selection</h2>

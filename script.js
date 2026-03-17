@@ -73,6 +73,9 @@ const submittedReportsContainer = document.getElementById("submittedReportsConta
 const reportPreviewSection = document.getElementById("reportPreviewSection");
 const reportPreviewFrame = document.getElementById("reportPreviewFrame");
 const downloadReportBtn = document.getElementById("downloadReportBtn");
+const reportProgressCard = document.getElementById("reportProgressCard");
+const reportProgressFill = document.getElementById("reportProgressFill");
+const reportProgressText = document.getElementById("reportProgressText");
 
 let currentPreviewBlobUrl = null;
 
@@ -549,6 +552,74 @@ function initializeSidebarScrollNavigation() {
       targetSection.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   });
+}
+
+function initializeFormProgressTracker() {
+  if (!reportProgressCard || !reportProgressFill || !reportProgressText) {
+    return;
+  }
+
+  const progressTrack = reportProgressFill.parentElement;
+  const formContainer = document.querySelector(".main-content");
+
+  if (!progressTrack || !formContainer) {
+    return;
+  }
+
+  const trackedFields = Array.from(formContainer.querySelectorAll("input, select, textarea"))
+    .filter((field) => {
+      if (!(field instanceof HTMLElement)) {
+        return false;
+      }
+
+      if (field.closest("#reportProgressCard")) {
+        return false;
+      }
+
+      if (field.hasAttribute("disabled") || field.hasAttribute("readonly")) {
+        return false;
+      }
+
+      if (field instanceof HTMLInputElement) {
+        const ignoredTypes = ["hidden", "button", "submit", "reset", "image"];
+        return !ignoredTypes.includes(field.type);
+      }
+
+      return true;
+    });
+
+  const isFilled = (field) => {
+    if (field instanceof HTMLInputElement) {
+      if (field.type === "checkbox" || field.type === "radio") {
+        return field.checked;
+      }
+
+      return String(field.value || "").trim() !== "";
+    }
+
+    if (field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement) {
+      return String(field.value || "").trim() !== "";
+    }
+
+    return false;
+  };
+
+  const updateProgress = () => {
+    const totalCount = trackedFields.length;
+    const filledCount = trackedFields.reduce((count, field) => (isFilled(field) ? count + 1 : count), 0);
+    const percentage = totalCount > 0 ? Math.round((filledCount / totalCount) * 100) : 0;
+
+    reportProgressFill.style.width = `${percentage}%`;
+    reportProgressText.textContent = `${percentage}%`;
+    progressTrack.setAttribute("aria-valuenow", String(percentage));
+  };
+
+  trackedFields.forEach((field) => {
+    field.addEventListener("input", updateProgress);
+    field.addEventListener("change", updateProgress);
+  });
+
+  updateProgress();
 }
 
 /* --------------------------------------------------
@@ -1215,6 +1286,7 @@ if (initializeAuthRouting()) {
     initializeIndustryChangeHandler();
     syncSamplingLocationFields();
     initializeLiveStatusUpdates();
+    initializeFormProgressTracker();
     initializeInputArrowNavigation();
     initializeSidebarScrollNavigation();
     initializeSubmittedReportsFromStorage();

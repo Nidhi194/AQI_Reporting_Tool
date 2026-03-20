@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monitoring Agency</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        h2 {
+            text-align: center;
+            background: linear-gradient(90deg, #2563eb, #1d4ed8);
+            color: white;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        h3 {
+            background: #dbeafe;
+            color: #1e3a8a;
+            padding: 12px 16px;
+            border-left: 6px solid #2563eb;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        select,
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        input:not([type]) {
+            width: 250px;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            outline: none;
+            margin-bottom: 10px;
+            background: white;
+            transition: 0.2s;
+        }
+
+        select:focus,
+        input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        th {
+            background: #2563eb;
+            color: white;
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        td {
+            border: 1px solid #e5e7eb;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        tr:hover {
+            background: #eef4ff;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            margin-right: 10px;
+            margin-top: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: 0.2s;
+            box-shadow: 0 3px 8px rgba(37, 99, 235, 0.25);
+        }
+
+        button:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        hr {
+            border: none;
+            height: 2px;
+            background: #cbd5e1;
+            margin: 30px 0;
+        }
+
+        #avg1, #avg2, #avg3, #v1, #v2, #v3,
+        #dust1, #dust2, #dust3, #pm1, #pm2, #pm3, #avgPM,
+        #a1, #a2, #a3, #a4, #a5, #a6,
+        #va1, #va2, #va3, #va4, #va5, #va6,
+        #so1, #so2, #so3, #so4, #so5, #so6, #avgSO2,
+        #x1, #x2, #x3, #x4, #x5, #x6,
+        #nva1, #nva2, #nva3, #nva4, #nva5, #nva6,
+        #no1, #no2, #no3, #no4, #no5, #no6, #avgNO2,
+        #pm25_avg1, #pm25_v1, #pm25_dust1, #pm25_1 {
+            font-weight: bold;
+            color: #065f46;
+            background: #ecfdf5;
+        }
+
+        @media print {
+            button {
+                display: none;
+            }
+
+            body {
+                background: white;
+                padding: 10px;
+            }
+
+            h2 {
+                background: none;
+                color: black;
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+
+            h3 {
+                background: none;
+                color: black;
+                border-left: 4px solid black;
+            }
+
+            table {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h2>Monitoring Agency Dashboard</h2>
+
+<h3>Industry Selection</h3>
+
+<select id="industry_name">
+    <option value="">Select Industry</option>
+</select><br><br>
+
+<input id="location" placeholder="Enter Location"><br><br>
+<input type="date" id="date"><br><br>
+
+<h3>PM10 Determination</h3>
+
+<table border="1" cellpadding="5">
+    <tr>
+        <th>Sr No</th>
+        <th>Parameter</th>
+        <th>1</th>
+        <th>2</th>
+        <th>3</th>
+    </tr>
+
+    <tr>
+        <td>1</td>
+        <td>Time of Sampling(in hours)</td>
+        <td><input id="pm_time_1"></td>
+        <td><input id="pm_time_2"></td>
+        <td><input id="pm_time_3"></td>
+    </tr>
+
+    <tr>
+        <td>2</td>
+        <td>Location Name</td>
+        <td><input id="pm_loc_1"></td>
+        <td><input id="pm_loc_2"></td>
+        <td><input id="pm_loc_3"></td>
+    </tr>
+
+    <tr>
+        <td>3</td>
+        <td>Duration (T in minutes)</td>
+        <td>480</td>
+        <td>480</td>
+        <td>480</td>
+    </tr>
+
+    <tr>
+        <td>4</td>
+        <td>Initial Flow Rate (Q1)</td>
+        <td><input id="q1_1" type="number" step="any"></td>
+        <td><input id="q1_2" type="number" step="any"></td>
+        <td><input id="q1_3" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>5</td>
+        <td>Final Flow Rate (Q2)</td>
+        <td><input id="q2_1" type="number" step="any"></td>
+        <td><input id="q2_2" type="number" step="any"></td>
+        <td><input id="q2_3" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>6</td>
+        <td>Average Flow Rate (Q1 + Q2) / 2</td>
+        <td id="avg1"></td>
+        <td id="avg2"></td>
+        <td id="avg3"></td>
+    </tr>
+
+    <tr>
+        <td>7</td>
+        <td>Volume of Air Sample in m^3 (V = Avg × T)</td>
+        <td id="v1"></td>
+        <td id="v2"></td>
+        <td id="v3"></td>
+    </tr>
+
+    <tr>
+        <td>8</td>
+        <td>Filter Paper Number / ID</td>
+        <td><input id="fp_1"></td>
+        <td><input id="fp_2"></td>
+        <td><input id="fp_3"></td>
+    </tr>
+
+    <tr>
+        <td>9</td>
+        <td>Weight of Filter Paper + Dust, W2 (g)</td>
+        <td><input id="w2_1" type="number" step="any"></td>
+        <td><input id="w2_2" type="number" step="any"></td>
+        <td><input id="w2_3" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>10</td>
+        <td>Weight of Filter Paper, W1 (g)</td>
+        <td><input id="w1_1" type="number" step="any"></td>
+        <td><input id="w1_2" type="number" step="any"></td>
+        <td><input id="w1_3" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>11</td>
+        <td>Weight of Dust (W2 - W1) (g)</td>
+        <td id="dust1"></td>
+        <td id="dust2"></td>
+        <td id="dust3"></td>
+    </tr>
+
+    <tr>
+        <td>12</td>
+        <td>Particulate matter PM10 (µg/m³) = ((W2 - W1) / V) × 10⁶</td>
+        <td id="pm1"></td>
+        <td id="pm2"></td>
+        <td id="pm3"></td>
+    </tr>
+
+    <tr>
+        <td>13</td>
+        <td>Average Concentration of PM10 (µg/m³)</td>
+        <td colspan="3" id="avgPM"></td>
+    </tr>
+</table>
+
+<br>
+<button onclick="calculatePM10()">Calculate PM10</button>
+<button onclick="savePM10()">Save PM10</button>
+
+<hr>
+
+<h3>Determination of Sulfur Dioxide (SO₂)</h3>
+
+<table border="1" cellpadding="5">
+    <tr>
+        <th>Sr No</th>
+        <th>Parameter</th>
+        <th>1</th>
+        <th>2</th>
+        <th>3</th>
+        <th>4</th>
+        <th>5</th>
+        <th>6</th>
+    </tr>
+
+    <tr>
+        <td>1</td>
+        <td>Time of Sampling</td>
+        <td><input id="so_time_1"></td>
+        <td><input id="so_time_2"></td>
+        <td><input id="so_time_3"></td>
+        <td><input id="so_time_4"></td>
+        <td><input id="so_time_5"></td>
+        <td><input id="so_time_6"></td>
+    </tr>
+
+    <tr>
+        <td>2</td>
+        <td>Location Name</td>
+        <td><input id="so_loc_1"></td>
+        <td><input id="so_loc_2"></td>
+        <td><input id="so_loc_3"></td>
+        <td><input id="so_loc_4"></td>
+        <td><input id="so_loc_5"></td>
+        <td><input id="so_loc_6"></td>
+    </tr>
+
+    <tr>
+        <td>3</td>
+        <td>Duration of Sampling (hours)</td>
+        <td><input id="t1" type="number" step="any"></td>
+        <td><input id="t2" type="number" step="any"></td>
+        <td><input id="t3" type="number" step="any"></td>
+        <td><input id="t4" type="number" step="any"></td>
+        <td><input id="t5" type="number" step="any"></td>
+        <td><input id="t6" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>4</td>
+        <td>Sample Absorbance (ES)</td>
+        <td><input id="es1" type="number" step="any"></td>
+        <td><input id="es2" type="number" step="any"></td>
+        <td><input id="es3" type="number" step="any"></td>
+        <td><input id="es4" type="number" step="any"></td>
+        <td><input id="es5" type="number" step="any"></td>
+        <td><input id="es6" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>5</td>
+        <td>Calibration Factor (CF)</td>
+        <td><input id="cf1" type="number" step="any"></td>
+        <td><input id="cf2" type="number" step="any"></td>
+        <td><input id="cf3" type="number" step="any"></td>
+        <td><input id="cf4" type="number" step="any"></td>
+        <td><input id="cf5" type="number" step="any"></td>
+        <td><input id="cf6" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>6</td>
+        <td>µg SO₂ / 10 ml (A = ES × CF)</td>
+        <td id="a1"></td>
+        <td id="a2"></td>
+        <td id="a3"></td>
+        <td id="a4"></td>
+        <td id="a5"></td>
+        <td id="a6"></td>
+    </tr>
+
+    <tr>
+        <td>7</td>
+        <td>Flow Rate Q (LPM)</td>
+        <td><input id="qso1" type="number" step="any"></td>
+        <td><input id="qso2" type="number" step="any"></td>
+        <td><input id="qso3" type="number" step="any"></td>
+        <td><input id="qso4" type="number" step="any"></td>
+        <td><input id="qso5" type="number" step="any"></td>
+        <td><input id="qso6" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>8</td>
+        <td>Volume of Sample in Liters (VA)</td>
+        <td id="va1"></td>
+        <td id="va2"></td>
+        <td id="va3"></td>
+        <td id="va4"></td>
+        <td id="va5"></td>
+        <td id="va6"></td>
+    </tr>
+
+    <tr>
+        <td>9</td>
+        <td>Volume of Sample in ml (VS)</td>
+        <td><input id="vs1" type="number" step="any"></td>
+        <td><input id="vs2" type="number" step="any"></td>
+        <td><input id="vs3" type="number" step="any"></td>
+        <td><input id="vs4" type="number" step="any"></td>
+        <td><input id="vs5" type="number" step="any"></td>
+        <td><input id="vs6" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>10</td>
+        <td>Volume Taken for Analysis (VT) ml</td>
+        <td><input id="vt1" type="number" step="any"></td>
+        <td><input id="vt2" type="number" step="any"></td>
+        <td><input id="vt3" type="number" step="any"></td>
+        <td><input id="vt4" type="number" step="any"></td>
+        <td><input id="vt5" type="number" step="any"></td>
+        <td><input id="vt6" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>11</td>
+        <td>Concentration of SO₂ (µg/m³) = (A × VS × 1000) / (VA × VT)</td>
+        <td id="so1"></td>
+        <td id="so2"></td>
+        <td id="so3"></td>
+        <td id="so4"></td>
+        <td id="so5"></td>
+        <td id="so6"></td>
+    </tr>
+
+    <tr>
+        <td>12</td>
+        <td>Average Concentration of SO₂ (µg/m³)</td>
+        <td colspan="6" id="avgSO2"></td>
+    </tr>
+</table>
+
+<br>
+<button onclick="calculateSO2()">Calculate SO₂</button>
+<button onclick="saveSO2()">Save SO₂</button>
+
+<hr>
+
+<h3>Determination of Nitrogen Dioxide (NO₂)</h3>
+
+<table border="1" cellpadding="5">
+    <tr>
+        <th>Sr No</th>
+        <th>Parameter</th>
+        <th>1</th>
+        <th>2</th>
+        <th>3</th>
+        <th>4</th>
+        <th>5</th>
+        <th>6</th>
+    </tr>
+
+    <tr>
+        <td>1</td>
+        <td>Time of Sampling</td>
+        <td><input id="no_time_1"></td>
+        <td><input id="no_time_2"></td>
+        <td><input id="no_time_3"></td>
+        <td><input id="no_time_4"></td>
+        <td><input id="no_time_5"></td>
+        <td><input id="no_time_6"></td>
+    </tr>
+
+    <tr>
+        <td>2</td>
+        <td>Location Name</td>
+        <td><input id="no_loc_1"></td>
+        <td><input id="no_loc_2"></td>
+        <td><input id="no_loc_3"></td>
+        <td><input id="no_loc_4"></td>
+        <td><input id="no_loc_5"></td>
+        <td><input id="no_loc_6"></td>
+    </tr>
+
+    <tr>
+        <td>3</td>
+        <td>Duration of Sampling (hours)</td>
+        <td><input id="not1" type="number" step="any"></td>
+        <td><input id="not2" type="number" step="any"></td>
+        <td><input id="not3" type="number" step="any"></td>
+        <td><input id="not4" type="number" step="any"></td>
+        <td><input id="not5" type="number" step="any"></td>
+        <td><input id="not6" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>4</td>
+        <td>Sample Absorbance (AS)</td>
+        <td><input id="as1" type="number" step="any"></td>
+        <td><input id="as2" type="number" step="any"></td>
+        <td><input id="as3" type="number" step="any"></td>
+        <td><input id="as4" type="number" step="any"></td>
+        <td><input id="as5" type="number" step="any"></td>
+        <td><input id="as6" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>5</td>
+        <td>Calibration Factor (CF)</td>
+        <td><input id="ncf1" type="number" step="any"></td>
+        <td><input id="ncf2" type="number" step="any"></td>
+        <td><input id="ncf3" type="number" step="any"></td>
+        <td><input id="ncf4" type="number" step="any"></td>
+        <td><input id="ncf5" type="number" step="any"></td>
+        <td><input id="ncf6" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>6</td>
+        <td>µg NO₂ / 10 ml (X = AS × CF)</td>
+        <td id="x1"></td>
+        <td id="x2"></td>
+        <td id="x3"></td>
+        <td id="x4"></td>
+        <td id="x5"></td>
+        <td id="x6"></td>
+    </tr>
+
+    <tr>
+        <td>7</td>
+        <td>Flow Rate Q (LPM)</td>
+        <td><input id="nq1" type="number" step="any"></td>
+        <td><input id="nq2" type="number" step="any"></td>
+        <td><input id="nq3" type="number" step="any"></td>
+        <td><input id="nq4" type="number" step="any"></td>
+        <td><input id="nq5" type="number" step="any"></td>
+        <td><input id="nq6" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>8</td>
+        <td>Volume of Sample in Liters (Va)</td>
+        <td id="nva1"></td>
+        <td id="nva2"></td>
+        <td id="nva3"></td>
+        <td id="nva4"></td>
+        <td id="nva5"></td>
+        <td id="nva6"></td>
+    </tr>
+
+    <tr>
+        <td>9</td>
+        <td>Volume of Sample in ml (Vs)</td>
+        <td><input id="nvs1" type="number" step="any"></td>
+        <td><input id="nvs2" type="number" step="any"></td>
+        <td><input id="nvs3" type="number" step="any"></td>
+        <td><input id="nvs4" type="number" step="any"></td>
+        <td><input id="nvs5" type="number" step="any"></td>
+        <td><input id="nvs6" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>10</td>
+        <td>Volume of Aliquot Taken for Analysis (Vt) ml</td>
+        <td><input id="nvt1" type="number" step="any"></td>
+        <td><input id="nvt2" type="number" step="any"></td>
+        <td><input id="nvt3" type="number" step="any"></td>
+        <td><input id="nvt4" type="number" step="any"></td>
+        <td><input id="nvt5" type="number" step="any"></td>
+        <td><input id="nvt6" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>11</td>
+        <td>Sample Efficiency</td>
+        <td>0.82</td>
+        <td>0.82</td>
+        <td>0.82</td>
+        <td>0.82</td>
+        <td>0.82</td>
+        <td>0.82</td>
+    </tr>
+
+    <tr>
+        <td>12</td>
+        <td>Concentration of NO₂ (µg/m³) = (X × Vs × 1000) / (Va × Vt × 0.82)</td>
+        <td id="no1"></td>
+        <td id="no2"></td>
+        <td id="no3"></td>
+        <td id="no4"></td>
+        <td id="no5"></td>
+        <td id="no6"></td>
+    </tr>
+
+    <tr>
+        <td>13</td>
+        <td>Average Concentration of NO₂ (µg/m³)</td>
+        <td colspan="6" id="avgNO2"></td>
+    </tr>
+</table>
+
+<br>
+<button onclick="calculateNO2()">Calculate NO₂</button>
+<button onclick="saveNO2()">Save NO₂</button>
+
+<hr>
+
+<h3>Determination of Particulate Matter PM2.5</h3>
+
+<table border="1" cellpadding="5">
+    <tr>
+        <th>Serial Number</th>
+        <th>Parameters</th>
+        <th>1</th>
+    </tr>
+
+    <tr>
+        <td>1</td>
+        <td>Time of Sampling</td>
+        <td><input id="pm25_time_1"></td>
+    </tr>
+
+    <tr>
+        <td>2</td>
+        <td>Location Name</td>
+        <td><input id="pm25_loc_1"></td>
+    </tr>
+
+    <tr>
+        <td>3</td>
+        <td>Duration of Sampling in Hours</td>
+        <td>24</td>
+    </tr>
+
+    <tr>
+        <td>4</td>
+        <td>Time in Minutes</td>
+        <td>1440</td>
+    </tr>
+
+    <tr>
+        <td>5</td>
+        <td>Initial Flow Rate Q1</td>
+        <td><input id="pm25_q1_1" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>6</td>
+        <td>Final Flow Rate Q2</td>
+        <td><input id="pm25_q2_1" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>7</td>
+        <td>Average Flow Rate (Q1 + Q2) / 2</td>
+        <td id="pm25_avg1"></td>
+    </tr>
+
+    <tr>
+        <td>8</td>
+        <td>Volume of Air Sample in meter cube V = ((Q1 + Q2) / 2) × T</td>
+        <td id="pm25_v1"></td>
+    </tr>
+
+    <tr>
+        <td>9</td>
+        <td>Filter Paper ID</td>
+        <td><input id="pm25_fp_1"></td>
+    </tr>
+
+    <tr>
+        <td>10</td>
+        <td>Weight of Filter Paper + Dust W2 in grams</td>
+        <td><input id="pm25_w2_1" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>11</td>
+        <td>Weight of Filter Paper W1 in grams</td>
+        <td><input id="pm25_w1_1" type="number" step="any"></td>
+    </tr>
+
+    <tr>
+        <td>12</td>
+        <td>Weight of Dust (W2 - W1)</td>
+        <td id="pm25_dust1"></td>
+    </tr>
+
+    <tr>
+        <td>13</td>
+        <td>Particulate Matter PM2.5 (µg/m³) = ((W2 - W1) × 10⁶) / V</td>
+        <td id="pm25_1"></td>
+    </tr>
+</table>
+
+<br>
+<button onclick="calculatePM25()">Calculate PM2.5</button>
+<button onclick="savePM25()">Save PM2.5</button>
+
+<hr>
+<button onclick="generateReport()">Generate Report / Print PDF</button>
+
+<script>
+async function loadIndustries() {
+    try {
+        let res = await fetch("http://localhost:3000/get-industries");
+        let data = await res.json();
+
+        let dropdown = document.getElementById("industry_name");
+        dropdown.innerHTML = '<option value="">Select Industry</option>';
+
+        data.forEach(item => {
+            let option = document.createElement("option");
+            option.value = item.industry_name;
+            option.text = item.industry_name;
+            dropdown.appendChild(option);
+        });
+    } catch (error) {
+        console.log("Error loading industries:", error);
+        alert("Could not load industries");
+    }
+}
+
+loadIndustries();
+
+function validateCommonFields() {
+    const industry = document.getElementById("industry_name").value.trim();
+    const location = document.getElementById("location").value.trim();
+    const date = document.getElementById("date").value.trim();
+
+    if (!industry || !location || !date) {
+        alert("Please fill Industry, Location and Date first");
+        return false;
+    }
+    return true;
+}
+
+function calculatePM10() {
+    let pmValues = [];
+
+    for (let i = 1; i <= 3; i++) {
+        let q1 = parseFloat(document.getElementById("q1_" + i).value) || 0;
+        let q2 = parseFloat(document.getElementById("q2_" + i).value) || 0;
+        let w1 = parseFloat(document.getElementById("w1_" + i).value) || 0;
+        let w2 = parseFloat(document.getElementById("w2_" + i).value) || 0;
+
+        let T = 480;
+        let avg = (q1 + q2) / 2;
+        let V = avg * T;
+        let dust = w2 - w1;
+
+        let pm = 0;
+        if (V !== 0) {
+            pm = ((w2 - w1) / V) * Math.pow(10, 6);
+        }
+
+        document.getElementById("avg" + i).innerText = avg.toFixed(2);
+        document.getElementById("v" + i).innerText = V.toFixed(2);
+        document.getElementById("dust" + i).innerText = dust.toFixed(4);
+        document.getElementById("pm" + i).innerText = pm.toFixed(2);
+
+        pmValues.push(pm);
+    }
+
+    let avgPM = (pmValues[0] + pmValues[1] + pmValues[2]) / 3;
+    document.getElementById("avgPM").innerText = avgPM.toFixed(2);
+}
+
+function calculateSO2() {
+    let soValues = [];
+
+    for (let i = 1; i <= 6; i++) {
+        let es = parseFloat(document.getElementById("es" + i).value) || 0;
+        let cf = parseFloat(document.getElementById("cf" + i).value) || 0;
+        let q = parseFloat(document.getElementById("qso" + i).value) || 0;
+        let t = parseFloat(document.getElementById("t" + i).value) || 0;
+        let vs = parseFloat(document.getElementById("vs" + i).value) || 0;
+        let vt = parseFloat(document.getElementById("vt" + i).value) || 0;
+
+        let A = es * cf;
+        let VA = q * t * 60;
+        let so2 = (VA !== 0 && vt !== 0) ? (A * vs * 1000) / (VA * vt) : 0;
+
+        document.getElementById("a" + i).innerText = A.toFixed(2);
+        document.getElementById("va" + i).innerText = VA.toFixed(2);
+        document.getElementById("so" + i).innerText = so2.toFixed(2);
+
+        soValues.push(so2);
+    }
+
+    let total = 0;
+    for (let i = 0; i < soValues.length; i++) {
+        total += soValues[i];
+    }
+
+    let avgSO2 = total / soValues.length;
+    document.getElementById("avgSO2").innerText = avgSO2.toFixed(2);
+}
+
+function calculateNO2() {
+    let noValues = [];
+
+    for (let i = 1; i <= 6; i++) {
+        let as = parseFloat(document.getElementById("as" + i).value) || 0;
+        let cf = parseFloat(document.getElementById("ncf" + i).value) || 0;
+        let q = parseFloat(document.getElementById("nq" + i).value) || 0;
+        let t = parseFloat(document.getElementById("not" + i).value) || 0;
+        let vs = parseFloat(document.getElementById("nvs" + i).value) || 0;
+        let vt = parseFloat(document.getElementById("nvt" + i).value) || 0;
+
+        let X = as * cf;
+        let Va = q * t * 60;
+        let no2 = (Va !== 0 && vt !== 0) ? (X * vs * 1000) / (Va * vt * 0.82) : 0;
+
+        document.getElementById("x" + i).innerText = X.toFixed(2);
+        document.getElementById("nva" + i).innerText = Va.toFixed(2);
+        document.getElementById("no" + i).innerText = no2.toFixed(2);
+
+        noValues.push(no2);
+    }
+
+    let total = 0;
+    for (let i = 0; i < noValues.length; i++) {
+        total += noValues[i];
+    }
+
+    let avgNO2 = total / noValues.length;
+    document.getElementById("avgNO2").innerText = avgNO2.toFixed(2);
+}
+
+function calculatePM25() {
+    let q1 = parseFloat(document.getElementById("pm25_q1_1").value) || 0;
+    let q2 = parseFloat(document.getElementById("pm25_q2_1").value) || 0;
+    let w1 = parseFloat(document.getElementById("pm25_w1_1").value) || 0;
+    let w2 = parseFloat(document.getElementById("pm25_w2_1").value) || 0;
+
+    let T = 1440;
+
+    let avg = (q1 + q2) / 2;
+    let V = avg * T;
+    let dust = w2 - w1;
+
+    let pm25 = 0;
+    if (V !== 0) {
+        pm25 = ((w2 - w1) * Math.pow(10, 6)) / V;
+    }
+
+    document.getElementById("pm25_avg1").innerText = avg.toFixed(2);
+    document.getElementById("pm25_v1").innerText = V.toFixed(2);
+    document.getElementById("pm25_dust1").innerText = dust.toFixed(4);
+    document.getElementById("pm25_1").innerText = pm25.toFixed(2);
+}
+
+async function savePM10() {
+    if (!validateCommonFields()) return;
+
+    calculatePM10();
+
+    const data = {
+        industry_name: document.getElementById("industry_name").value,
+        location: document.getElementById("location").value,
+        monitoring_date: document.getElementById("date").value,
+
+        q1_1: document.getElementById("q1_1").value,
+        q2_1: document.getElementById("q2_1").value,
+        w1_1: document.getElementById("w1_1").value,
+        w2_1: document.getElementById("w2_1").value,
+
+        q1_2: document.getElementById("q1_2").value,
+        q2_2: document.getElementById("q2_2").value,
+        w1_2: document.getElementById("w1_2").value,
+        w2_2: document.getElementById("w2_2").value,
+
+        q1_3: document.getElementById("q1_3").value,
+        q2_3: document.getElementById("q2_3").value,
+        w1_3: document.getElementById("w1_3").value,
+        w2_3: document.getElementById("w2_3").value
+    };
+
+    try {
+        const res = await fetch("http://localhost:3000/save-pm10", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+        alert(result.message || result.error);
+    } catch (error) {
+        console.log("PM10 Save Error:", error);
+        alert("Error saving PM10 data");
+    }
+}
+
+async function saveSO2() {
+    if (!validateCommonFields()) return;
+
+    calculateSO2();
+
+    const data = {
+        industry_name: document.getElementById("industry_name").value,
+        location: document.getElementById("location").value,
+        monitoring_date: document.getElementById("date").value,
+
+        duration_1: document.getElementById("t1").value,
+        es_1: document.getElementById("es1").value,
+        cf_1: document.getElementById("cf1").value,
+        a_1: document.getElementById("a1").innerText,
+        q_1: document.getElementById("qso1").value,
+        va_1: document.getElementById("va1").innerText,
+        vs_1: document.getElementById("vs1").value,
+        vt_1: document.getElementById("vt1").value,
+        so2_1: document.getElementById("so1").innerText,
+
+        duration_2: document.getElementById("t2").value,
+        es_2: document.getElementById("es2").value,
+        cf_2: document.getElementById("cf2").value,
+        a_2: document.getElementById("a2").innerText,
+        q_2: document.getElementById("qso2").value,
+        va_2: document.getElementById("va2").innerText,
+        vs_2: document.getElementById("vs2").value,
+        vt_2: document.getElementById("vt2").value,
+        so2_2: document.getElementById("so2").innerText,
+
+        duration_3: document.getElementById("t3").value,
+        es_3: document.getElementById("es3").value,
+        cf_3: document.getElementById("cf3").value,
+        a_3: document.getElementById("a3").innerText,
+        q_3: document.getElementById("qso3").value,
+        va_3: document.getElementById("va3").innerText,
+        vs_3: document.getElementById("vs3").value,
+        vt_3: document.getElementById("vt3").value,
+        so2_3: document.getElementById("so3").innerText,
+
+        duration_4: document.getElementById("t4").value,
+        es_4: document.getElementById("es4").value,
+        cf_4: document.getElementById("cf4").value,
+        a_4: document.getElementById("a4").innerText,
+        q_4: document.getElementById("qso4").value,
+        va_4: document.getElementById("va4").innerText,
+        vs_4: document.getElementById("vs4").value,
+        vt_4: document.getElementById("vt4").value,
+        so2_4: document.getElementById("so4").innerText,
+
+        duration_5: document.getElementById("t5").value,
+        es_5: document.getElementById("es5").value,
+        cf_5: document.getElementById("cf5").value,
+        a_5: document.getElementById("a5").innerText,
+        q_5: document.getElementById("qso5").value,
+        va_5: document.getElementById("va5").innerText,
+        vs_5: document.getElementById("vs5").value,
+        vt_5: document.getElementById("vt5").value,
+        so2_5: document.getElementById("so5").innerText,
+
+        duration_6: document.getElementById("t6").value,
+        es_6: document.getElementById("es6").value,
+        cf_6: document.getElementById("cf6").value,
+        a_6: document.getElementById("a6").innerText,
+        q_6: document.getElementById("qso6").value,
+        va_6: document.getElementById("va6").innerText,
+        vs_6: document.getElementById("vs6").value,
+        vt_6: document.getElementById("vt6").value,
+        so2_6: document.getElementById("so6").innerText,
+
+        avg_so2: document.getElementById("avgSO2").innerText
+    };
+
+    try {
+        const res = await fetch("http://localhost:3000/save-so2", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+        alert(result.message || result.error);
+    } catch (error) {
+        console.log("SO2 Save Error:", error);
+        alert("Error saving SO2 data");
+    }
+}
+
+async function saveNO2() {
+    if (!validateCommonFields()) return;
+
+    calculateNO2();
+
+    const data = {
+        industry_name: document.getElementById("industry_name").value,
+        location: document.getElementById("location").value,
+        monitoring_date: document.getElementById("date").value,
+
+        duration_1: document.getElementById("not1").value,
+        as_1: document.getElementById("as1").value,
+        cf_1: document.getElementById("ncf1").value,
+        x_1: document.getElementById("x1").innerText,
+        q_1: document.getElementById("nq1").value,
+        va_1: document.getElementById("nva1").innerText,
+        vs_1: document.getElementById("nvs1").value,
+        vt_1: document.getElementById("nvt1").value,
+        no2_1: document.getElementById("no1").innerText,
+
+        duration_2: document.getElementById("not2").value,
+        as_2: document.getElementById("as2").value,
+        cf_2: document.getElementById("ncf2").value,
+        x_2: document.getElementById("x2").innerText,
+        q_2: document.getElementById("nq2").value,
+        va_2: document.getElementById("nva2").innerText,
+        vs_2: document.getElementById("nvs2").value,
+        vt_2: document.getElementById("nvt2").value,
+        no2_2: document.getElementById("no2").innerText,
+
+        duration_3: document.getElementById("not3").value,
+        as_3: document.getElementById("as3").value,
+        cf_3: document.getElementById("ncf3").value,
+        x_3: document.getElementById("x3").innerText,
+        q_3: document.getElementById("nq3").value,
+        va_3: document.getElementById("nva3").innerText,
+        vs_3: document.getElementById("nvs3").value,
+        vt_3: document.getElementById("nvt3").value,
+        no2_3: document.getElementById("no3").innerText,
+
+        duration_4: document.getElementById("not4").value,
+        as_4: document.getElementById("as4").value,
+        cf_4: document.getElementById("ncf4").value,
+        x_4: document.getElementById("x4").innerText,
+        q_4: document.getElementById("nq4").value,
+        va_4: document.getElementById("nva4").innerText,
+        vs_4: document.getElementById("nvs4").value,
+        vt_4: document.getElementById("nvt4").value,
+        no2_4: document.getElementById("no4").innerText,
+
+        duration_5: document.getElementById("not5").value,
+        as_5: document.getElementById("as5").value,
+        cf_5: document.getElementById("ncf5").value,
+        x_5: document.getElementById("x5").innerText,
+        q_5: document.getElementById("nq5").value,
+        va_5: document.getElementById("nva5").innerText,
+        vs_5: document.getElementById("nvs5").value,
+        vt_5: document.getElementById("nvt5").value,
+        no2_5: document.getElementById("no5").innerText,
+
+        duration_6: document.getElementById("not6").value,
+        as_6: document.getElementById("as6").value,
+        cf_6: document.getElementById("ncf6").value,
+        x_6: document.getElementById("x6").innerText,
+        q_6: document.getElementById("nq6").value,
+        va_6: document.getElementById("nva6").innerText,
+        vs_6: document.getElementById("nvs6").value,
+        vt_6: document.getElementById("nvt6").value,
+        no2_6: document.getElementById("no6").innerText,
+
+        avg_no2: document.getElementById("avgNO2").innerText
+    };
+
+    try {
+        const res = await fetch("http://localhost:3000/save-no2", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+        alert(result.message || result.error);
+    } catch (error) {
+        console.log("NO2 Save Error:", error);
+        alert("Error saving NO2 data");
+    }
+}
+
+async function savePM25() {
+    if (!validateCommonFields()) return;
+
+    calculatePM25();
+
+    const data = {
+        industry_name: document.getElementById("industry_name").value,
+        location: document.getElementById("location").value,
+        monitoring_date: document.getElementById("date").value,
+
+        q1: document.getElementById("pm25_q1_1").value,
+        q2: document.getElementById("pm25_q2_1").value,
+        w1: document.getElementById("pm25_w1_1").value,
+        w2: document.getElementById("pm25_w2_1").value
+    };
+
+    try {
+        const res = await fetch("http://localhost:3000/save-pm25", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+        alert(result.message || result.error);
+    } catch (error) {
+        console.log("PM2.5 Save Error:", error);
+        alert("Error saving PM2.5 data");
+    }
+}
+
+function generateReport() {
+    if (!validateCommonFields()) return;
+
+    calculatePM10();
+    calculateSO2();
+    calculateNO2();
+    calculatePM25();
+
+    window.print();
+}
+</script>
+
+</body>
+</html>

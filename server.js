@@ -75,6 +75,26 @@ app.post('/login', (req, res) => {
 app.post('/save-industry', (req, res) => {
     const data = req.body;
 
+    const missingFields = [];
+
+    if (!data.user_email || !String(data.user_email).trim()) missingFields.push("User Login Email");
+    if (!data.industry_name || !String(data.industry_name).trim()) missingFields.push("Industry Name");
+    if (!data.industry_type || !String(data.industry_type).trim()) missingFields.push("Industry Type");
+    if (!data.industry_id || !String(data.industry_id).trim()) missingFields.push("Industry ID / Registration Number");
+    if (!data.address || !String(data.address).trim()) missingFields.push("Location / Address");
+    if (!data.contact_name || !String(data.contact_name).trim()) missingFields.push("Contact Person Name");
+    if (!data.role_designation || !String(data.role_designation).trim()) missingFields.push("Role / Designation");
+    if (!data.email || !String(data.email).trim()) missingFields.push("Email ID");
+    if (!data.phone || !String(data.phone).trim()) missingFields.push("Primary Phone Number");
+    if (!data.monitoring_frequency || !String(data.monitoring_frequency).trim()) missingFields.push("AQI Monitoring Frequency");
+    if (!data.notification_pref || !String(data.notification_pref).trim()) missingFields.push("Notification Preference");
+
+    if (missingFields.length > 0) {
+        return res.json({
+            error: "These required fields are missing: " + missingFields.join(", ")
+        });
+    }
+
     const sql = `
         INSERT INTO industry_details
         (user_email, industry_name, industry_type, industry_id, address,
@@ -84,18 +104,18 @@ app.post('/save-industry', (req, res) => {
     `;
 
     db.query(sql, [
-        data.user_email,
-        data.industry_name,
-        data.industry_type,
-        data.industry_id,
-        data.address,
-        data.contact_name,
-        data.role_designation,
-        data.email,
-        data.phone,
-        data.alt_phone,
-        data.monitoring_frequency,
-        data.notification_pref
+        String(data.user_email).trim(),
+        String(data.industry_name).trim(),
+        String(data.industry_type).trim(),
+        String(data.industry_id).trim(),
+        String(data.address).trim(),
+        String(data.contact_name).trim(),
+        String(data.role_designation).trim(),
+        String(data.email).trim(),
+        String(data.phone).trim(),
+        data.alt_phone ? String(data.alt_phone).trim() : "",
+        String(data.monitoring_frequency).trim(),
+        String(data.notification_pref).trim()
     ], (err) => {
         if (err) {
             console.log("Save Industry Error:", err);
@@ -173,7 +193,6 @@ app.post('/save-pm10', (req, res) => {
         data.industry_name,
         data.location,
         data.monitoring_date,
-
         q1_1, q2_1, avg_1, volume_1, w1_1, w2_1, dust_1, pm10_1,
         q1_2, q2_2, avg_2, volume_2, w1_2, w2_2, dust_2, pm10_2,
         q1_3, q2_3, avg_3, volume_3, w1_3, w2_3, dust_3, pm10_3,

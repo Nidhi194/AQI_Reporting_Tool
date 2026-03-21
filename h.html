@@ -14,103 +14,161 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #4f46e5, #06b6d4, #22c55e);
-            padding: 20px;
+            padding: 30px;
+            background: linear-gradient(90deg, #153a73 0%, #1d4f97 45%, #9eb6d3 100%);
         }
 
-        .container {
+        .main-wrapper {
             width: 100%;
-            max-width: 420px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 35px 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 1420px;
+            min-height: 720px;
+            display: flex;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #ffffff;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .left-panel {
+            width: 52%;
+            background: linear-gradient(180deg, #123f84 0%, #1d4f97 100%);
+            color: white;
+            padding: 70px 42px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .left-panel h1 {
+            margin: 0 0 14px 0;
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .left-panel .tagline {
+            font-size: 22px;
+            line-height: 1.5;
+            margin-bottom: 34px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .feature-list {
+            margin: 0;
+            padding-left: 28px;
+        }
+
+        .feature-list li {
+            font-size: 21px;
+            line-height: 1.8;
+            margin-bottom: 6px;
+        }
+
+        .right-panel {
+            width: 48%;
+            background: #f8f8f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 32px;
+        }
+
+        .form-box {
+            width: 100%;
+            max-width: 620px;
         }
 
         h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #1e3a8a;
-            font-size: 30px;
+            margin: 0 0 28px 0;
+            font-size: 54px;
+            color: #0b458c;
+            font-weight: 700;
         }
 
-        .subtitle {
-            text-align: center;
-            color: #475569;
-            margin-bottom: 25px;
-            font-size: 14px;
+        .form-group {
+            margin-bottom: 22px;
         }
 
-        input, select {
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 19px;
+            color: #4d6580;
+            font-weight: 600;
+        }
+
+        input,
+        select {
             width: 100%;
-            padding: 12px 14px;
-            margin-bottom: 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: 10px;
+            height: 64px;
+            border: 1.5px solid #d4dde7;
+            border-radius: 16px;
+            padding: 0 18px;
+            font-size: 18px;
+            color: #334155;
+            background: #ffffff;
             outline: none;
-            font-size: 15px;
-            background: #f8fafc;
-            transition: 0.2s;
+            transition: 0.2s ease;
         }
 
-        input:focus, select:focus {
-            border-color: #4f46e5;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        input::placeholder {
+            color: #7b8794;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #0b458c;
+            box-shadow: 0 0 0 3px rgba(11, 69, 140, 0.12);
         }
 
         button {
             width: 100%;
-            padding: 12px;
+            height: 62px;
             border: none;
-            border-radius: 10px;
-            background: linear-gradient(90deg, #2563eb, #4f46e5);
+            border-radius: 14px;
+            margin-top: 18px;
+            background: #123f84;
             color: white;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 22px;
+            font-weight: 700;
             cursor: pointer;
-            transition: 0.2s;
-            margin-top: 5px;
+            transition: 0.2s ease;
         }
 
         button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 14px rgba(79, 70, 229, 0.25);
+            background: #0f376f;
         }
 
         p {
             text-align: center;
-            margin-top: 18px;
-            color: #475569;
-            font-size: 14px;
+            margin-top: 26px;
+            font-size: 18px;
+            color: #5f7387;
         }
 
         a {
-            color: #2563eb;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        a:hover {
+            color: #0b458c;
+            font-weight: 700;
             text-decoration: underline;
         }
 
         #result {
             text-align: center;
             margin-top: 18px;
-            font-size: 16px;
+            min-height: 28px;
+            font-size: 18px;
+            font-weight: 600;
             color: #dc2626;
-            min-height: 24px;
         }
 
         .icon {
-            text-align: center;
-            font-size: 42px;
-            margin-bottom: 10px;
+            display: none;
         }
 
-        #loginForm, #registerForm {
-            animation: fadeIn 0.3s ease;
+        #loginForm,
+        #registerForm {
+            animation: fadeIn 0.25s ease;
         }
 
         @keyframes fadeIn {
@@ -124,58 +182,171 @@
             }
         }
 
-        @media (max-width: 500px) {
-            .container {
-                padding: 25px 20px;
+        @media (max-width: 1100px) {
+            .main-wrapper {
+                flex-direction: column;
+                min-height: auto;
+            }
+
+            .left-panel,
+            .right-panel {
+                width: 100%;
+            }
+
+            .left-panel {
+                padding: 50px 30px;
+            }
+
+            .left-panel h1 {
+                font-size: 42px;
+            }
+
+            .left-panel .tagline {
+                font-size: 18px;
+            }
+
+            .feature-list li {
+                font-size: 18px;
+            }
+
+            .right-panel {
+                padding: 36px 24px 42px;
             }
 
             h2 {
-                font-size: 26px;
+                font-size: 40px;
+            }
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 14px;
+            }
+
+            .left-panel {
+                padding: 36px 22px;
+            }
+
+            .right-panel {
+                padding: 28px 18px 34px;
+            }
+
+            .left-panel h1 {
+                font-size: 34px;
+            }
+
+            .left-panel .tagline {
+                font-size: 16px;
+            }
+
+            .feature-list li {
+                font-size: 16px;
+            }
+
+            h2 {
+                font-size: 34px;
+                margin-bottom: 22px;
+            }
+
+            label {
+                font-size: 16px;
+            }
+
+            input,
+            select {
+                height: 56px;
+                font-size: 16px;
+                border-radius: 12px;
+            }
+
+            button {
+                height: 56px;
+                font-size: 20px;
+            }
+
+            p,
+            #result {
+                font-size: 16px;
             }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="icon">🌿</div>
-    <h2 id="title">Login</h2>
-    <div class="subtitle">Air Monitoring Management System</div>
+<div class="main-wrapper">
+    <div class="left-panel">
+        <h1>EnviroMonitor System</h1>
+        <div class="tagline">Environmental Monitoring &amp; Reporting Platform</div>
 
-    <!-- LOGIN FORM -->
-    <div id="loginForm">
-        <input id="loginEmail" type="email" placeholder="Enter your email">
-        <input id="loginPassword" type="password" placeholder="Enter your password">
-
-        <button onclick="login()">Login</button>
-
-        <p>
-            New user?
-            <a href="#" onclick="showRegister(); return false;">Register here</a>
-        </p>
+        <ul class="feature-list">
+            <li>Create your access account</li>
+            <li>Select your role for dashboard routing</li>
+            <li>Backend-ready modular flow</li>
+        </ul>
     </div>
 
-    <!-- REGISTER FORM -->
-    <div id="registerForm" style="display:none;">
-        <input id="regEmail" type="email" placeholder="Enter your email">
-        <input id="regPassword" type="password" placeholder="Create password">
-        <input id="confirmPassword" type="password" placeholder="Confirm password">
+    <div class="right-panel">
+        <div class="form-box">
+            <div class="icon">🌿</div>
+            <h2 id="title">Login</h2>
 
-        <select id="role">
-            <option value="">Select Role</option>
-            <option value="Monitoring Agency">Monitoring Agency</option>
-            <option value="Industry">Industry</option>
-        </select>
+            <!-- LOGIN FORM -->
+            <div id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input id="loginEmail" type="email" placeholder="Enter email address">
+                </div>
 
-        <button onclick="register()">Register</button>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input id="loginPassword" type="password" placeholder="Enter password">
+                </div>
 
-        <p>
-            Already have an account?
-            <a href="#" onclick="showLogin(); return false;">Login here</a>
-        </p>
+                <button onclick="login()">Login</button>
+
+                <p>
+                    Don't have an account?
+                    <a href="#" onclick="showRegister(); return false;">Sign up</a>
+                </p>
+            </div>
+
+            <!-- REGISTER FORM -->
+            <div id="registerForm" style="display:none;">
+                <div class="form-group">
+                    <label for="regEmail">Email</label>
+                    <input id="regEmail" type="email" placeholder="Create email address">
+                </div>
+
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <input id="regPassword" type="password" placeholder="Create password">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input id="confirmPassword" type="password" placeholder="Confirm password">
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role">
+                        <option value="">-- Select Role --</option>
+                        <option value="Monitoring Agency">Monitoring Agency</option>
+                        <option value="Industry">Industry</option>
+                    </select>
+                </div>
+
+                <button onclick="register()">Create Account</button>
+
+                <p>
+                    Already have an account?
+                    <a href="#" onclick="showLogin(); return false;">Login</a>
+                </p>
+            </div>
+
+            <h3 id="result"></h3>
+        </div>
     </div>
-
-    <h3 id="result"></h3>
 </div>
 
 <script>
@@ -183,8 +354,9 @@
 function showRegister() {
     document.getElementById("loginForm").style.display = "none";
     document.getElementById("registerForm").style.display = "block";
-    document.getElementById("title").innerText = "Register";
+    document.getElementById("title").innerText = "Sign Up";
     document.getElementById("result").innerText = "";
+    document.getElementById("result").style.color = "#dc2626";
 }
 
 function showLogin() {
@@ -192,6 +364,7 @@ function showLogin() {
     document.getElementById("loginForm").style.display = "block";
     document.getElementById("title").innerText = "Login";
     document.getElementById("result").innerText = "";
+    document.getElementById("result").style.color = "#dc2626";
 }
 
 // REGISTER
@@ -223,6 +396,7 @@ async function register() {
         let data = await res.json();
 
         if (data.error) {
+            document.getElementById("result").style.color = "#dc2626";
             document.getElementById("result").innerText = data.error;
         } else {
             document.getElementById("result").style.color = "#16a34a";

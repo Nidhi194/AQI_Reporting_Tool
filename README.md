@@ -1,72 +1,150 @@
-# EnviroMonitor System
+🚀 EnviroMonitor System
 
-An environmental monitoring project designed to grow into a full-fledged platform with role-based access, compliance workflows, and report management.
+A scalable, full-stack environmental monitoring and compliance platform designed to digitize how industries and regulatory agencies track, analyze, and report environmental data.
 
-## Project Overview
+🌍 Vision
 
-This project provides a web interface for:
-- User authentication (signup and login)
-- Role selection (Industry or Monitoring Agency)
-- Role-based dashboard access
-- Air quality data entry with permissible limit checks
-- AQI calculation with category and dominant pollutant summary
+Environmental compliance is often fragmented, manual, and inefficient.
 
-Authentication and user records are currently stored in browser localStorage for demo/testing.
-The current version focuses on core workflow screens and logic, with backend integration planned as the next stage.
+EnviroMonitor aims to solve this by providing a centralized, digital ecosystem where:
 
-## Tech Stack
+Industries can submit and manage environmental data
+Monitoring agencies can verify, analyze, and enforce compliance
+Systems can automatically calculate AQI and generate reports
+✨ Key Highlights
+🔐 Secure role-based authentication
+📊 Real-time Air Quality Index (AQI) calculation
+⚖️ Automatic compliance validation
+🧪 Dedicated dashboards for agencies & industries
+📄 Integrated report generation system
+🗄️ Persistent database storage
+🔁 Dynamic unit conversion (µg/m³ ↔ mg/m³)
+🧠 System Architecture
 
-- Current: HTML5, CSS3, Vanilla JavaScript (ES6)
-- Planned: Backend API, persistent database, secure authentication, and reporting services
+EnviroMonitor follows a multi-layered architecture:
 
-## Project Structure
+🎨 Frontend → UI & user interaction
+⚙️ Backend (Flask + Node) → APIs, business logic
+🗄️ Database (SQLite) → persistent storage
+📄 Reports Layer → generated outputs
+🧰 Tech Stack
+🎨 Frontend
+HTML5
+CSS3
+JavaScript (ES6)
+⚙️ Backend
+Python (Flask) – Core API & logic
+Node.js – Supporting services / extensions
+🗄️ Database
+SQLite (enviro.db)
+🔐 Authentication
+Backend-based validation (secure, no localStorage)
+📁 Project Structure
+/enviro-monitor
+│
+├── reports/                 # Generated reports storage
+├── venv/                    # Python virtual environment
+│
+├── app.py                   # Flask backend (main logic)
+├── server.js                # Node backend (auxiliary services)
+├── enviro.db                # SQLite database
+│
+├── login.html
+├── signup.html
+├── agency-dashboard.html
+├── industry-dashboard.html
+├── agency.html
+├── industry.html
+├── index.html
+│
+├── script.js                # Frontend logic (AQI, validation)
+├── style.css                # UI styling
+│
+├── requirements.txt         # Python dependencies
+├── package.json             # Node dependencies
+├── LICENSE
+└── README.md
+⚙️ Core Functionalities
+🔐 Authentication & Authorization
+Secure signup/login system
+Role-based routing:
+🏭 Industry
+🧪 Monitoring Agency
+📊 AQI Calculation Engine
+Accepts pollutant inputs (PM2.5, PM10, etc.)
+Performs:
+AQI computation
+Category classification (Good → Severe)
+Dominant pollutant detection
+⚖️ Compliance Monitoring
+Validates data against permissible limits
+Flags:
+✅ Within limit
+❌ Exceeds limit
+🧪 Monitoring Agency Dashboard
+Select industry & monitoring date
+Analyze pollution data
+Validate compliance
+Generate reports
+🏭 Industry Dashboard
+Submit environmental readings
+Track compliance status
+View system feedback
+📄 Report Generation System
+Reports stored in /reports
+Designed for export & audit workflows
+▶️ Installation & Setup
+1️⃣ Clone the Repository
+git clone https://github.com/your-username/enviro-monitor.git
+cd enviro-monitor
+2️⃣ Setup Python Backend
+pip install -r requirements.txt
+python app.py
+3️⃣ (Optional) Start Node Server
+npm install
+node server.js
+4️⃣ Run Frontend
+Open login.html in browser
+OR
+Use VS Code Live Server
+🔄 Application Workflow
+User registers and logs in
+Role-based dashboard access
+Industry submits pollution data
+Agency reviews and validates
+System calculates AQI instantly
+Reports generated and stored
+🔐 Security Features
+Backend authentication system
+Server-side validation
+Role-based access control
+No reliance on localStorage for credentials
+📊 Use Cases
+Environmental compliance tracking
+Industrial pollution monitoring
+Government/regulatory audits
+Data-driven environmental analysis
+🚧 Future Enhancements
+📊 Advanced analytics dashboards (charts & trends)
+📄 PDF/Excel report export
+☁️ Cloud deployment (AWS/Azure)
+📱 Mobile responsiveness
+🔔 Notification & alert system
+💧 Water quality monitoring module
+📸 Screenshots (Add Yours Here)
 
-- login.html: User login page
-- signup.html: User registration page
-- agency-dashboard.html: Monitoring agency dashboard with AQI workflow
-- industry-dashboard.html: Industry dashboard placeholder page
-- index.html: Legacy/alternate dashboard page layout
-- style.css: Shared styling for auth and dashboard pages
-- script.js: App logic (auth, routing, limits, status, AQI)
 
-## Current Air Unit Behavior
 
-In the Monitoring Agency air quality table:
-- A common unit dropdown is available in the Unit header.
-- Supported units are ug/m3 and mg/m3.
-- Changing the unit updates displayed permissible limits and status checks.
+## 🤝 Contributors
 
-## How to Run
 
-In the current phase, you can run and test the UI and client logic directly.
+ [NIDHI VINOD NIKAM](https://github.com/Nidhi194) 
+ [YASH PATIL](https://github.com/YashPatil2307) 
+ [VEDANT SAWANT](https://github.com/vedantsawant2803-cloud) 
+📜 License
 
-### Option 1: Open directly
-1. Open login.html in a browser.
+This project is licensed under the MIT License.
 
-### Option 2: Use VS Code Live Server (recommended)
-1. Install Live Server extension in VS Code.
-2. Right-click login.html.
-3. Click Open with Live Server.
+💡 Final Thought
 
-## Demo Flow
-
-1. Go to signup.html and create an account with a role.
-2. Login using the same credentials on login.html.
-3. You will be redirected based on selected role:
-   - agency -> agency-dashboard.html
-   - industry -> industry-dashboard.html
-4. In agency dashboard, select industry and date.
-5. Enter pollutant values and click Calculate AQI.
-
-## Notes and Limitations
-
-- Authentication in this phase uses localStorage and is not production-ready.
-- Password handling and role data should be moved to secure backend services in the next phase.
-- Save Data and Generate Report are ready extension points for API integration.
-
-## Future Improvements
-
-- Integrate backend authentication and database (for example Java Servlet + MySQL, or Python API stack)
-- Add report persistence and download/export
-- Add water quality monitoring section
-- Add role-specific profile management and settings
+EnviroMonitor is more than a project — it’s a real-world solution prototype for environmental governance, combining technology, compliance, and data intelligence into one platform.

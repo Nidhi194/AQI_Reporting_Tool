@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const path = require('path');
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
@@ -9,6 +10,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname)));
 
 const db = mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
@@ -25,9 +27,9 @@ db.connect((err) => {
     }
 });
 
-// Test Route
+// Open the login page when you visit http://localhost:3000/
 app.get('/', (req, res) => {
-    res.send('Server is running');
+    res.redirect('/h.html');
 });
 
 // REGISTER
@@ -59,10 +61,38 @@ app.post('/login', (req, res) => {
         }
 
         if (result.length > 0) {
+            const user = result[0];
+
+            if (user.role === 'Industry') {
+                db.query(
+                    'SELECT 1 AS ok FROM industry_details WHERE user_email = ? LIMIT 1',
+                    [user.email],
+                    (err2, rows) => {
+                        if (err2) {
+                            console.log('Industry profile check:', err2.message);
+                            return res.json({
+                                success: true,
+                                role: user.role,
+                                email: user.email,
+                                industryProfileComplete: false
+                            });
+                        }
+                        res.json({
+                            success: true,
+                            role: user.role,
+                            email: user.email,
+                            industryProfileComplete: rows.length > 0
+                        });
+                    }
+                );
+                return;
+            }
+
             res.json({
                 success: true,
-                role: result[0].role,
-                email: result[0].email
+                role: user.role,
+                email: user.email,
+                industryProfileComplete: false
             });
         } else {
             res.json({
@@ -126,6 +156,53 @@ app.post('/save-industry', (req, res) => {
 
         res.json({ message: 'Profile saved successfully' });
     });
+});
+
+// Industry user already completed profile (row in industry_details)
+app.get('/industry-onboarding-status', (req, res) => {
+    const email = String(req.query.user_email || '').trim();
+    if (!email) {
+        return res.json({ complete: false, error: 'user_email required' });
+    }
+
+    db.query(
+        'SELECT 1 AS ok FROM industry_details WHERE user_email = ? LIMIT 1',
+        [email],
+        (err, rows) => {
+            if (err) {
+                console.log('Onboarding status error:', err.message);
+                return res.json({ complete: false });
+            }
+            res.json({ complete: rows.length > 0 });
+        }
+    );
+});
+
+// Reports list for industry dashboard (return { reports: [] } from DB when ready)
+app.get('/industry-reports', (req, res) => {
+    const email = String(req.query.user_email || '').trim();
+    if (!email) {
+        return res.json({ error: 'user_email required', reports: [] });
+    }
+
+    // TODO: SELECT from your reports table WHERE user_email = ? OR industry linked to user
+    res.json({ reports: [] });
+});
+
+// Issue reports from industry users (persist to DB when ready)
+app.post('/report-industry-issue', (req, res) => {
+    const { user_email, subject, description, severity } = req.body || {};
+    const email = String(user_email || '').trim();
+    const sub = String(subject || '').trim();
+    const desc = String(description || '').trim();
+
+    if (!email || !sub || !desc) {
+        return res.json({ error: 'user_email, subject, and description are required' });
+    }
+
+    console.log('Industry issue:', { user_email: email, subject: sub, severity: severity || 'medium' });
+    // TODO: INSERT INTO industry_issues ...
+    res.json({ message: 'Issue received. Our team will review it shortly.' });
 });
 
 // GET INDUSTRY NAMES FOR AGENCY DROPDOWN

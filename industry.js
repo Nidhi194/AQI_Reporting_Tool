@@ -1,6 +1,24 @@
+(function redirectIfProfileAlreadySaved() {
+    if (typeof document === "undefined" || !document.getElementById("industry_name")) {
+        return;
+    }
+    const email = localStorage.getItem("userEmail");
+    if (!email) {
+        return;
+    }
+    fetch(`http://localhost:3000/industry-onboarding-status?user_email=${encodeURIComponent(email)}`)
+        .then((r) => r.json())
+        .then((data) => {
+            if (data && data.complete) {
+                window.location.href = "industry-reports.html";
+            }
+        })
+        .catch(() => {});
+})();
+
 function logout() {
     localStorage.removeItem("userEmail");
-    window.location.href = "h.html";
+    window.location.replace("h.html");
 }
 
 function openSection(sectionId, clickedItem) {
@@ -123,7 +141,14 @@ async function saveData() {
         });
 
         let result = await res.json();
-        alert(result.message || result.error);
+
+        if (result.error) {
+            alert(result.error);
+            return;
+        }
+
+        alert(result.message || "Profile saved successfully");
+        window.location.href = "industry-reports.html";
     } catch (error) {
         console.log(error);
         alert("Server connection error");

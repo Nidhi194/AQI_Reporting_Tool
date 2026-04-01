@@ -91,11 +91,7 @@ async function login() {
             localStorage.setItem("userEmail", data.email);
 
             if (data.role === "Industry") {
-                if (data.industryProfileComplete) {
-                    window.location.href = "industry-reports.html";
-                } else {
-                    window.location.href = "industry.html";
-                }
+                window.location.href = "industry.html";
             } else if (data.role === "Monitoring Agency") {
                 window.location.href = "agency.html";
             } else {

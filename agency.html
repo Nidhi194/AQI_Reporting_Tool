@@ -17,47 +17,43 @@
     </header>
 
     <div class="dashboard-layout">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-title">Control Panel</div>
-                <div class="sidebar-subtitle">Click any section below to open that part of the dashboard.</div>
-            </div>
-
-            <ul class="nav-list" id="agencyNav">
-                <li class="nav-item active" onclick="openSection('section-industry', this)">
-                    <div class="nav-number">1</div>
-                    <div class="nav-text">Industry Selection</div>
-                </li>
-                <li class="nav-item" onclick="openSection('section-pm10', this)">
-                    <div class="nav-number">2</div>
-                    <div class="nav-text">PM10 Determination</div>
-                </li>
-                <li class="nav-item" onclick="openSection('section-so2', this)">
-                    <div class="nav-number">3</div>
-                    <div class="nav-text">SO₂ Determination</div>
-                </li>
-                <li class="nav-item" onclick="openSection('section-no2', this)">
-                    <div class="nav-number">4</div>
-                    <div class="nav-text">NO₂ Determination</div>
-                </li>
-                <li class="nav-item" onclick="openSection('section-pm25', this)">
-                    <div class="nav-number">5</div>
-                    <div class="nav-text">PM2.5 Determination</div>
-                </li>
-                <li class="nav-item" onclick="openSection('section-report', this)">
-                    <div class="nav-number">6</div>
-                    <div class="nav-text">Generate Report</div>
-                </li>
-            </ul>
-        </aside>
-
         <main class="main-content">
-            <div class="page-title-card">
-                <h2>Monitoring Agency Dashboard</h2>
-            </div>
-
             <section class="section-card" id="section-industry">
                 <h3>Industry Selection</h3>
+
+                <div class="step-nav-wrap" aria-label="Dashboard Steps">
+                    <div class="step-nav-header">
+                        <div class="step-nav-title">Monitoring Workflow</div>
+                        <div class="step-nav-subtitle">Select a step to jump to the same existing section.</div>
+                    </div>
+
+                    <ul class="nav-list" id="agencyNav">
+                        <li class="nav-item active" onclick="openSection('section-industry', this)">
+                            <div class="nav-number">1</div>
+                            <div class="nav-text">Industry Selection</div>
+                        </li>
+                        <li class="nav-item" onclick="openSection('section-pm10', this)">
+                            <div class="nav-number">2</div>
+                            <div class="nav-text">PM10 Determination</div>
+                        </li>
+                        <li class="nav-item" onclick="openSection('section-so2', this)">
+                            <div class="nav-number">3</div>
+                            <div class="nav-text">SO₂ Determination</div>
+                        </li>
+                        <li class="nav-item" onclick="openSection('section-no2', this)">
+                            <div class="nav-number">4</div>
+                            <div class="nav-text">NO₂ Determination</div>
+                        </li>
+                        <li class="nav-item" onclick="openSection('section-pm25', this)">
+                            <div class="nav-number">5</div>
+                            <div class="nav-text">PM2.5 Determination</div>
+                        </li>
+                        <li class="nav-item" onclick="openSection('section-report', this)">
+                            <div class="nav-number">6</div>
+                            <div class="nav-text">Generate Report</div>
+                        </li>
+                    </ul>
+                </div>
 
                 <div class="top-fields">
                     <div class="field-box">
@@ -95,17 +91,49 @@
                         <tr>
                             <td>1</td>
                             <td>Time of Sampling(in hours)</td>
-                            <td><input id="pm_time_1"></td>
-                            <td><input id="pm_time_2"></td>
-                            <td><input id="pm_time_3"></td>
+                            <td>
+                                <div class="time-range-group">
+                                    <div class="sampling-time-inline">
+                                        <input id="pm_time_from_1" type="time" aria-label="From Time 1">
+                                        <span class="sampling-time-label">From</span>
+                                        <input id="pm_time_to_1" type="time" aria-label="To Time 1">
+                                    </div>
+                                    <input id="pm_time_1" type="hidden">
+                                    <div class="time-validation" id="pm_time_error_1"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="time-range-group">
+                                    <div class="sampling-time-inline">
+                                        <input id="pm_time_from_2" type="time" aria-label="From Time 2">
+                                        <span class="sampling-time-label">From</span>
+                                        <input id="pm_time_to_2" type="time" aria-label="To Time 2">
+                                    </div>
+                                    <input id="pm_time_2" type="hidden">
+                                    <div class="time-validation" id="pm_time_error_2"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="time-range-group">
+                                    <div class="sampling-time-inline">
+                                        <input id="pm_time_from_3" type="time" aria-label="From Time 3">
+                                        <span class="sampling-time-label">From</span>
+                                        <input id="pm_time_to_3" type="time" aria-label="To Time 3">
+                                    </div>
+                                    <input id="pm_time_3" type="hidden">
+                                    <div class="time-validation" id="pm_time_error_3"></div>
+                                </div>
+                            </td>
                         </tr>
 
                         <tr>
                             <td>2</td>
                             <td>Location Name</td>
-                            <td><input id="pm_loc_1"></td>
-                            <td><input id="pm_loc_2"></td>
-                            <td><input id="pm_loc_3"></td>
+                            <td colspan="3" class="location-merged-cell">
+                                <input id="pm_loc_1" class="location-sync-input" readonly>
+                                <input id="pm_loc_2" type="hidden">
+                                <input id="pm_loc_3" type="hidden">
+                            </td>
                         </tr>
 
                         <tr>
@@ -221,23 +249,67 @@
                         <tr>
                             <td>1</td>
                             <td>Time of Sampling</td>
-                            <td><input id="so_time_1"></td>
-                            <td><input id="so_time_2"></td>
-                            <td><input id="so_time_3"></td>
-                            <td><input id="so_time_4"></td>
-                            <td><input id="so_time_5"></td>
-                            <td><input id="so_time_6"></td>
+                            <td>
+                                <div class="sampling-time-inline">
+                                    <input id="so_time_start_1" type="time" aria-label="SO2 Time Start 1">
+                                    <span class="sampling-time-label">From</span>
+                                    <input id="so_time_end_1" type="time" aria-label="SO2 Time End 1">
+                                    <input id="so_time_1" type="hidden">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="sampling-time-inline">
+                                    <input id="so_time_start_2" type="time" aria-label="SO2 Time Start 2">
+                                    <span class="sampling-time-label">From</span>
+                                    <input id="so_time_end_2" type="time" aria-label="SO2 Time End 2">
+                                    <input id="so_time_2" type="hidden">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="sampling-time-inline">
+                                    <input id="so_time_start_3" type="time" aria-label="SO2 Time Start 3">
+                                    <span class="sampling-time-label">From</span>
+                                    <input id="so_time_end_3" type="time" aria-label="SO2 Time End 3">
+                                    <input id="so_time_3" type="hidden">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="sampling-time-inline">
+                                    <input id="so_time_start_4" type="time" aria-label="SO2 Time Start 4">
+                                    <span class="sampling-time-label">From</span>
+                                    <input id="so_time_end_4" type="time" aria-label="SO2 Time End 4">
+                                    <input id="so_time_4" type="hidden">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="sampling-time-inline">
+                                    <input id="so_time_start_5" type="time" aria-label="SO2 Time Start 5">
+                                    <span class="sampling-time-label">From</span>
+                                    <input id="so_time_end_5" type="time" aria-label="SO2 Time End 5">
+                                    <input id="so_time_5" type="hidden">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="sampling-time-inline">
+                                    <input id="so_time_start_6" type="time" aria-label="SO2 Time Start 6">
+                                    <span class="sampling-time-label">From</span>
+                                    <input id="so_time_end_6" type="time" aria-label="SO2 Time End 6">
+                                    <input id="so_time_6" type="hidden">
+                                </div>
+                            </td>
                         </tr>
 
                         <tr>
                             <td>2</td>
                             <td>Location Name</td>
-                            <td><input id="so_loc_1"></td>
-                            <td><input id="so_loc_2"></td>
-                            <td><input id="so_loc_3"></td>
-                            <td><input id="so_loc_4"></td>
-                            <td><input id="so_loc_5"></td>
-                            <td><input id="so_loc_6"></td>
+                            <td colspan="6" class="location-merged-cell">
+                                <input id="so_loc_1" class="location-sync-input" readonly>
+                                <input id="so_loc_2" type="hidden">
+                                <input id="so_loc_3" type="hidden">
+                                <input id="so_loc_4" type="hidden">
+                                <input id="so_loc_5" type="hidden">
+                                <input id="so_loc_6" type="hidden">
+                            </td>
                         </tr>
 
                         <tr>
@@ -372,23 +444,67 @@
                         <tr>
                             <td>1</td>
                             <td>Time of Sampling</td>
-                            <td><input id="no_time_1"></td>
-                            <td><input id="no_time_2"></td>
-                            <td><input id="no_time_3"></td>
-                            <td><input id="no_time_4"></td>
-                            <td><input id="no_time_5"></td>
-                            <td><input id="no_time_6"></td>
+                            <td>
+                                <div class="sampling-time-inline">
+                                    <input id="no_time_start_1" type="time" aria-label="NO2 Time Start 1">
+                                    <span class="sampling-time-label">From</span>
+                                    <input id="no_time_end_1" type="time" aria-label="NO2 Time End 1">
+                                    <input id="no_time_1" type="hidden">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="sampling-time-inline">
+                                    <input id="no_time_start_2" type="time" aria-label="NO2 Time Start 2">
+                                    <span class="sampling-time-label">From</span>
+                                    <input id="no_time_end_2" type="time" aria-label="NO2 Time End 2">
+                                    <input id="no_time_2" type="hidden">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="sampling-time-inline">
+                                    <input id="no_time_start_3" type="time" aria-label="NO2 Time Start 3">
+                                    <span class="sampling-time-label">From</span>
+                                    <input id="no_time_end_3" type="time" aria-label="NO2 Time End 3">
+                                    <input id="no_time_3" type="hidden">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="sampling-time-inline">
+                                    <input id="no_time_start_4" type="time" aria-label="NO2 Time Start 4">
+                                    <span class="sampling-time-label">From</span>
+                                    <input id="no_time_end_4" type="time" aria-label="NO2 Time End 4">
+                                    <input id="no_time_4" type="hidden">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="sampling-time-inline">
+                                    <input id="no_time_start_5" type="time" aria-label="NO2 Time Start 5">
+                                    <span class="sampling-time-label">From</span>
+                                    <input id="no_time_end_5" type="time" aria-label="NO2 Time End 5">
+                                    <input id="no_time_5" type="hidden">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="sampling-time-inline">
+                                    <input id="no_time_start_6" type="time" aria-label="NO2 Time Start 6">
+                                    <span class="sampling-time-label">From</span>
+                                    <input id="no_time_end_6" type="time" aria-label="NO2 Time End 6">
+                                    <input id="no_time_6" type="hidden">
+                                </div>
+                            </td>
                         </tr>
 
                         <tr>
                             <td>2</td>
                             <td>Location Name</td>
-                            <td><input id="no_loc_1"></td>
-                            <td><input id="no_loc_2"></td>
-                            <td><input id="no_loc_3"></td>
-                            <td><input id="no_loc_4"></td>
-                            <td><input id="no_loc_5"></td>
-                            <td><input id="no_loc_6"></td>
+                            <td colspan="6" class="location-merged-cell">
+                                <input id="no_loc_1" class="location-sync-input" readonly>
+                                <input id="no_loc_2" type="hidden">
+                                <input id="no_loc_3" type="hidden">
+                                <input id="no_loc_4" type="hidden">
+                                <input id="no_loc_5" type="hidden">
+                                <input id="no_loc_6" type="hidden">
+                            </td>
                         </tr>
 
                         <tr>
@@ -529,13 +645,20 @@
                         <tr>
                             <td>1</td>
                             <td>Time of Sampling</td>
-                            <td><input id="pm25_time_1"></td>
+                            <td>
+                                <div class="sampling-time-inline">
+                                    <input id="pm25_time_start_1" type="time" aria-label="PM2.5 Time Start 1">
+                                    <span class="sampling-time-label">From</span>
+                                    <input id="pm25_time_end_1" type="time" aria-label="PM2.5 Time End 1">
+                                    <input id="pm25_time_1" type="hidden">
+                                </div>
+                            </td>
                         </tr>
 
                         <tr>
                             <td>2</td>
                             <td>Location Name</td>
-                            <td><input id="pm25_loc_1"></td>
+                            <td><input id="pm25_loc_1" class="location-sync-input" readonly></td>
                         </tr>
 
                         <tr>

@@ -20,6 +20,112 @@ async function loadIndustries() {
 
 loadIndustries();
 
+const industryLocationMap = {
+    manufacturing: "Industrial Zone",
+    chemical: "Chemical Estate",
+    "cement & construction": "Industrial Zone",
+    "steel & metallurgy": "Metal Park",
+    textile: "Textile Cluster",
+    "paper & pulp": "Paper Industrial Area",
+    pharmaceutical: "Pharma Hub",
+    "power generation": "Power Plant Zone",
+    it: "Tech Park"
+};
+
+function getAutofillLocation(industryValue) {
+    const normalized = (industryValue || "").trim().toLowerCase();
+    if (!normalized) return "";
+
+    if (industryLocationMap[normalized]) {
+        return industryLocationMap[normalized];
+    }
+
+    const keywordMatch = Object.keys(industryLocationMap).find(key => normalized.includes(key));
+    if (keywordMatch) {
+        return industryLocationMap[keywordMatch];
+    }
+
+    return `${industryValue.trim()} Location`;
+}
+
+function setupIndustryLocationAutofill() {
+    const industryDropdown = document.getElementById("industry_name");
+    const locationInput = document.getElementById("location");
+
+    if (!industryDropdown || !locationInput) return;
+
+    industryDropdown.addEventListener("change", (event) => {
+        const selectedIndustry = event.target.value;
+        locationInput.value = getAutofillLocation(selectedIndustry);
+        syncSixColumnLocations(locationInput.value);
+    });
+}
+
+function syncSixColumnLocations(locationValue) {
+    const value = (locationValue || "").trim();
+
+    for (let i = 1; i <= 3; i++) {
+        const pmLoc = document.getElementById(`pm_loc_${i}`);
+        if (pmLoc) pmLoc.value = value;
+    }
+
+    for (let i = 1; i <= 6; i++) {
+        const soLoc = document.getElementById(`so_loc_${i}`);
+        const noLoc = document.getElementById(`no_loc_${i}`);
+        if (soLoc) soLoc.value = value;
+        if (noLoc) noLoc.value = value;
+    }
+
+    const pm25Loc = document.getElementById("pm25_loc_1");
+    if (pm25Loc) pm25Loc.value = value;
+}
+
+function setupSixColumnLocationBinding() {
+    const locationInput = document.getElementById("location");
+    if (!locationInput) return;
+
+    const syncHandler = () => syncSixColumnLocations(locationInput.value);
+    locationInput.addEventListener("input", syncHandler);
+    locationInput.addEventListener("change", syncHandler);
+    syncHandler();
+}
+
+function syncSamplingTimePair(prefix, index) {
+    const startInput = document.getElementById(`${prefix}_time_start_${index}`);
+    const endInput = document.getElementById(`${prefix}_time_end_${index}`);
+    const combinedInput = document.getElementById(`${prefix}_time_${index}`);
+
+    if (!startInput || !endInput || !combinedInput) return;
+
+    const start = startInput.value;
+    const end = endInput.value;
+
+    if (start && end) {
+        combinedInput.value = `${start} - ${end}`;
+    } else {
+        combinedInput.value = start || end || "";
+    }
+}
+
+function setupSixColumnTimeSync(prefix) {
+    for (let i = 1; i <= 6; i++) {
+        const startInput = document.getElementById(`${prefix}_time_start_${i}`);
+        const endInput = document.getElementById(`${prefix}_time_end_${i}`);
+
+        if (startInput) {
+            startInput.addEventListener("input", () => syncSamplingTimePair(prefix, i));
+            startInput.addEventListener("change", () => syncSamplingTimePair(prefix, i));
+        }
+
+        if (endInput) {
+            endInput.addEventListener("input", () => syncSamplingTimePair(prefix, i));
+            endInput.addEventListener("change", () => syncSamplingTimePair(prefix, i));
+        }
+
+        syncSamplingTimePair(prefix, i);
+    }
+}
+
 function validateCommonFields() {
     const industry = document.getElementById("industry_name").value.trim();
     const location = document.getElementById("location").value.trim();
@@ -148,8 +254,75 @@ function calculatePM25() {
     document.getElementById("pm25_1").innerText = pm25.toFixed(2);
 }
 
+function syncSamplingTimeRange(index) {
+    const fromInput = document.getElementById(`pm_time_from_${index}`);
+    const toInput = document.getElementById(`pm_time_to_${index}`);
+    const hiddenInput = document.getElementById(`pm_time_${index}`);
+    const errorEl = document.getElementById(`pm_time_error_${index}`);
+
+    if (!fromInput || !toInput || !hiddenInput || !errorEl) {
+        return true;
+    }
+
+    const fromValue = fromInput.value;
+    const toValue = toInput.value;
+
+    fromInput.classList.remove("time-invalid");
+    toInput.classList.remove("time-invalid");
+    errorEl.innerText = "";
+
+    if (!fromValue && !toValue) {
+        hiddenInput.value = "";
+        return true;
+    }
+
+    if (!fromValue || !toValue) {
+        hiddenInput.value = [fromValue, toValue].filter(Boolean).join(" - ");
+        errorEl.innerText = "Please select both From and To time.";
+        if (!fromValue) fromInput.classList.add("time-invalid");
+        if (!toValue) toInput.classList.add("time-invalid");
+        return false;
+    }
+
+    if (toValue <= fromValue) {
+        hiddenInput.value = `${fromValue} - ${toValue}`;
+        errorEl.innerText = "To time must be later than From time.";
+        fromInput.classList.add("time-invalid");
+        toInput.classList.add("time-invalid");
+        return false;
+    }
+
+    hiddenInput.value = `${fromValue} - ${toValue}`;
+    return true;
+}
+
+function validateAllSamplingTimeRanges() {
+    let isValid = true;
+    for (let i = 1; i <= 3; i++) {
+        if (!syncSamplingTimeRange(i)) {
+            isValid = false;
+        }
+    }
+    return isValid;
+}
+
+function setupSamplingTimeRangeControls() {
+    for (let i = 1; i <= 3; i++) {
+        const fromInput = document.getElementById(`pm_time_from_${i}`);
+        const toInput = document.getElementById(`pm_time_to_${i}`);
+        if (fromInput) fromInput.addEventListener("input", () => syncSamplingTimeRange(i));
+        if (toInput) toInput.addEventListener("input", () => syncSamplingTimeRange(i));
+        syncSamplingTimeRange(i);
+    }
+}
+
 async function savePM10() {
     if (!validateCommonFields()) return;
+
+    if (!validateAllSamplingTimeRanges()) {
+        alert("Please correct invalid PM10 sampling time ranges.");
+        return;
+    }
 
     calculatePM10();
 
@@ -421,12 +594,26 @@ function logout() {
     window.location.href = "h.html";
 }
 
+function updateStepStates(activeItem) {
+    const navItems = Array.from(document.querySelectorAll(".nav-item"));
+    const activeIndex = navItems.indexOf(activeItem);
+
+    navItems.forEach((item, index) => {
+        item.classList.remove("active", "completed", "upcoming");
+
+        if (index < activeIndex) {
+            item.classList.add("completed");
+        } else if (index === activeIndex) {
+            item.classList.add("active");
+        } else {
+            item.classList.add("upcoming");
+        }
+    });
+}
+
 function openSection(sectionId, clickedItem) {
     const targetSection = document.getElementById(sectionId);
-    const navItems = document.querySelectorAll(".nav-item");
-
-    navItems.forEach(item => item.classList.remove("active"));
-    clickedItem.classList.add("active");
+    updateStepStates(clickedItem);
 
     if (targetSection) {
         targetSection.scrollIntoView({
@@ -435,3 +622,17 @@ function openSection(sectionId, clickedItem) {
         });
     }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    const initialActive = document.querySelector(".nav-item.active") || document.querySelector(".nav-item");
+    if (initialActive) {
+        updateStepStates(initialActive);
+    }
+
+    setupIndustryLocationAutofill();
+    setupSamplingTimeRangeControls();
+    setupSixColumnLocationBinding();
+    setupSixColumnTimeSync("so");
+    setupSixColumnTimeSync("no");
+    setupSixColumnTimeSync("pm25");
+});

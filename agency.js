@@ -126,6 +126,104 @@ function setupSixColumnTimeSync(prefix) {
     }
 }
 
+// Enable arrow key navigation across table inputs
+function enableTableArrowKeyNavigation() {
+    const isNavigableInput = (el) => {
+        return el && el.tagName === "INPUT" && el.type !== "hidden" && !el.disabled;
+    };
+
+    const getCellRange = (row, targetCell) => {
+        let start = 0;
+        for (const cell of row.cells) {
+            const span = cell.colSpan || 1;
+            const end = start + span - 1;
+            if (cell === targetCell) {
+                return { start, end };
+            }
+            start += span;
+        }
+        return null;
+    };
+
+    const findCellByColumn = (row, columnIndex) => {
+        let start = 0;
+        for (const cell of row.cells) {
+            const span = cell.colSpan || 1;
+            const end = start + span - 1;
+            if (columnIndex >= start && columnIndex <= end) {
+                return cell;
+            }
+            start += span;
+        }
+        return null;
+    };
+
+    const getNavigableInputs = (root) => {
+        return Array.from(root.querySelectorAll("input"))
+            .filter(isNavigableInput);
+    };
+
+    const focusInput = (input) => {
+        if (!input) return;
+        input.focus();
+        if (typeof input.select === "function" && (input.type === "text" || input.type === "number" || input.type === "time")) {
+            input.select();
+        }
+    };
+
+    document.addEventListener("keydown", (event) => {
+        if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) return;
+        if (event.altKey || event.ctrlKey || event.metaKey) return;
+
+        const currentInput = event.target;
+        if (!isNavigableInput(currentInput)) return;
+
+        const table = currentInput.closest("table");
+        const currentCell = currentInput.closest("td, th");
+        const currentRow = currentInput.closest("tr");
+        if (!table || !currentCell || !currentRow) return;
+
+        const rows = Array.from(table.querySelectorAll("tr"));
+        const rowIndex = rows.indexOf(currentRow);
+        if (rowIndex === -1) return;
+
+        let nextInput = null;
+
+        if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+            const rowInputs = getNavigableInputs(currentRow);
+            const inputIndex = rowInputs.indexOf(currentInput);
+            if (inputIndex === -1) return;
+
+            const delta = event.key === "ArrowRight" ? 1 : -1;
+            nextInput = rowInputs[inputIndex + delta] || null;
+        } else {
+            const currentRange = getCellRange(currentRow, currentCell);
+            if (!currentRange) return;
+
+            const currentCellInputs = getNavigableInputs(currentCell);
+            const inCellIndex = Math.max(0, currentCellInputs.indexOf(currentInput));
+            const step = event.key === "ArrowDown" ? 1 : -1;
+
+            for (let i = rowIndex + step; i >= 0 && i < rows.length; i += step) {
+                const candidateRow = rows[i];
+                const candidateCell = findCellByColumn(candidateRow, currentRange.start);
+                if (!candidateCell) continue;
+
+                const candidateInputs = getNavigableInputs(candidateCell);
+                if (!candidateInputs.length) continue;
+
+                nextInput = candidateInputs[Math.min(inCellIndex, candidateInputs.length - 1)];
+                break;
+            }
+        }
+
+        if (!nextInput) return;
+
+        event.preventDefault();
+        focusInput(nextInput);
+    });
+}
+
 function validateCommonFields() {
     const industry = document.getElementById("industry_name").value.trim();
     const location = document.getElementById("location").value.trim();
@@ -635,4 +733,5 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSixColumnTimeSync("so");
     setupSixColumnTimeSync("no");
     setupSixColumnTimeSync("pm25");
+    enableTableArrowKeyNavigation();
 });

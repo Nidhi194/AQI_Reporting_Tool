@@ -1,9 +1,10 @@
-(function redirectIfProfileAlreadySaved() {
+ (function guardIndustryOnboarding() {
     if (typeof document === "undefined" || !document.getElementById("industry_name")) {
         return;
     }
     const email = localStorage.getItem("userEmail");
     if (!email) {
+        window.location.href = "h.html";
         return;
     }
     fetch(`http://localhost:3000/industry-onboarding-status?user_email=${encodeURIComponent(email)}`)

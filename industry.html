@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Industry Profile</title>
     <link rel="stylesheet" href="industry.css">
 </head>
@@ -16,6 +18,11 @@
 
 <div class="dashboard-layout">
     <aside class="sidebar">
+        <div class="sidebar-header">
+            <p class="sidebar-eyebrow">Navigation</p>
+            <h2 class="sidebar-title">Profile Sections</h2>
+        </div>
+
         <ul class="nav-list">
             <li class="nav-item active" onclick="openSection('industrySection', this)">Industry Profile</li>
             <li class="nav-item" onclick="openSection('contactSection', this)">Contact Information</li>
@@ -28,12 +35,22 @@
                 <div class="progress-fill" id="progressFill"></div>
             </div>
             <div class="progress-text" id="progressText">0%</div>
+            <p class="progress-note">Keep all mandatory details updated to improve onboarding readiness.</p>
         </div>
     </aside>
 
     <main class="main-content">
+        <section class="page-intro-card">
+            <p class="intro-eyebrow">Industry Onboarding</p>
+            <h1 class="intro-title">Industry Dashboard Profile Setup</h1>
+            <p class="intro-subtitle">Maintain accurate plant and contact records for AQI reporting, compliance workflows, and formal review readiness.</p>
+        </section>
+
         <div class="section-card" id="industrySection">
-            <h3>Industry Details</h3>
+            <div class="section-heading">
+                <h3>Industry Details</h3>
+                <p class="section-support">Core operational identity and registered location details.</p>
+            </div>
 
             <div class="grid">
                 <div>
@@ -70,7 +87,10 @@
         </div>
 
         <div class="section-card" id="contactSection">
-            <h3>Contact Information</h3>
+            <div class="section-heading">
+                <h3>Contact Information</h3>
+                <p class="section-support">Primary communication contacts for regulatory and operational coordination.</p>
+            </div>
 
             <div class="grid">
                 <div>
@@ -101,7 +121,10 @@
         </div>
 
         <div class="section-card" id="complianceSection">
-            <h3>Compliance &amp; Notifications</h3>
+            <div class="section-heading">
+                <h3>Compliance &amp; Notifications</h3>
+                <p class="section-support">Monitoring cadence and alert preferences for timely response.</p>
+            </div>
 
             <div class="grid">
                 <div>

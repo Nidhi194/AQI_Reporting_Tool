@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Agency Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkR4j8Y7qWfR4+6J0JQ1hYxP2m5x2l3w9A3w==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="../css/agency-dash.css">
+</head>
+<body>
+    <!-- Full-screen monitoring dashboard layout -->
+    <div class="app-layout" id="appLayout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebarPanel" aria-label="Monitoring Agency Navigation">
+            <div class="sidebar-brand">
+                <div class="brand-logo" aria-hidden="true">
+                    <i class="fa-solid fa-industry"></i>
+                </div>
+                <div class="brand-copy">
+                    <p class="brand-title">EnviroMonitor</p>
+                    <p class="brand-subtitle">Monitoring Agency</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav" aria-label="Sidebar Menu">
+                <a href="#" class="sidebar-link is-active">
+                    <i class="fa-solid fa-grid-2"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="sidebar-link">
+                    <i class="fa-regular fa-file-lines"></i>
+                    <span>Reports</span>
+                </a>
+                <a href="#" class="sidebar-link">
+                    <i class="fa-solid fa-file-circle-plus"></i>
+                    <span>Generate Report</span>
+                </a>
+                <a href="#" class="sidebar-link">
+                    <i class="fa-regular fa-calendar-check"></i>
+                    <span>Schedules</span>
+                </a>
+                <a href="#" class="sidebar-link">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="#" class="sidebar-link">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>Audit Logs</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-profile">
+                <div class="profile-avatar" aria-hidden="true">MA</div>
+                <div class="profile-content">
+                    <p class="profile-name">Monitoring Agency</p>
+                    <p class="profile-role">Agency User</p>
+                </div>
+                <button id="btnProfileMenu" name="profile_menu" value="profile_menu" class="icon-button" type="button" aria-label="Profile menu">
+                    <i class="fa-solid fa-angle-down"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main content -->
+        <main class="main-panel">
+            <!-- Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button id="btnSidebarToggle" name="sidebar_toggle" value="sidebar_toggle" class="icon-button mobile-only" type="button" aria-label="Toggle sidebar">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1>Monitoring Agency Dashboard</h1>
+                </div>
+
+                <div class="header-right">
+                    <button id="btnNotifications" name="notifications" value="notifications" class="icon-button" type="button" aria-label="Notifications">
+                        <i class="fa-regular fa-bell"></i>
+                    </button>
+                    <button id="btnLogout" name="logout" value="logout" class="btn btn-logout" type="button" aria-label="Logout">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Logout</span>
+                    </button>
+                    <button id="btnHeaderProfile" name="header_profile" value="header_profile" class="avatar-button" type="button" aria-label="Open profile">
+                        MA
+                    </button>
+                </div>
+            </header>
+
+            <!-- Summary cards -->
+            <section class="stats-grid" aria-label="Summary cards">
+                <article class="stat-card">
+                    <div class="stat-icon icon-total"><i class="fa-regular fa-file-lines"></i></div>
+                    <div>
+                        <p class="stat-value" id="statTotalReports">254</p>
+                        <p class="stat-label">Total Reports</p>
+                    </div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-icon icon-active"><i class="fa-solid fa-chart-line"></i></div>
+                    <div>
+                        <p class="stat-value" id="statActiveReports">68</p>
+                        <p class="stat-label">Active Reports</p>
+                    </div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-icon icon-pending"><i class="fa-regular fa-clock"></i></div>
+                    <div>
+                        <p class="stat-value" id="statPendingReports">12</p>
+                        <p class="stat-label">Pending Reports</p>
+                    </div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-icon icon-overdue"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div>
+                        <p class="stat-value" id="statOverdueReports">5</p>
+                        <p class="stat-label">Overdue Reports</p>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Reports overview -->
+            <section class="reports-panel" aria-label="Reports overview">
+                <div class="reports-panel-header">
+                    <h2>Reports Overview</h2>
+
+                    <div class="panel-actions">
+                        <button id="btnGenerateReport" name="generate_report" value="generate_report" class="btn btn-secondary" type="button">
+                            <i class="fa-regular fa-file-lines"></i>
+                            <span>Generate Report</span>
+                        </button>
+                        <button id="btnScheduleReport" name="schedule_report" value="schedule_report" class="btn btn-secondary" type="button">
+                            <i class="fa-regular fa-calendar"></i>
+                            <span>Schedule</span>
+                        </button>
+                        <button id="btnExportCsv" name="export_csv" value="export_csv" class="btn btn-secondary" type="button">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Export CSV</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="reports-toolbar">
+                    <label class="search-box" for="inputSearchReports">
+                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                        <input id="inputSearchReports" name="search_reports" type="search" placeholder="Search reports..." autocomplete="off">
+                    </label>
+
+                    <button id="btnNewReport" name="new_report" value="new_report" class="btn btn-primary" type="button">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>New Report</span>
+                    </button>
+                </div>
+
+                <!-- Reports table section. Backend/API can replace placeholder rows below. -->
+                <div class="table-wrapper" id="tableWrapperReports">
+                    <table id="tableReports" class="reports-table">
+                        <thead>
+                            <tr>
+                                <th>Report Name</th>
+                                <th>Type</th>
+                                <th>Generated By</th>
+                                <th>Status</th>
+                                <th>Date Generated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyReports">
+                            <!-- Dynamic report rows will be injected here -->
+                            <!-- Placeholder rows only for UI preview -->
+                            <tr data-report-row data-report-id="RPT-0001">
+                                <td>Ambient Air Quality Report</td>
+                                <td>Environmental</td>
+                                <td>John Doe</td>
+                                <td><span class="status-badge status-in-progress"><i class="fa-solid fa-circle"></i>In Progress</span></td>
+                                <td>April 26, 2024</td>
+                                <td class="actions-cell">
+                                    <button id="btnRowActionRpt0001" name="row_action" value="RPT-0001" class="btn-row-action" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Open row actions">
+                                        <i class="fa-solid fa-ellipsis"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr data-report-row data-report-id="RPT-0002">
+                                <td>Emission Monitoring Report</td>
+                                <td>Industrial</td>
+                                <td>Jane Smith</td>
+                                <td><span class="status-badge status-completed"><i class="fa-solid fa-circle"></i>Completed</span></td>
+                                <td>April 20, 2024</td>
+                                <td class="actions-cell">
+                                    <button id="btnRowActionRpt0002" name="row_action" value="RPT-0002" class="btn-row-action" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Open row actions">
+                                        <i class="fa-solid fa-ellipsis"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="table-empty-state" id="tableEmptyState" hidden>
+                        <i class="fa-regular fa-folder-open" aria-hidden="true"></i>
+                        <p>No reports found.</p>
+                        <span>New records from backend will appear here once available.</span>
+                    </div>
+                </div>
+
+                <footer class="table-footer">
+                    <p id="textTableSummary">Showing 2 of 2 reports</p>
+                    <div class="pagination-mock" aria-label="Pagination preview">
+                        <button id="btnPagePrev" name="page_prev" value="page_prev" class="icon-button" type="button" aria-label="Previous page">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button id="btnPageNext" name="page_next" value="page_next" class="icon-button" type="button" aria-label="Next page">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </footer>
+            </section>
+        </main>
+    </div>
+
+    <!-- Shared row action menu. Backend can map actions using selected report id. -->
+    <div id="reportActionMenu" class="action-menu" role="menu" hidden>
+        <button id="btnMenuEdit" name="menu_edit" value="edit" class="action-menu-item" type="button"><i class="fa-regular fa-pen-to-square"></i><span>Edit</span></button>
+        <button id="btnMenuView" name="menu_view" value="view" class="action-menu-item" type="button"><i class="fa-regular fa-eye"></i><span>View</span></button>
+        <button id="btnMenuGenerateReport" name="menu_generate_report" value="generate_report" class="action-menu-item" type="button"><i class="fa-regular fa-file-lines"></i><span>Generate Report</span></button>
+        <button id="btnMenuDuplicate" name="menu_duplicate" value="duplicate" class="action-menu-item" type="button"><i class="fa-regular fa-copy"></i><span>Duplicate</span></button>
+        <button id="btnMenuDelete" name="menu_delete" value="delete" class="action-menu-item danger" type="button"><i class="fa-regular fa-trash-can"></i><span>Delete</span></button>
+    </div>
+
+    <script src="../js/agency-dash.js"></script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login System</title>
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+<body class="page-home">
+
+<div class="main-wrapper">
+    <div class="left-panel">
+        <h1>EnviroMonitor System</h1>
+        <div class="tagline">Environmental Monitoring &amp; Reporting Platform</div>
+
+        <ul class="feature-list">
+            <li>Create your access account</li>
+            <li>Select your role for dashboard routing</li>
+            <li>Backend-ready modular flow</li>
+        </ul>
+    </div>
+
+    <div class="right-panel">
+        <div class="form-box">
+            <div class="icon">🌿</div>
+            <h2 id="title">Login</h2>
+
+            <!-- LOGIN FORM -->
+            <div id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input id="loginEmail" type="email" placeholder="Enter email address">
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input id="loginPassword" type="password" placeholder="Enter password">
+                </div>
+
+                <button onclick="login()">Login</button>
+
+                <p>
+                    Don't have an account?
+                    <a href="#" onclick="showRegister(); return false;">Sign up</a>
+                </p>
+            </div>
+
+            <!-- REGISTER FORM -->
+            <div id="registerForm" style="display:none;">
+                <div class="form-group">
+                    <label for="regEmail">Email</label>
+                    <input id="regEmail" type="email" placeholder="Create email address">
+                </div>
+
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <input id="regPassword" type="password" placeholder="Create password">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input id="confirmPassword" type="password" placeholder="Confirm password">
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role">
+                        <option value="">-- Select Role --</option>
+                        <option value="Monitoring Agency">Monitoring Agency</option>
+                        <option value="Industry">Industry</option>
+                    </select>
+                </div>
+
+                <button onclick="register()">Create Account</button>
+
+                <p>
+                    Already have an account?
+                    <a href="#" onclick="showLogin(); return false;">Login</a>
+                </p>
+            </div>
+
+            <h3 id="result"></h3>
+        </div>
+    </div>
+</div>
+
+<script src="../js/app.js"></script>
+</body>
+</html>

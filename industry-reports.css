@@ -1,4 +1,4 @@
-/* Extends industry.css — same palette via shared variables */
+/* Extends app.css (merged from h, industry, and agency files) */
 
 .reports-shell {
     display: grid;

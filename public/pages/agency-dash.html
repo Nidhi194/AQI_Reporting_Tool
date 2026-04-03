@@ -9,6 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkR4j8Y7qWfR4+6J0JQ1hYxP2m5x2l3w9A3w==" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="../css/agency-dash.css">
+    <link rel="stylesheet" href="../css/glass-theme.css">
+    <link rel="stylesheet" href="../css/agency-features.css">
 </head>
 <body>
     <!-- Full-screen monitoring dashboard layout -->
@@ -89,10 +91,29 @@
                 </div>
             </header>
 
+            <!-- Real-time Alert Ticker -->
+            <div class="alert-ticker" aria-live="polite">
+                <div class="alert-ticker-track" id="alertTickerTrack">
+                    <span><i class="fa-solid fa-triangle-exclamation"></i> [10:42 AM] ALERT: Heavy Metal Industries PM2.5 levels nearing critical threshold.</span>
+                    <span><i class="fa-solid fa-circle-check"></i> [10:15 AM] UPDATE: BioChem Corp weekly emission report verified.</span>
+                    <span><i class="fa-solid fa-bolt"></i> [09:50 AM] ALERT: Global Power Plant SO2 anomalies detected in sector 4.</span>
+                    <!-- Duplicate for infinite scroll loop effect -->
+                    <span aria-hidden="true"><i class="fa-solid fa-triangle-exclamation"></i> [10:42 AM] ALERT: Heavy Metal Industries PM2.5 levels nearing critical threshold.</span>
+                    <span aria-hidden="true"><i class="fa-solid fa-circle-check"></i> [10:15 AM] UPDATE: BioChem Corp weekly emission report verified.</span>
+                    <span aria-hidden="true"><i class="fa-solid fa-bolt"></i> [09:50 AM] ALERT: Global Power Plant SO2 anomalies detected in sector 4.</span>
+                </div>
+            </div>
+
             <!-- Summary cards -->
             <section class="stats-grid" aria-label="Summary cards">
                 <article class="stat-card">
-                    <div class="stat-icon icon-total"><i class="fa-regular fa-file-lines"></i></div>
+                    <div class="stat-card-radial gauge-total">
+                        <svg class="radial-svg" viewBox="0 0 44 44">
+                            <circle class="radial-bg" cx="22" cy="22" r="20"></circle>
+                            <circle class="radial-progress" cx="22" cy="22" r="20" data-percentage="100"></circle>
+                        </svg>
+                        <div class="radial-icon"><i class="fa-regular fa-file-lines"></i></div>
+                    </div>
                     <div>
                         <p class="stat-value" id="statTotalReports">254</p>
                         <p class="stat-label">Total Reports</p>
@@ -100,7 +121,13 @@
                 </article>
 
                 <article class="stat-card">
-                    <div class="stat-icon icon-active"><i class="fa-solid fa-chart-line"></i></div>
+                    <div class="stat-card-radial gauge-active">
+                        <svg class="radial-svg" viewBox="0 0 44 44">
+                            <circle class="radial-bg" cx="22" cy="22" r="20"></circle>
+                            <circle class="radial-progress" cx="22" cy="22" r="20" data-percentage="65"></circle>
+                        </svg>
+                        <div class="radial-icon"><i class="fa-solid fa-chart-line"></i></div>
+                    </div>
                     <div>
                         <p class="stat-value" id="statActiveReports">68</p>
                         <p class="stat-label">Active Reports</p>
@@ -108,7 +135,13 @@
                 </article>
 
                 <article class="stat-card">
-                    <div class="stat-icon icon-pending"><i class="fa-regular fa-clock"></i></div>
+                    <div class="stat-card-radial gauge-pending">
+                        <svg class="radial-svg" viewBox="0 0 44 44">
+                            <circle class="radial-bg" cx="22" cy="22" r="20"></circle>
+                            <circle class="radial-progress" cx="22" cy="22" r="20" data-percentage="25"></circle>
+                        </svg>
+                        <div class="radial-icon"><i class="fa-regular fa-clock"></i></div>
+                    </div>
                     <div>
                         <p class="stat-value" id="statPendingReports">12</p>
                         <p class="stat-label">Pending Reports</p>
@@ -116,7 +149,13 @@
                 </article>
 
                 <article class="stat-card">
-                    <div class="stat-icon icon-overdue"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div class="stat-card-radial gauge-overdue">
+                        <svg class="radial-svg" viewBox="0 0 44 44">
+                            <circle class="radial-bg" cx="22" cy="22" r="20"></circle>
+                            <circle class="radial-progress" cx="22" cy="22" r="20" data-percentage="15"></circle>
+                        </svg>
+                        <div class="radial-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    </div>
                     <div>
                         <p class="stat-value" id="statOverdueReports">5</p>
                         <p class="stat-label">Overdue Reports</p>
@@ -167,6 +206,7 @@
                                 <th>Generated By</th>
                                 <th>Status</th>
                                 <th>Date Generated</th>
+                                <th>7-Day Trend</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -179,6 +219,7 @@
                                 <td>John Doe</td>
                                 <td><span class="status-badge status-in-progress"><i class="fa-solid fa-circle"></i>In Progress</span></td>
                                 <td>April 26, 2024</td>
+                                <td class="sparkline-cell"><div class="sparkline-wrap"><canvas class="sparkline-canvas"></canvas></div></td>
                                 <td class="actions-cell">
                                     <button id="btnRowActionRpt0001" name="row_action" value="RPT-0001" class="btn-row-action" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Open row actions">
                                         <i class="fa-solid fa-ellipsis"></i>
@@ -191,6 +232,7 @@
                                 <td>Jane Smith</td>
                                 <td><span class="status-badge status-completed"><i class="fa-solid fa-circle"></i>Completed</span></td>
                                 <td>April 20, 2024</td>
+                                <td class="sparkline-cell"><div class="sparkline-wrap"><canvas class="sparkline-canvas"></canvas></div></td>
                                 <td class="actions-cell">
                                     <button id="btnRowActionRpt0002" name="row_action" value="RPT-0002" class="btn-row-action" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Open row actions">
                                         <i class="fa-solid fa-ellipsis"></i>
@@ -231,6 +273,8 @@
         <button id="btnMenuDelete" name="menu_delete" value="delete" class="action-menu-item danger" type="button"><i class="fa-regular fa-trash-can"></i><span>Delete</span></button>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../js/agency-dash.js"></script>
+    <script src="../js/agency-features.js"></script>
 </body>
 </html>

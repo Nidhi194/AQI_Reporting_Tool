@@ -6,6 +6,9 @@
     <title>Industry Reports – EnviroMonitor</title>
     <link rel="stylesheet" href="../css/app.css">
     <link rel="stylesheet" href="../css/industry-reports.css">
+    <link rel="stylesheet" href="../css/glass-theme.css">
+    <link rel="stylesheet" href="../css/industry-features.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkR4j8Y7qWfR4+6J0JQ1hYxP2m5x2l3w9A3w==" crossorigin="anonymous" referrerpolicy="no-referrer">
 </head>
 <body class="page-industry">
 
@@ -29,7 +32,67 @@
             <p class="intro-subtitle">Preview and download reports issued for your facility. New rows appear here when your monitoring agency publishes them.</p>
         </section>
 
-        <div class="section-card reports-table-card">
+        <!-- AQI Predictive Chart Section -->
+        <div class="section-card" style="margin-bottom: 22px;">
+            <div class="section-heading">
+                <h3>Pollution Trend &amp; Predictive Analysis</h3>
+                <p class="section-support">Historical AQI levels with AI-driven forecast for the upcoming month showing rising pollution markers.</p>
+            </div>
+            <div style="position: relative; height: 320px; width: 100%;">
+                <canvas id="aqiChart"></canvas>
+            </div>
+            
+            <div class="chart-controls">
+                <label>Simulate Emission Reduction: <span id="sliderValue">0%</span></label>
+                <input type="range" id="reductionSlider" min="0" max="40" value="0">
+            </div>
+            
+            <div class="ai-insight-box">
+                <i class="fa-solid fa-robot"></i>
+                <p id="aiInsightText">⚠️ Prediction: AQI will spike to 235 next month. Recommendation: Reduce plant output by at least 15% to remain compliant.</p>
+            </div>
+        </div>
+
+        <div class="section-card certificates-section">
+            <div class="section-heading">
+                <h3>Certified Emission Reports</h3>
+                <p class="section-support">Immutable blockchain-verified environmental records.</p>
+            </div>
+            
+            <div class="cert-grid">
+                <div class="cert-card">
+                    <div class="cert-inner">
+                        <div class="cert-front">
+                            <i class="fa-solid fa-file-shield cert-icon"></i>
+                            <p class="cert-title">Q1 Ambient Air Report</p>
+                            <p class="cert-date">Issued: March 2024</p>
+                            <span class="cert-status valid">Verified</span>
+                        </div>
+                        <div class="cert-back">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=AQI-VERIFIED-782" alt="QR Seal" class="qr-code">
+                            <button class="btn-primary btn-sm">Download Validated PDF</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="cert-card">
+                    <div class="cert-inner">
+                        <div class="cert-front">
+                            <i class="fa-solid fa-file-shield cert-icon"></i>
+                            <p class="cert-title">Weekly Emission Log</p>
+                            <p class="cert-date">Issued: Early March</p>
+                            <span class="cert-status valid">Verified</span>
+                        </div>
+                        <div class="cert-back">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=AQI-VERIFIED-910" alt="QR Seal" class="qr-code">
+                            <button class="btn-primary btn-sm">Download Validated PDF</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card reports-table-card" style="display: none;">
             <div class="section-heading reports-table-heading">
                 <div>
                     <h3>Report library</h3>
@@ -59,6 +122,26 @@
     </main>
 
     <aside class="reports-aside">
+        <div class="section-card compliance-card">
+            <h3>Live Compliance Health</h3>
+            <div class="gauge-container">
+                <svg viewBox="0 0 100 50" class="gauge-svg">
+                    <path class="gauge-bg" d="M 10 45 A 40 40 0 0 1 90 45"></path>
+                    <path class="gauge-val" d="M 10 45 A 40 40 0 0 1 90 45"></path>
+                </svg>
+                <div class="gauge-score">185</div>
+                <div class="gauge-label">Poor (Action Req.)</div>
+            </div>
+        </div>
+        
+        <div class="section-card weather-widget">
+            <div class="weather-icon"><i class="fa-solid fa-wind"></i></div>
+            <div class="weather-info">
+                <p class="w-main">East Wind, 14 km/h</p>
+                <p class="w-sub">Dispersal: Optimal today</p>
+            </div>
+        </div>
+
         <div class="section-card issue-card">
             <div class="section-heading">
                 <h3>Report an issue</h3>
@@ -103,7 +186,10 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="../js/app.js"></script>
 <script src="../js/industry-reports.js"></script>
+<script src="../js/aqi-chart.js"></script>
+<script src="../js/industry-features.js"></script>
 </body>
 </html>

@@ -131,3 +131,31 @@
     width: 100%;
     height: 100%;
 }
+
+/* 4. Action Buttons Fix */
+.btn-action-pop {
+    width: auto !important;
+    height: auto !important;
+    padding: 6px 14px !important;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 0.8rem;
+    font-weight: 800;
+    box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3) !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-action-pop:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(2, 132, 199, 0.5) !important;
+}
+
+.btn-action-pop i {
+    font-size: 0.75rem;
+}

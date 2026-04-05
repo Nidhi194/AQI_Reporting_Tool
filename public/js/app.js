@@ -1,4 +1,4 @@
-﻿/* Merged from h, industry, and agency files for cleaner structure */
+/* Merged from h, industry, and agency files for cleaner structure */
 
 /* Home Page Logic */
 (() => {
@@ -98,7 +98,9 @@ async function login() {
         if (data.success) {
             localStorage.setItem("userEmail", data.email);
 
-            if (data.role === "Industry") {
+            if (data.redirectPage) {
+                window.location.href = data.redirectPage;
+            } else if (data.role === "Industry") {
                 window.location.href = "industry.html";
             } else if (data.role === "Monitoring Agency") {
                 window.location.href = "agency.html";
@@ -133,6 +135,99 @@ async function login() {
 function logout() {
     localStorage.removeItem("userEmail");
     window.location.href = "h.html";
+}
+
+function isIndustryEditMode() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("edit") === "1";
+}
+
+function setIndustryIdLocked(isLocked) {
+    const industryIdInput = document.getElementById("industry_id");
+    const hint = document.getElementById("industryIdLockHint");
+
+    if (!industryIdInput) return;
+
+    industryIdInput.readOnly = Boolean(isLocked);
+    industryIdInput.style.backgroundColor = isLocked ? "#f8fafc" : "";
+    industryIdInput.style.cursor = isLocked ? "not-allowed" : "";
+
+    if (hint) {
+        hint.style.display = isLocked ? "block" : "none";
+    }
+}
+
+function populateIndustryProfile(profile = {}) {
+    const mapping = {
+        industry_name: "industry_name",
+        industry_type: "industry_type",
+        industry_id: "industry_id",
+        address: "address",
+        contact_name: "contact_name",
+        role_designation: "role_designation",
+        email: "email",
+        phone: "phone",
+        alt_phone: "alt_phone",
+        monitoring_frequency: "monitoring_frequency",
+        notification_pref: "notification_pref"
+    };
+
+    Object.entries(mapping).forEach(([profileKey, elementId]) => {
+        const el = document.getElementById(elementId);
+        if (el && profile[profileKey] !== undefined && profile[profileKey] !== null) {
+            el.value = String(profile[profileKey]);
+        }
+    });
+
+    const nameDisplay = document.getElementById("industryNameDisplay");
+    if (nameDisplay) {
+        nameDisplay.textContent = profile.industry_name || localStorage.getItem("userEmail") || "Industry User";
+    }
+
+    updateProgress();
+}
+
+async function handleIndustryEntryFlow() {
+    const userEmail = (localStorage.getItem("userEmail") || "").trim();
+
+    if (!userEmail) {
+        window.location.href = "h.html";
+        return;
+    }
+
+    const editing = isIndustryEditMode();
+
+    try {
+        const res = await fetch(`http://localhost:3000/industry-profile-status?user_email=${encodeURIComponent(userEmail)}`);
+        const result = await res.json();
+
+        if (!res.ok) {
+            throw new Error(result.error || "Could not load industry profile");
+        }
+
+        if (result.hasIndustryProfile && result.profile) {
+            if (!editing) {
+                window.location.replace("industry-reports.html");
+                return;
+            }
+
+            populateIndustryProfile(result.profile);
+            setIndustryIdLocked(true);
+
+            const title = document.getElementById("industryPageTitle");
+            const subtitle = document.getElementById("industryPageSubtitle");
+            const saveBtn = document.getElementById("saveIndustryBtn");
+
+            if (title) title.textContent = "Update Industry Profile";
+            if (subtitle) subtitle.textContent = "Review and update your saved industry details. Industry ID / Registration Number stays locked to preserve the original record.";
+            if (saveBtn) saveBtn.textContent = "Update Profile";
+            return;
+        }
+
+        setIndustryIdLocked(false);
+    } catch (error) {
+        console.log("Industry profile status check failed:", error);
+    }
 }
 
 function openSection(sectionId, clickedItem) {
@@ -207,6 +302,9 @@ function setActiveSidebar(index) {
     }
 }
 
+handleIndustryEntryFlow();
+updateProgress();
+
 async function saveData() {
     let userEmail = localStorage.getItem("userEmail");
 
@@ -255,7 +353,17 @@ async function saveData() {
         });
 
         let result = await res.json();
-        alert(result.message || result.error);
+
+        if (result.error) {
+            alert(result.error);
+            return;
+        }
+
+        alert(result.message || 'Profile saved successfully');
+
+        if (result.redirectPage) {
+            window.location.href = result.redirectPage;
+        }
     } catch (error) {
         console.log(error);
         alert("Server connection error");
@@ -951,6 +1059,182 @@ async function savePM25() {
     }
 }
 
+function collectAgencyReportPayload() {
+    return {
+        industry_name: document.getElementById("industry_name").value,
+        location: document.getElementById("location").value,
+        monitoring_date: document.getElementById("date").value,
+        pm10: {
+            q1_1: document.getElementById("q1_1").value,
+            q2_1: document.getElementById("q2_1").value,
+            w1_1: document.getElementById("w1_1").value,
+            w2_1: document.getElementById("w2_1").value,
+            q1_2: document.getElementById("q1_2").value,
+            q2_2: document.getElementById("q2_2").value,
+            w1_2: document.getElementById("w1_2").value,
+            w2_2: document.getElementById("w2_2").value,
+            q1_3: document.getElementById("q1_3").value,
+            q2_3: document.getElementById("q2_3").value,
+            w1_3: document.getElementById("w1_3").value,
+            w2_3: document.getElementById("w2_3").value
+        },
+        so2: {
+            duration_1: document.getElementById("t1").value,
+            es_1: document.getElementById("es1").value,
+            cf_1: document.getElementById("cf1").value,
+            a_1: document.getElementById("a1").innerText,
+            q_1: document.getElementById("qso1").value,
+            va_1: document.getElementById("va1").innerText,
+            vs_1: document.getElementById("vs1").value,
+            vt_1: document.getElementById("vt1").value,
+            so2_1: document.getElementById("so1").innerText,
+            duration_2: document.getElementById("t2").value,
+            es_2: document.getElementById("es2").value,
+            cf_2: document.getElementById("cf2").value,
+            a_2: document.getElementById("a2").innerText,
+            q_2: document.getElementById("qso2").value,
+            va_2: document.getElementById("va2").innerText,
+            vs_2: document.getElementById("vs2").value,
+            vt_2: document.getElementById("vt2").value,
+            so2_2: document.getElementById("so2").innerText,
+            duration_3: document.getElementById("t3").value,
+            es_3: document.getElementById("es3").value,
+            cf_3: document.getElementById("cf3").value,
+            a_3: document.getElementById("a3").innerText,
+            q_3: document.getElementById("qso3").value,
+            va_3: document.getElementById("va3").innerText,
+            vs_3: document.getElementById("vs3").value,
+            vt_3: document.getElementById("vt3").value,
+            so2_3: document.getElementById("so3").innerText,
+            duration_4: document.getElementById("t4").value,
+            es_4: document.getElementById("es4").value,
+            cf_4: document.getElementById("cf4").value,
+            a_4: document.getElementById("a4").innerText,
+            q_4: document.getElementById("qso4").value,
+            va_4: document.getElementById("va4").innerText,
+            vs_4: document.getElementById("vs4").value,
+            vt_4: document.getElementById("vt4").value,
+            so2_4: document.getElementById("so4").innerText,
+            duration_5: document.getElementById("t5").value,
+            es_5: document.getElementById("es5").value,
+            cf_5: document.getElementById("cf5").value,
+            a_5: document.getElementById("a5").innerText,
+            q_5: document.getElementById("qso5").value,
+            va_5: document.getElementById("va5").innerText,
+            vs_5: document.getElementById("vs5").value,
+            vt_5: document.getElementById("vt5").value,
+            so2_5: document.getElementById("so5").innerText,
+            duration_6: document.getElementById("t6").value,
+            es_6: document.getElementById("es6").value,
+            cf_6: document.getElementById("cf6").value,
+            a_6: document.getElementById("a6").innerText,
+            q_6: document.getElementById("qso6").value,
+            va_6: document.getElementById("va6").innerText,
+            vs_6: document.getElementById("vs6").value,
+            vt_6: document.getElementById("vt6").value,
+            so2_6: document.getElementById("so6").innerText,
+            avg_so2: document.getElementById("avgSO2").innerText
+        },
+        no2: {
+            duration_1: document.getElementById("not1").value,
+            as_1: document.getElementById("as1").value,
+            cf_1: document.getElementById("ncf1").value,
+            x_1: document.getElementById("x1").innerText,
+            q_1: document.getElementById("nq1").value,
+            va_1: document.getElementById("nva1").innerText,
+            vs_1: document.getElementById("nvs1").value,
+            vt_1: document.getElementById("nvt1").value,
+            no2_1: document.getElementById("no1").innerText,
+            duration_2: document.getElementById("not2").value,
+            as_2: document.getElementById("as2").value,
+            cf_2: document.getElementById("ncf2").value,
+            x_2: document.getElementById("x2").innerText,
+            q_2: document.getElementById("nq2").value,
+            va_2: document.getElementById("nva2").innerText,
+            vs_2: document.getElementById("nvs2").value,
+            vt_2: document.getElementById("nvt2").value,
+            no2_2: document.getElementById("no2").innerText,
+            duration_3: document.getElementById("not3").value,
+            as_3: document.getElementById("as3").value,
+            cf_3: document.getElementById("ncf3").value,
+            x_3: document.getElementById("x3").innerText,
+            q_3: document.getElementById("nq3").value,
+            va_3: document.getElementById("nva3").innerText,
+            vs_3: document.getElementById("nvs3").value,
+            vt_3: document.getElementById("nvt3").value,
+            no2_3: document.getElementById("no3").innerText,
+            duration_4: document.getElementById("not4").value,
+            as_4: document.getElementById("as4").value,
+            cf_4: document.getElementById("ncf4").value,
+            x_4: document.getElementById("x4").innerText,
+            q_4: document.getElementById("nq4").value,
+            va_4: document.getElementById("nva4").innerText,
+            vs_4: document.getElementById("nvs4").value,
+            vt_4: document.getElementById("nvt4").value,
+            no2_4: document.getElementById("no4").innerText,
+            duration_5: document.getElementById("not5").value,
+            as_5: document.getElementById("as5").value,
+            cf_5: document.getElementById("ncf5").value,
+            x_5: document.getElementById("x5").innerText,
+            q_5: document.getElementById("nq5").value,
+            va_5: document.getElementById("nva5").innerText,
+            vs_5: document.getElementById("nvs5").value,
+            vt_5: document.getElementById("nvt5").value,
+            no2_5: document.getElementById("no5").innerText,
+            duration_6: document.getElementById("not6").value,
+            as_6: document.getElementById("as6").value,
+            cf_6: document.getElementById("ncf6").value,
+            x_6: document.getElementById("x6").innerText,
+            q_6: document.getElementById("nq6").value,
+            va_6: document.getElementById("nva6").innerText,
+            vs_6: document.getElementById("nvs6").value,
+            vt_6: document.getElementById("nvt6").value,
+            no2_6: document.getElementById("no6").innerText,
+            avg_no2: document.getElementById("avgNO2").innerText
+        },
+        pm25: {
+            q1: document.getElementById("pm25_q1_1").value,
+            q2: document.getElementById("pm25_q2_1").value,
+            w1: document.getElementById("pm25_w1_1").value,
+            w2: document.getElementById("pm25_w2_1").value
+        }
+    };
+}
+
+async function saveAgencyReport() {
+    if (!validateCommonFields()) return;
+
+    calculatePM10();
+    calculateSO2();
+    calculateNO2();
+    calculatePM25();
+
+    const payload = collectAgencyReportPayload();
+
+    try {
+        const res = await fetch("http://localhost:3000/save-agency-report", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+
+        if (!res.ok || result.error) {
+            alert(result.error || "Error saving agency report");
+            return;
+        }
+
+        alert(result.message || "Agency report saved successfully");
+        window.location.href = result.redirectPage || "agency-dash.html";
+    } catch (error) {
+        console.log("Agency Report Save Error:", error);
+        alert("Error saving agency report");
+    }
+}
+
 function generateReport() {
     if (!validateCommonFields()) return;
 
@@ -1023,5 +1307,6 @@ document.addEventListener("DOMContentLoaded", () => {
     window.saveSO2 = saveSO2;
     window.saveNO2 = saveNO2;
     window.savePM25 = savePM25;
+    window.saveAgencyReport = saveAgencyReport;
     window.generateReport = generateReport;
 })();

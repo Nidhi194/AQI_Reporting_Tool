@@ -97,32 +97,10 @@ async function login() {
 
         if (data.success) {
             localStorage.setItem("userEmail", data.email);
-
-<<<<<<< HEAD
             let basePath = (window.location.protocol.startsWith('http') && window.location.pathname === '/') ? 'pages/' : '';
 
             if (data.role === "Industry") {
-                try {
-                    let profileRes = await fetch("http://localhost:3000/check-industry-profile", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ email: data.email })
-                    });
-                    let profileData = await profileRes.json();
-                    if (profileData.exists) {
-                        window.location.href = basePath + "industry-reports.html";
-                    } else {
-                        window.location.href = basePath + "industry.html";
-                    }
-                } catch (e) {
-                    window.location.href = basePath + "industry.html";
-                }
-=======
-            if (data.redirectPage) {
-                window.location.href = data.redirectPage;
-            } else if (data.role === "Industry") {
-                window.location.href = "industry.html";
->>>>>>> 9249abc7634cc1d3a763726b54979c03501e901a
+                window.location.href = basePath + (data.redirectPage || "industry.html");
             } else if (data.role === "Monitoring Agency") {
                 try {
                     let profileRes = await fetch("http://localhost:3000/check-agency-profile", {
@@ -171,9 +149,21 @@ window.logout = function() {
     window.location.href = "h.html";
 };
 
-<<<<<<< HEAD
 window.openSection = function(sectionId, clickedItem) {
-=======
+    document.getElementById(sectionId).scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+    document.querySelectorAll(".nav-item").forEach(item => {
+        item.classList.remove("active");
+    });
+
+    if (clickedItem) {
+        clickedItem.classList.add("active");
+    }
+};
+
 function isIndustryEditMode() {
     const params = new URLSearchParams(window.location.search);
     return params.get("edit") === "1";
@@ -266,22 +256,6 @@ async function handleIndustryEntryFlow() {
         console.log("Industry profile status check failed:", error);
     }
 }
-
-function openSection(sectionId, clickedItem) {
->>>>>>> 9249abc7634cc1d3a763726b54979c03501e901a
-    document.getElementById(sectionId).scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-    });
-
-    document.querySelectorAll(".nav-item").forEach(item => {
-        item.classList.remove("active");
-    });
-
-    if (clickedItem) {
-        clickedItem.classList.add("active");
-    }
-};
 
 window.saveAgencyProfile = async function() {
     let userEmail = localStorage.getItem("userEmail");
@@ -445,14 +419,6 @@ async function saveData() {
         });
 
         let result = await res.json();
-<<<<<<< HEAD
-        if (result.error) {
-            alert(result.error);
-        } else {
-            alert(result.message || "Profile Saved Successfully!");
-            window.location.href = "industry-reports.html";
-=======
-
         if (result.error) {
             alert(result.error);
             return;
@@ -461,8 +427,11 @@ async function saveData() {
         alert(result.message || 'Profile saved successfully');
 
         if (result.redirectPage) {
-            window.location.href = result.redirectPage;
->>>>>>> 9249abc7634cc1d3a763726b54979c03501e901a
+            let basePath = (window.location.protocol.startsWith('http') && window.location.pathname === '/') ? 'pages/' : '';
+            window.location.href = basePath + result.redirectPage;
+        } else {
+            let basePath = (window.location.protocol.startsWith('http') && window.location.pathname === '/') ? 'pages/' : '';
+            window.location.href = basePath + "industry-reports.html";
         }
     } catch (error) {
         console.log(error);

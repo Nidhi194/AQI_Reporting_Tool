@@ -165,8 +165,8 @@ db.connect((err) => {
     }
 });
 
-// TEST ROUTE
-app.get('/', (req, res) => {
+// Landing Page Routes
+app.get(['/', '/index.html'], (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'pages', 'index.html'));
 });
 

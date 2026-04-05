@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Industry Reports – EnviroMonitor</title>
     <link rel="stylesheet" href="../css/app.css">
-    <link rel="stylesheet" href="../css/industry-reports.css">
+    <link rel="stylesheet" href="../css/industry-reports.css?v=v3">
     <link rel="stylesheet" href="../css/glass-theme.css">
-    <link rel="stylesheet" href="../css/industry-features.css">
+    <link rel="stylesheet" href="../css/industry-features.css?v=v3">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkR4j8Y7qWfR4+6J0JQ1hYxP2m5x2l3w9A3w==" crossorigin="anonymous" referrerpolicy="no-referrer">
 </head>
 <body class="page-industry">
@@ -125,9 +125,10 @@
         <div class="section-card compliance-card">
             <h3>Live Compliance Health</h3>
             <div class="gauge-container">
-                <svg viewBox="0 0 100 50" class="gauge-svg">
-                    <path class="gauge-bg" d="M 10 45 A 40 40 0 0 1 90 45"></path>
-                    <path class="gauge-val" d="M 10 45 A 40 40 0 0 1 90 45"></path>
+                <svg viewBox="0 0 200 120" class="gauge-svg" preserveAspectRatio="xMidYMax meet">
+                    <!-- Arc from left (20,100) to right (180,100) with radius 80 -->
+                    <path class="gauge-bg" d="M 20 100 A 80 80 0 0 1 180 100"></path>
+                    <path class="gauge-val" d="M 20 100 A 80 80 0 0 1 180 100"></path>
                 </svg>
                 <div class="gauge-score">185</div>
                 <div class="gauge-label">Poor (Action Req.)</div>
@@ -168,6 +169,27 @@
             </form>
             <p class="issue-feedback" id="issueFeedback" role="status"></p>
         </div>
+
+        <div class="section-card contact-card" style="margin-top: 1.5rem;">
+            <div class="section-heading">
+                <h3>Contact your Agency</h3>
+                <p class="section-support">Directly reach out to your assigned environmental monitoring officers.</p>
+            </div>
+            <div class="contact-methods" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+                <button class="btn-secondary" type="button" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600;">
+                    <i class="fa-solid fa-envelope"></i> Compose Auto-Message
+                </button>
+                <div style="background: rgba(255,255,255,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.6); text-align: center; font-size: 0.9rem;">
+                    <div style="color: var(--text-strong); font-weight: 700; margin-bottom: 6px;">Urgent Compliance Hotlines</div>
+                    <div style="color: var(--text-main); margin-bottom: 4px;">
+                        <i class="fa-solid fa-phone" style="margin-right: 5px;"></i> 1-800-AQI-CTRL
+                    </div>
+                    <div style="color: var(--text-main);">
+                        <i class="fa-solid fa-headset" style="margin-right: 5px;"></i> Priority Support available
+                    </div>
+                </div>
+            </div>
+        </div>
     </aside>
 </div>
 
@@ -188,8 +210,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="../js/app.js"></script>
-<script src="../js/industry-reports.js"></script>
+<script src="../js/industry-reports.js?v=v4"></script>
 <script src="../js/aqi-chart.js"></script>
-<script src="../js/industry-features.js"></script>
+<script src="../js/industry-features.js?v=v3"></script>
 </body>
 </html>

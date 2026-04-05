@@ -3,31 +3,61 @@ require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
 
 const db = mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'user_db'
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
 });
 
 db.connect((err) => {
     if (err) {
-        console.log('DB Error:', err.message);
+        console.log('❌ DB Error:', err.message);
     } else {
-        console.log('DB Connected');
+        console.log('✅ Connected to Railway MySQL');
+        
+        // Ensure agency_details table exists
+        const createTableSql = `
+            CREATE TABLE IF NOT EXISTS agency_details (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_email VARCHAR(255) NOT NULL,
+                agency_name VARCHAR(255),
+                owner_name VARCHAR(255),
+                email VARCHAR(255),
+                phone VARCHAR(50)
+            )
+        `;
+        db.query(createTableSql, (err) => {
+            if (err) console.log("Agency Details Table Creation Error: ", err.message);
+        });
+
+        // Add user_email to report tables if they don't have it
+        const addCol = (table) => {
+            db.query(`ALTER TABLE ${table} ADD COLUMN user_email VARCHAR(255)`, (err) => {
+                // Ignore error as it usually means column exists
+            });
+        };
+        addCol('pm10_data');
+        addCol('so2_data');
+        addCol('no2_data');
+        addCol('pm25_data');
     }
 });
 
-// Test Route
+// TEST ROUTE
 app.get('/', (req, res) => {
-    res.send('Server is running');
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'index.html'));
 });
 
 // REGISTER
@@ -70,6 +100,55 @@ app.post('/login', (req, res) => {
                 error: 'Invalid email or password'
             });
         }
+    });
+});
+
+// CHECK AGENCY PROFILE
+app.post('/check-agency-profile', (req, res) => {
+    const { email } = req.body;
+    db.query('SELECT * FROM agency_details WHERE user_email = ?', [email], (err, result) => {
+        if (err) {
+            return res.json({ error: err.message });
+        }
+        res.json({ exists: result.length > 0 });
+    });
+});
+
+// CHECK INDUSTRY PROFILE
+app.post('/check-industry-profile', (req, res) => {
+    const { email } = req.body;
+    db.query('SELECT id FROM industry_details WHERE user_email = ?', [email], (err, result) => {
+        if (err) {
+            return res.json({ error: err.message });
+        }
+        res.json({ exists: result.length > 0 });
+    });
+});
+
+// SAVE AGENCY PROFILE
+app.post('/save-agency-profile', (req, res) => {
+    const data = req.body;
+    
+    if (!data.user_email || !data.agency_name || !data.owner_name || !data.email || !data.phone) {
+        return res.json({ error: 'All fields are required.' });
+    }
+
+    const sql = `
+        INSERT INTO agency_details (user_email, agency_name, owner_name, email, phone) 
+        VALUES (?, ?, ?, ?, ?)
+    `;
+    db.query(sql, [
+        data.user_email.trim(),
+        data.agency_name.trim(),
+        data.owner_name.trim(),
+        data.email.trim(),
+        data.phone.trim()
+    ], (err) => {
+        if (err) {
+            console.log('Save Agency Error:', err.message);
+            return res.json({ error: err.message });
+        }
+        res.json({ message: 'Profile saved successfully' });
     });
 });
 
@@ -121,14 +200,14 @@ app.post('/save-industry', (req, res) => {
     ], (err) => {
         if (err) {
             console.log('Save Industry Error:', err.message);
-            return res.json({ error: 'Database error' });
+            return res.json({ error: err.message });
         }
 
         res.json({ message: 'Profile saved successfully' });
     });
 });
 
-// GET INDUSTRY NAMES FOR AGENCY DROPDOWN
+// GET INDUSTRY NAMES
 app.get('/get-industries', (req, res) => {
     const sql = 'SELECT industry_name FROM industry_details';
 
@@ -183,15 +262,16 @@ app.post('/save-pm10', (req, res) => {
 
     const sql = `
         INSERT INTO pm10_data (
-            industry_name, location, monitoring_date,
+            user_email, industry_name, location, monitoring_date,
             q1_1, q2_1, avg_1, volume_1, w1_1, w2_1, dust_1, pm10_1,
             q1_2, q2_2, avg_2, volume_2, w1_2, w2_2, dust_2, pm10_2,
             q1_3, q2_3, avg_3, volume_3, w1_3, w2_3, dust_3, pm10_3,
             avg_pm10
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     db.query(sql, [
+        data.user_email || '',
         data.industry_name,
         data.location,
         data.monitoring_date,
@@ -218,81 +298,11 @@ app.post('/save-pm10', (req, res) => {
 // SAVE SO2 DATA
 app.post('/save-so2', (req, res) => {
     const data = req.body;
-
-    const record = {
-        industry_name: data.industry_name,
-        location: data.location,
-        monitoring_date: data.monitoring_date,
-
-        duration_1: parseFloat(data.duration_1) || 0,
-        es_1: parseFloat(data.es_1) || 0,
-        cf_1: parseFloat(data.cf_1) || 0,
-        a_1: parseFloat(data.a_1) || 0,
-        q_1: parseFloat(data.q_1) || 0,
-        va_1: parseFloat(data.va_1) || 0,
-        vs_1: parseFloat(data.vs_1) || 0,
-        vt_1: parseFloat(data.vt_1) || 0,
-        so2_1: parseFloat(data.so2_1) || 0,
-
-        duration_2: parseFloat(data.duration_2) || 0,
-        es_2: parseFloat(data.es_2) || 0,
-        cf_2: parseFloat(data.cf_2) || 0,
-        a_2: parseFloat(data.a_2) || 0,
-        q_2: parseFloat(data.q_2) || 0,
-        va_2: parseFloat(data.va_2) || 0,
-        vs_2: parseFloat(data.vs_2) || 0,
-        vt_2: parseFloat(data.vt_2) || 0,
-        so2_2: parseFloat(data.so2_2) || 0,
-
-        duration_3: parseFloat(data.duration_3) || 0,
-        es_3: parseFloat(data.es_3) || 0,
-        cf_3: parseFloat(data.cf_3) || 0,
-        a_3: parseFloat(data.a_3) || 0,
-        q_3: parseFloat(data.q_3) || 0,
-        va_3: parseFloat(data.va_3) || 0,
-        vs_3: parseFloat(data.vs_3) || 0,
-        vt_3: parseFloat(data.vt_3) || 0,
-        so2_3: parseFloat(data.so2_3) || 0,
-
-        duration_4: parseFloat(data.duration_4) || 0,
-        es_4: parseFloat(data.es_4) || 0,
-        cf_4: parseFloat(data.cf_4) || 0,
-        a_4: parseFloat(data.a_4) || 0,
-        q_4: parseFloat(data.q_4) || 0,
-        va_4: parseFloat(data.va_4) || 0,
-        vs_4: parseFloat(data.vs_4) || 0,
-        vt_4: parseFloat(data.vt_4) || 0,
-        so2_4: parseFloat(data.so2_4) || 0,
-
-        duration_5: parseFloat(data.duration_5) || 0,
-        es_5: parseFloat(data.es_5) || 0,
-        cf_5: parseFloat(data.cf_5) || 0,
-        a_5: parseFloat(data.a_5) || 0,
-        q_5: parseFloat(data.q_5) || 0,
-        va_5: parseFloat(data.va_5) || 0,
-        vs_5: parseFloat(data.vs_5) || 0,
-        vt_5: parseFloat(data.vt_5) || 0,
-        so2_5: parseFloat(data.so2_5) || 0,
-
-        duration_6: parseFloat(data.duration_6) || 0,
-        es_6: parseFloat(data.es_6) || 0,
-        cf_6: parseFloat(data.cf_6) || 0,
-        a_6: parseFloat(data.a_6) || 0,
-        q_6: parseFloat(data.q_6) || 0,
-        va_6: parseFloat(data.va_6) || 0,
-        vs_6: parseFloat(data.vs_6) || 0,
-        vt_6: parseFloat(data.vt_6) || 0,
-        so2_6: parseFloat(data.so2_6) || 0,
-
-        avg_so2: parseFloat(data.avg_so2) || 0
-    };
-
-    db.query('INSERT INTO so2_data SET ?', record, (err) => {
+    db.query('INSERT INTO so2_data SET ?', data, (err) => {
         if (err) {
             console.log('Save SO2 Error:', err.message);
             return res.json({ error: err.message });
         }
-
         res.json({ message: 'SO2 data saved successfully' });
     });
 });
@@ -300,81 +310,11 @@ app.post('/save-so2', (req, res) => {
 // SAVE NO2 DATA
 app.post('/save-no2', (req, res) => {
     const data = req.body;
-
-    const record = {
-        industry_name: data.industry_name,
-        location: data.location,
-        monitoring_date: data.monitoring_date,
-
-        duration_1: parseFloat(data.duration_1) || 0,
-        as_1: parseFloat(data.as_1) || 0,
-        cf_1: parseFloat(data.cf_1) || 0,
-        x_1: parseFloat(data.x_1) || 0,
-        q_1: parseFloat(data.q_1) || 0,
-        va_1: parseFloat(data.va_1) || 0,
-        vs_1: parseFloat(data.vs_1) || 0,
-        vt_1: parseFloat(data.vt_1) || 0,
-        no2_1: parseFloat(data.no2_1) || 0,
-
-        duration_2: parseFloat(data.duration_2) || 0,
-        as_2: parseFloat(data.as_2) || 0,
-        cf_2: parseFloat(data.cf_2) || 0,
-        x_2: parseFloat(data.x_2) || 0,
-        q_2: parseFloat(data.q_2) || 0,
-        va_2: parseFloat(data.va_2) || 0,
-        vs_2: parseFloat(data.vs_2) || 0,
-        vt_2: parseFloat(data.vt_2) || 0,
-        no2_2: parseFloat(data.no2_2) || 0,
-
-        duration_3: parseFloat(data.duration_3) || 0,
-        as_3: parseFloat(data.as_3) || 0,
-        cf_3: parseFloat(data.cf_3) || 0,
-        x_3: parseFloat(data.x_3) || 0,
-        q_3: parseFloat(data.q_3) || 0,
-        va_3: parseFloat(data.va_3) || 0,
-        vs_3: parseFloat(data.vs_3) || 0,
-        vt_3: parseFloat(data.vt_3) || 0,
-        no2_3: parseFloat(data.no2_3) || 0,
-
-        duration_4: parseFloat(data.duration_4) || 0,
-        as_4: parseFloat(data.as_4) || 0,
-        cf_4: parseFloat(data.cf_4) || 0,
-        x_4: parseFloat(data.x_4) || 0,
-        q_4: parseFloat(data.q_4) || 0,
-        va_4: parseFloat(data.va_4) || 0,
-        vs_4: parseFloat(data.vs_4) || 0,
-        vt_4: parseFloat(data.vt_4) || 0,
-        no2_4: parseFloat(data.no2_4) || 0,
-
-        duration_5: parseFloat(data.duration_5) || 0,
-        as_5: parseFloat(data.as_5) || 0,
-        cf_5: parseFloat(data.cf_5) || 0,
-        x_5: parseFloat(data.x_5) || 0,
-        q_5: parseFloat(data.q_5) || 0,
-        va_5: parseFloat(data.va_5) || 0,
-        vs_5: parseFloat(data.vs_5) || 0,
-        vt_5: parseFloat(data.vt_5) || 0,
-        no2_5: parseFloat(data.no2_5) || 0,
-
-        duration_6: parseFloat(data.duration_6) || 0,
-        as_6: parseFloat(data.as_6) || 0,
-        cf_6: parseFloat(data.cf_6) || 0,
-        x_6: parseFloat(data.x_6) || 0,
-        q_6: parseFloat(data.q_6) || 0,
-        va_6: parseFloat(data.va_6) || 0,
-        vs_6: parseFloat(data.vs_6) || 0,
-        vt_6: parseFloat(data.vt_6) || 0,
-        no2_6: parseFloat(data.no2_6) || 0,
-
-        avg_no2: parseFloat(data.avg_no2) || 0
-    };
-
-    db.query('INSERT INTO no2_data SET ?', record, (err) => {
+    db.query('INSERT INTO no2_data SET ?', data, (err) => {
         if (err) {
             console.log('Save NO2 Error:', err.message);
             return res.json({ error: err.message });
         }
-
         res.json({ message: 'NO2 data saved successfully' });
     });
 });
@@ -397,13 +337,14 @@ app.post('/save-pm25', (req, res) => {
 
     const sql = `
         INSERT INTO pm25_data (
-            industry_name, location, monitoring_date,
+            user_email, industry_name, location, monitoring_date,
             q1, q2, avg, volume,
             w1, w2, dust, pm25
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     db.query(sql, [
+        data.user_email || '',
         data.industry_name,
         data.location,
         data.monitoring_date,
@@ -431,7 +372,52 @@ app.post('/save-pm25', (req, res) => {
     });
 });
 
-// START SERVER
+// GET USER REPORTS
+app.get('/api/reports', (req, res) => {
+    const userEmail = req.query.user_email;
+    if (!userEmail) return res.json({ error: 'user_email required' });
+
+    let pending = 4;
+    let allReports = [];
+    let hasError = false;
+
+    const checkDone = () => {
+        pending--;
+        if (pending === 0 && !hasError) {
+            res.json(allReports);
+        }
+    };
+
+    const handleError = (err) => {
+        if (!hasError) {
+            hasError = true;
+            console.log('Get Reports Error:', err.message);
+            res.status(500).json({ error: err.message });
+        }
+    };
+
+    db.query("SELECT id, industry_name, monitoring_date as date, 'PM10 Report' as type FROM pm10_data WHERE user_email = ?", [userEmail], (err, results) => {
+        if (err) return handleError(err);
+        allReports = allReports.concat(results);
+        checkDone();
+    });
+    db.query("SELECT id, industry_name, monitoring_date as date, 'SO2 Report' as type FROM so2_data WHERE user_email = ?", [userEmail], (err, results) => {
+        if (err) return handleError(err);
+        allReports = allReports.concat(results);
+        checkDone();
+    });
+    db.query("SELECT id, industry_name, monitoring_date as date, 'NO2 Report' as type FROM no2_data WHERE user_email = ?", [userEmail], (err, results) => {
+        if (err) return handleError(err);
+        allReports = allReports.concat(results);
+        checkDone();
+    });
+    db.query("SELECT id, industry_name, monitoring_date as date, 'PM2.5 Report' as type FROM pm25_data WHERE user_email = ?", [userEmail], (err, results) => {
+        if (err) return handleError(err);
+        allReports = allReports.concat(results);
+        checkDone();
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });

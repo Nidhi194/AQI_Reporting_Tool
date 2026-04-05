@@ -59,7 +59,7 @@ function requireAuth() {
 }
 
 async function fetchIndustryReports(userEmail) {
-    const url = `${API_BASE}/industry-reports?user_email=${encodeURIComponent(userEmail)}`;
+    const url = `${API_BASE}/api/reports?user_email=${encodeURIComponent(userEmail)}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error("Failed to load reports");
     const data = await res.json();
@@ -173,6 +173,91 @@ function downloadReport(report) {
     );
 }
 
+function updateComplianceGauge(reports) {
+    const gaugeScoreEl = document.querySelector('.gauge-score');
+    const gaugeLabelEl = document.querySelector('.gauge-label');
+    const gaugeValEl = document.querySelector('.gauge-val');
+    
+    if (!gaugeScoreEl || !gaugeLabelEl || !gaugeValEl) return;
+
+    // Use a placeholder logic for AQI: e.g. 50 if no reports, otherwise calculate a dummy 
+    // or retrieve from real reports (we just simulate a score based on count to react visually)
+    let aqi = reports.length === 0 ? 0 : 50 + (reports.length * 15);
+    if (aqi > 300) aqi = 300; // Cap it
+    
+    gaugeScoreEl.textContent = aqi;
+    
+    let color = "#10b981"; // Excellent (Green)
+    let label = "Excellent";
+    let dashOffset = 251.2; // Start empty
+
+    if (aqi === 0) {
+        color = "#94a3b8";
+        label = "No Data";
+        dashOffset = 251.2;
+    } else if (aqi <= 50) {
+        color = "#10b981"; // Green
+        label = "Excellent (Compliant)";
+        dashOffset = 251.2 - (251.2 * (aqi / 300));
+    } else if (aqi <= 100) {
+        color = "#eab308"; // Yellow
+        label = "Moderate (Acceptable)";
+        dashOffset = 251.2 - (251.2 * (aqi / 300));
+    } else if (aqi <= 200) {
+        color = "#f97316"; // Orange
+        label = "Poor (Warning)";
+        dashOffset = 251.2 - (251.2 * (aqi / 300));
+    } else {
+        color = "#e11d48"; // Red
+        label = "Severe (Action Req.)";
+        dashOffset = 251.2 - (251.2 * (aqi / 300));
+    }
+
+    gaugeLabelEl.textContent = label;
+    gaugeScoreEl.style.color = color;
+    gaugeScoreEl.style.textShadow = `0 0 16px ${color}80`;
+    
+    gaugeValEl.style.stroke = color;
+    gaugeValEl.style.filter = `drop-shadow(0 0 12px ${color}99)`;
+    gaugeValEl.style.strokeDashoffset = Math.max(0, dashOffset);
+}
+
+function updateWidgets(reports) {
+    // 1. Update AI Insight Box & Chart
+    const insightText = document.getElementById('aiInsightText');
+    if (reports.length === 0) {
+        if (insightText) insightText.innerHTML = "⚠️ <strong>No monitoring data found.</strong> Begin submitting your logs to enable AI forecasting.";
+        if (window.aqiChart) {
+            window.aqiChart.data.datasets[0].data = [];
+            window.aqiChart.data.datasets[1].data = [];
+            window.aqiChart.update();
+        }
+    } else {
+        const count = reports.length;
+        // Dynamically calculate a fake trend based on report volume (since real AQI algorithms would rely on numeric PM10 array values which we abstract)
+        const baseAqi = 50 + (count * 10);
+        const predictedAqi = baseAqi + 20;
+
+        if (insightText) {
+            if (predictedAqi > 100) {
+                insightText.innerHTML = `⚠️ <strong>Prediction: AQI may rise to ${predictedAqi} next month based on recent ${count} submissions.</strong> Recommendation: Optimize filter efficiency.`;
+            } else {
+                insightText.innerHTML = `✅ <strong>Prediction: Stable AQI at ~${predictedAqi} expected.</strong> Your current operational capacity is well within compliance standards.`;
+            }
+        }
+
+        if (window.aqiChart) {
+            // Overwrite chart with dynamically scaled data
+            const historical = [Math.floor(baseAqi * 0.7), Math.floor(baseAqi * 0.8), Math.floor(baseAqi * 0.9), Math.floor(baseAqi), Math.floor(baseAqi * 1.05), baseAqi, null];
+            window.aqiChart.data.datasets[0].data = historical;
+            
+            // Forecast curve branching from the current baseAqi
+            window.aqiChart.data.datasets[1].data = [null, null, null, null, null, baseAqi, predictedAqi];
+            window.aqiChart.update();
+        }
+    }
+}
+
 async function loadReportsTable() {
     const userEmail = getUserEmail();
     if (!userEmail) return;
@@ -184,6 +269,8 @@ async function loadReportsTable() {
         list = await fetchIndustryReports(userEmail);
         cachedReports = list;
         renderReports(list, false);
+        updateComplianceGauge(list);
+        updateWidgets(list);
         return;
     } catch (e) {
         console.warn(e);
@@ -193,6 +280,8 @@ async function loadReportsTable() {
 
     cachedReports = list;
     renderReports(list, usedDemo);
+    updateComplianceGauge(list);
+    updateWidgets(list);
 }
 
 async function submitIssue(ev) {

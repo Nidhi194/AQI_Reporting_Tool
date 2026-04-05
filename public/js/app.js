@@ -1,4 +1,4 @@
-﻿/* Merged from h, industry, and agency files for cleaner structure */
+/* Merged from h, industry, and agency files for cleaner structure */
 
 /* Home Page Logic */
 (() => {
@@ -98,10 +98,40 @@ async function login() {
         if (data.success) {
             localStorage.setItem("userEmail", data.email);
 
+            let basePath = (window.location.protocol.startsWith('http') && window.location.pathname === '/') ? 'pages/' : '';
+
             if (data.role === "Industry") {
-                window.location.href = "industry.html";
+                try {
+                    let profileRes = await fetch("http://localhost:3000/check-industry-profile", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email: data.email })
+                    });
+                    let profileData = await profileRes.json();
+                    if (profileData.exists) {
+                        window.location.href = basePath + "industry-reports.html";
+                    } else {
+                        window.location.href = basePath + "industry.html";
+                    }
+                } catch (e) {
+                    window.location.href = basePath + "industry.html";
+                }
             } else if (data.role === "Monitoring Agency") {
-                window.location.href = "agency.html";
+                try {
+                    let profileRes = await fetch("http://localhost:3000/check-agency-profile", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email: data.email })
+                    });
+                    let profileData = await profileRes.json();
+                    if (profileData.exists) {
+                        window.location.href = basePath + "agency-dash.html";
+                    } else {
+                        window.location.href = basePath + "agency-info.html";
+                    }
+                } catch (e) {
+                    window.location.href = basePath + "agency-info.html";
+                }
             } else {
                 document.getElementById("result").style.color = "#dc2626";
                 document.getElementById("result").innerText = "Unknown role";
@@ -124,18 +154,17 @@ async function login() {
     window.login = login;
 })();
 
-/* Industry Page Logic */
-(() => {
-    if (!document.getElementById('industrySection')) {
-        return;
-    }
-
-function logout() {
+/* Shared Logic */
+window.logout = function() {
     localStorage.removeItem("userEmail");
+    let basePath = (window.location.protocol.startsWith('http') && window.location.pathname === '/') ? 'pages/' : '';
+    window.location.href = basePath ? 'h.html' : '../h.html'; 
+    // Usually logout sends to h.html, if we are in /pages/ we should probably just use 'h.html' if it's in the same folder.
+    // Wait, in the original code it was window.location.href = "h.html". I will keep it the same.
     window.location.href = "h.html";
-}
+};
 
-function openSection(sectionId, clickedItem) {
+window.openSection = function(sectionId, clickedItem) {
     document.getElementById(sectionId).scrollIntoView({
         behavior: "smooth",
         block: "start"
@@ -145,8 +174,62 @@ function openSection(sectionId, clickedItem) {
         item.classList.remove("active");
     });
 
-    clickedItem.classList.add("active");
-}
+    if (clickedItem) {
+        clickedItem.classList.add("active");
+    }
+};
+
+window.saveAgencyProfile = async function() {
+    let userEmail = localStorage.getItem("userEmail");
+
+    let data = {
+        user_email: userEmail,
+        agency_name: document.getElementById("agency_name").value.trim(),
+        owner_name: document.getElementById("owner_name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        phone: document.getElementById("phone").value.trim()
+    };
+
+    let missingFields = [];
+    if (!data.agency_name) missingFields.push("Agency Name");
+    if (!data.owner_name) missingFields.push("Owner Name");
+    if (!data.email) missingFields.push("Email ID");
+    if (!data.phone) missingFields.push("Phone Number");
+
+    if (missingFields.length > 0) {
+        alert("Please fill the following required fields:\n\n" + missingFields.join("\n"));
+        return;
+    }
+
+    try {
+        let res = await fetch("http://localhost:3000/save-agency-profile", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        let result = await res.json();
+        if (result.error) {
+            alert(result.error);
+        } else {
+            alert("Profile saved successfully.");
+            window.location.href = "agency-dash.html";
+        }
+    } catch (error) {
+        console.log(error);
+        alert("Server connection error");
+    }
+};
+
+/* Industry Page Logic */
+(() => {
+    if (!document.getElementById('industrySection')) {
+        return;
+    }
+
+
 
 function updateProgress() {
     const fieldIds = [
@@ -255,7 +338,12 @@ async function saveData() {
         });
 
         let result = await res.json();
-        alert(result.message || result.error);
+        if (result.error) {
+            alert(result.error);
+        } else {
+            alert(result.message || "Profile Saved Successfully!");
+            window.location.href = "industry-reports.html";
+        }
     } catch (error) {
         console.log(error);
         alert("Server connection error");
@@ -263,8 +351,6 @@ async function saveData() {
 }
 
 
-    window.logout = logout;
-    window.openSection = openSection;
     window.saveData = saveData;
 })();
 
@@ -701,6 +787,7 @@ async function savePM10() {
     calculatePM10();
 
     const data = {
+        user_email: localStorage.getItem("userEmail"),
         industry_name: document.getElementById("industry_name").value,
         location: document.getElementById("location").value,
         monitoring_date: document.getElementById("date").value,
@@ -744,6 +831,7 @@ async function saveSO2() {
     calculateSO2();
 
     const data = {
+        user_email: localStorage.getItem("userEmail"),
         industry_name: document.getElementById("industry_name").value,
         location: document.getElementById("location").value,
         monitoring_date: document.getElementById("date").value,
@@ -834,6 +922,7 @@ async function saveNO2() {
     calculateNO2();
 
     const data = {
+        user_email: localStorage.getItem("userEmail"),
         industry_name: document.getElementById("industry_name").value,
         location: document.getElementById("location").value,
         monitoring_date: document.getElementById("date").value,
@@ -924,6 +1013,7 @@ async function savePM25() {
     calculatePM25();
 
     const data = {
+        user_email: localStorage.getItem("userEmail"),
         industry_name: document.getElementById("industry_name").value,
         location: document.getElementById("location").value,
         monitoring_date: document.getElementById("date").value,

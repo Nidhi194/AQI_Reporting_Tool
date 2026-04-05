@@ -1,0 +1,127 @@
+/* Landing Page Animations and Enhancements */
+body.page-landing {
+    overflow: hidden; /* Keep it clean and fixed */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Page Out Transition Overlay */
+.page-transition-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--brand-800), var(--brand-600));
+    z-index: 9999;
+    transform: translateY(100%);
+    transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.page-transition-active .page-transition-overlay {
+    transform: translateY(0);
+}
+
+.landing-container {
+    text-align: center;
+    padding: 3rem 2rem;
+    max-width: 800px;
+    z-index: 10;
+    animation: fadeInUp 1s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* Glass Wrapper */
+.glass-hero {
+    background: var(--surface);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--stroke);
+    box-shadow: var(--shadow-heavy);
+    border-radius: var(--radius-xl);
+    padding: 4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Floating abstract shapes behind glass */
+.shape {
+    position: absolute;
+    filter: blur(60px);
+    z-index: -1;
+    opacity: 0.6;
+    animation: floatShape 8s infinite alternate ease-in-out;
+}
+.shape-1 {
+    width: 300px;
+    height: 300px;
+    background: var(--brand-700);
+    top: -100px;
+    left: -100px;
+    border-radius: 50%;
+}
+.shape-2 {
+    width: 250px;
+    height: 250px;
+    background: var(--accent);
+    bottom: -50px;
+    right: -50px;
+    border-radius: 50%;
+    animation-delay: -3s;
+}
+
+.landing-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 4rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--brand-800), var(--brand-600));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
+}
+
+.landing-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+}
+
+.landing-actions {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+}
+
+.landing-actions button {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+}
+
+.btn-large {
+    padding: 1rem 2.5rem !important;
+    font-size: 1.1rem !important;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes floatShape {
+    to {
+        transform: translate(30px, 30px) scale(1.1);
+    }
+}

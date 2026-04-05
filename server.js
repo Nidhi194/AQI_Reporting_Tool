@@ -14,12 +14,130 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 const db = mysql.createConnection({
+<<<<<<< HEAD
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME
+=======
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 3306,
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'user_db'
+>>>>>>> 9249abc7634cc1d3a763726b54979c03501e901a
 });
+
+const dbPromise = db.promise();
+
+function toNumber(value) {
+    const num = parseFloat(value);
+    return Number.isFinite(num) ? num : 0;
+}
+
+async function insertAgencyCombinedReport(data) {
+    const pm10 = data.pm10 || {};
+    const so2 = data.so2 || {};
+    const no2 = data.no2 || {};
+    const pm25 = data.pm25 || {};
+
+    const industry_name = String(data.industry_name || '').trim();
+    const location = String(data.location || '').trim();
+    const monitoring_date = String(data.monitoring_date || '').trim();
+
+    const T_PM10 = 480;
+    const q1_1 = toNumber(pm10.q1_1), q2_1 = toNumber(pm10.q2_1), w1_1 = toNumber(pm10.w1_1), w2_1 = toNumber(pm10.w2_1);
+    const q1_2 = toNumber(pm10.q1_2), q2_2 = toNumber(pm10.q2_2), w1_2 = toNumber(pm10.w1_2), w2_2 = toNumber(pm10.w2_2);
+    const q1_3 = toNumber(pm10.q1_3), q2_3 = toNumber(pm10.q2_3), w1_3 = toNumber(pm10.w1_3), w2_3 = toNumber(pm10.w2_3);
+    const avg_1 = (q1_1 + q2_1) / 2, avg_2 = (q1_2 + q2_2) / 2, avg_3 = (q1_3 + q2_3) / 2;
+    const volume_1 = avg_1 * T_PM10, volume_2 = avg_2 * T_PM10, volume_3 = avg_3 * T_PM10;
+    const dust_1 = w2_1 - w1_1, dust_2 = w2_2 - w1_2, dust_3 = w2_3 - w1_3;
+    const pm10_1 = volume_1 !== 0 ? (dust_1 / volume_1) * Math.pow(10, 6) : 0;
+    const pm10_2 = volume_2 !== 0 ? (dust_2 / volume_2) * Math.pow(10, 6) : 0;
+    const pm10_3 = volume_3 !== 0 ? (dust_3 / volume_3) * Math.pow(10, 6) : 0;
+    const avg_pm10 = (pm10_1 + pm10_2 + pm10_3) / 3;
+
+    const so2Record = { industry_name, location, monitoring_date };
+    for (let i = 1; i <= 6; i++) {
+        so2Record[`duration_${i}`] = toNumber(so2[`duration_${i}`]);
+        so2Record[`es_${i}`] = toNumber(so2[`es_${i}`]);
+        so2Record[`cf_${i}`] = toNumber(so2[`cf_${i}`]);
+        so2Record[`a_${i}`] = toNumber(so2[`a_${i}`]);
+        so2Record[`q_${i}`] = toNumber(so2[`q_${i}`]);
+        so2Record[`va_${i}`] = toNumber(so2[`va_${i}`]);
+        so2Record[`vs_${i}`] = toNumber(so2[`vs_${i}`]);
+        so2Record[`vt_${i}`] = toNumber(so2[`vt_${i}`]);
+        so2Record[`so2_${i}`] = toNumber(so2[`so2_${i}`]);
+    }
+    so2Record.avg_so2 = toNumber(so2.avg_so2);
+
+    const no2Record = { industry_name, location, monitoring_date };
+    for (let i = 1; i <= 6; i++) {
+        no2Record[`duration_${i}`] = toNumber(no2[`duration_${i}`]);
+        no2Record[`as_${i}`] = toNumber(no2[`as_${i}`]);
+        no2Record[`cf_${i}`] = toNumber(no2[`cf_${i}`]);
+        no2Record[`x_${i}`] = toNumber(no2[`x_${i}`]);
+        no2Record[`q_${i}`] = toNumber(no2[`q_${i}`]);
+        no2Record[`va_${i}`] = toNumber(no2[`va_${i}`]);
+        no2Record[`vs_${i}`] = toNumber(no2[`vs_${i}`]);
+        no2Record[`vt_${i}`] = toNumber(no2[`vt_${i}`]);
+        no2Record[`no2_${i}`] = toNumber(no2[`no2_${i}`]);
+    }
+    no2Record.avg_no2 = toNumber(no2.avg_no2);
+
+    const q1_pm25 = toNumber(pm25.q1), q2_pm25 = toNumber(pm25.q2), w1_pm25 = toNumber(pm25.w1), w2_pm25 = toNumber(pm25.w2);
+    const T_PM25 = 1440;
+    const avg_pm25_flow = (q1_pm25 + q2_pm25) / 2;
+    const volume_pm25 = avg_pm25_flow * T_PM25;
+    const dust_pm25 = w2_pm25 - w1_pm25;
+    const pm25_value = volume_pm25 !== 0 ? (dust_pm25 * Math.pow(10, 6)) / volume_pm25 : 0;
+
+    await dbPromise.beginTransaction();
+    try {
+        await dbPromise.query(`
+            INSERT INTO pm10_data (
+                industry_name, location, monitoring_date,
+                q1_1, q2_1, avg_1, volume_1, w1_1, w2_1, dust_1, pm10_1,
+                q1_2, q2_2, avg_2, volume_2, w1_2, w2_2, dust_2, pm10_2,
+                q1_3, q2_3, avg_3, volume_3, w1_3, w2_3, dust_3, pm10_3,
+                avg_pm10
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+            industry_name, location, monitoring_date,
+            q1_1, q2_1, avg_1, volume_1, w1_1, w2_1, dust_1, pm10_1,
+            q1_2, q2_2, avg_2, volume_2, w1_2, w2_2, dust_2, pm10_2,
+            q1_3, q2_3, avg_3, volume_3, w1_3, w2_3, dust_3, pm10_3,
+            avg_pm10
+        ]);
+
+        await dbPromise.query('INSERT INTO so2_data SET ?', [so2Record]);
+        await dbPromise.query('INSERT INTO no2_data SET ?', [no2Record]);
+        await dbPromise.query(`
+            INSERT INTO pm25_data (
+                industry_name, location, monitoring_date,
+                q1, q2, avg, volume,
+                w1, w2, dust, pm25
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+            industry_name, location, monitoring_date,
+            q1_pm25, q2_pm25, avg_pm25_flow, volume_pm25,
+            w1_pm25, w2_pm25, dust_pm25, pm25_value
+        ]);
+
+        await dbPromise.commit();
+
+        return {
+            avg_pm10,
+            avg_so2: so2Record.avg_so2,
+            avg_no2: no2Record.avg_no2,
+            pm25: pm25_value
+        };
+    } catch (error) {
+        await dbPromise.rollback();
+        throw error;
+    }
+}
 
 db.connect((err) => {
     if (err) {
@@ -60,6 +178,26 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'pages', 'index.html'));
 });
 
+function getIndustryProfileByUserEmail(userEmail) {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT *
+            FROM industry_details
+            WHERE user_email = ?
+            LIMIT 1
+        `;
+
+        db.query(sql, [userEmail], (err, result) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+
+            resolve(result[0] || null);
+        });
+    });
+}
+
 // REGISTER
 app.post('/register', (req, res) => {
     const { email, password, role } = req.body;
@@ -82,22 +220,43 @@ app.post('/login', (req, res) => {
 
     const sql = 'SELECT * FROM users WHERE email = ? AND password = ?';
 
-    db.query(sql, [email, password], (err, result) => {
+    db.query(sql, [email, password], async (err, result) => {
         if (err) {
             console.log('Login Error:', err.message);
             return res.json({ error: 'Database error' });
         }
 
-        if (result.length > 0) {
-            res.json({
-                success: true,
-                role: result[0].role,
-                email: result[0].email
-            });
-        } else {
-            res.json({
+        if (result.length === 0) {
+            return res.json({
                 success: false,
                 error: 'Invalid email or password'
+            });
+        }
+
+        const user = result[0];
+
+        try {
+            const industryProfile = user.role === 'Industry'
+                ? await getIndustryProfileByUserEmail(user.email)
+                : null;
+
+            res.json({
+                success: true,
+                role: user.role,
+                email: user.email,
+                hasIndustryProfile: Boolean(industryProfile),
+                redirectPage: user.role === 'Industry'
+                    ? (industryProfile ? 'industry-reports.html' : 'industry.html')
+                    : (user.role === 'Monitoring Agency' ? 'agency.html' : '')
+            });
+        } catch (profileErr) {
+            console.log('Industry Profile Check Error:', profileErr.message);
+            res.json({
+                success: true,
+                role: user.role,
+                email: user.email,
+                hasIndustryProfile: false,
+                redirectPage: user.role === 'Industry' ? 'industry.html' : (user.role === 'Monitoring Agency' ? 'agency.html' : '')
             });
         }
     });
@@ -176,15 +335,7 @@ app.post('/save-industry', (req, res) => {
         });
     }
 
-    const sql = `
-        INSERT INTO industry_details
-        (user_email, industry_name, industry_type, industry_id, address,
-         contact_name, role_designation, email, phone, alt_phone,
-         monitoring_frequency, notification_pref)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    db.query(sql, [
+    const payload = [
         String(data.user_email).trim(),
         String(data.industry_name).trim(),
         String(data.industry_type).trim(),
@@ -197,17 +348,138 @@ app.post('/save-industry', (req, res) => {
         data.alt_phone ? String(data.alt_phone).trim() : '',
         String(data.monitoring_frequency).trim(),
         String(data.notification_pref).trim()
+<<<<<<< HEAD
     ], (err) => {
         if (err) {
             console.log('Save Industry Error:', err.message);
             return res.json({ error: err.message });
+=======
+    ];
+
+    const checkSql = 'SELECT id FROM industry_details WHERE user_email = ? LIMIT 1';
+
+    db.query(checkSql, [payload[0]], (checkErr, rows) => {
+        if (checkErr) {
+            console.log('Industry Profile Check Error:', checkErr.message);
+            return res.json({ error: 'Database error' });
+>>>>>>> 9249abc7634cc1d3a763726b54979c03501e901a
         }
 
-        res.json({ message: 'Profile saved successfully' });
+        const hasExistingProfile = rows.length > 0;
+
+        const sql = hasExistingProfile
+            ? `
+                UPDATE industry_details
+                SET industry_name = ?, industry_type = ?, address = ?,
+                    contact_name = ?, role_designation = ?, email = ?, phone = ?, alt_phone = ?,
+                    monitoring_frequency = ?, notification_pref = ?
+                WHERE user_email = ?
+            `
+            : `
+                INSERT INTO industry_details
+                (user_email, industry_name, industry_type, industry_id, address,
+                 contact_name, role_designation, email, phone, alt_phone,
+                 monitoring_frequency, notification_pref)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `;
+
+        const queryParams = hasExistingProfile
+            ? [
+                payload[1], payload[2], payload[4], payload[5], payload[6],
+                payload[7], payload[8], payload[9], payload[10], payload[11], payload[0]
+            ]
+            : payload;
+
+        db.query(sql, queryParams, (err) => {
+            if (err) {
+                console.log('Save Industry Error:', err.message);
+                return res.json({ error: 'Database error' });
+            }
+
+            res.json({
+                success: true,
+                hasIndustryProfile: true,
+                redirectPage: 'industry-reports.html',
+                message: hasExistingProfile ? 'Profile updated successfully' : 'Profile saved successfully'
+            });
+        });
     });
 });
 
+<<<<<<< HEAD
 // GET INDUSTRY NAMES
+=======
+// CHECK INDUSTRY PROFILE STATUS
+app.get('/industry-profile-status', async (req, res) => {
+    const userEmail = String(req.query.user_email || '').trim();
+
+    if (!userEmail) {
+        return res.status(400).json({ error: 'user_email is required' });
+    }
+
+    try {
+        const profile = await getIndustryProfileByUserEmail(userEmail);
+        res.json({
+            hasIndustryProfile: Boolean(profile),
+            profile
+        });
+    } catch (err) {
+        console.log('Industry Profile Status Error:', err.message);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// INDUSTRY REPORT LIST
+app.get('/industry-reports', async (req, res) => {
+    const userEmail = String(req.query.user_email || '').trim();
+
+    if (!userEmail) {
+        return res.status(400).json({ error: 'user_email is required' });
+    }
+
+    try {
+        const profile = await getIndustryProfileByUserEmail(userEmail);
+
+        if (!profile) {
+            return res.json({ reports: [] });
+        }
+
+        const reports = [
+            {
+                id: `profile-${userEmail}`,
+                title: `${profile.industry_name} profile report`,
+                reportType: 'Industry Profile',
+                periodLabel: 'Latest saved profile',
+                status: 'Published',
+                previewUrl: '',
+                downloadUrl: '',
+                industryName: profile.industry_name,
+                contactName: profile.contact_name,
+                email: profile.email,
+                phone: profile.phone
+            }
+        ];
+
+        res.json({ reports });
+    } catch (err) {
+        console.log('Industry Reports Error:', err.message);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+// REPORT INDUSTRY ISSUE
+app.post('/report-industry-issue', (req, res) => {
+    const { user_email, subject, description } = req.body;
+
+    if (!String(user_email || '').trim() || !String(subject || '').trim() || !String(description || '').trim()) {
+        return res.status(400).json({ error: 'Please fill all required fields' });
+    }
+
+    res.json({ message: 'Issue submitted successfully' });
+});
+
+// GET INDUSTRY NAMES FOR AGENCY DROPDOWN
+>>>>>>> 9249abc7634cc1d3a763726b54979c03501e901a
 app.get('/get-industries', (req, res) => {
     const sql = 'SELECT industry_name FROM industry_details';
 
@@ -372,6 +644,7 @@ app.post('/save-pm25', (req, res) => {
     });
 });
 
+<<<<<<< HEAD
 // GET USER REPORTS
 app.get('/api/reports', (req, res) => {
     const userEmail = req.query.user_email;
@@ -418,6 +691,72 @@ app.get('/api/reports', (req, res) => {
     });
 });
 
+=======
+
+
+
+// AGENCY DASHBOARD DATA
+app.get('/agency-dashboard-data', async (req, res) => {
+    try {
+        const [rows] = await dbPromise.query(`
+            SELECT id, industry_name, location, monitoring_date
+            FROM pm10_data
+            ORDER BY monitoring_date DESC, id DESC
+        `);
+
+        const reports = rows.map((row, index) => ({
+            reportId: `RPT-${String(row.id || index + 1).padStart(4, '0')}`,
+            companyName: row.industry_name,
+            reportType: 'AQI Monitoring Report',
+            generatedBy: 'Monitoring Agency',
+            status: 'Completed',
+            monitoringDate: row.monitoring_date,
+            location: row.location
+        }));
+
+        res.json({
+            success: true,
+            summary: {
+                totalReports: reports.length,
+                activeReports: reports.length,
+                pendingReports: 0,
+                overdueReports: 0
+            },
+            reports
+        });
+    } catch (error) {
+        console.log('Agency Dashboard Data Error:', error.message);
+        res.status(500).json({ error: 'Unable to load agency dashboard data' });
+    }
+});
+
+// SAVE FULL AGENCY REPORT DATA AT ONCE
+app.post('/save-agency-report', async (req, res) => {
+    const data = req.body || {};
+    const industry_name = String(data.industry_name || '').trim();
+    const location = String(data.location || '').trim();
+    const monitoring_date = String(data.monitoring_date || '').trim();
+
+    if (!industry_name || !location || !monitoring_date) {
+        return res.status(400).json({ error: 'Industry, location and monitoring date are required' });
+    }
+
+    try {
+        const metrics = await insertAgencyCombinedReport(data);
+        res.json({
+            success: true,
+            message: 'Agency report saved successfully',
+            redirectPage: 'agency-dash.html',
+            metrics
+        });
+    } catch (error) {
+        console.log('Save Agency Report Error:', error.message);
+        res.status(500).json({ error: 'Agency report save failed' });
+    }
+});
+
+// START SERVER
+>>>>>>> 9249abc7634cc1d3a763726b54979c03501e901a
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });

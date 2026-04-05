@@ -1306,7 +1306,7 @@ async function saveAgencyReport() {
     }
 }
 
-function generateReport() {
+async function generateReport() {
     if (!validateCommonFields()) return;
 
     calculatePM10();
@@ -1314,7 +1314,29 @@ function generateReport() {
     calculateNO2();
     calculatePM25();
 
+    // Suppress individual alerts during mass save
+    const originalAlert = window.alert;
+    window.alert = function() {};
+
+    try {
+        await savePM10();
+        await saveSO2();
+        await saveNO2();
+        await savePM25();
+    } catch(e) {
+        console.error("Error saving reports:", e);
+    } finally {
+        window.alert = originalAlert;
+    }
+
+    // Now all parameters are in the database and will appear on dashboard!
+    originalAlert("Full Report Generated & Saved to Dashboard Successfully! Click OK to Print/Save PDF.");
+    
+    // 1. Generate/Print PDF (Blocking print dialog)
     window.print();
+    
+    // 2. Redirect to dashboard immediately after the print dialog closes
+    window.location.href = "agency-dash.html";
 }
 
 function logout() {

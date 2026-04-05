@@ -1613,46 +1613,67 @@ body.page-agency .sampling-time-label {
 }
 }
 @media print {
-body.page-agency .top-navbar,
-body.page-agency .step-nav-wrap,
-body.page-agency .btn-row,
-body.page-agency .logout-btn {
-
+    body.page-agency .top-navbar,
+    body.page-agency .step-nav-wrap,
+    body.page-agency .btn-row,
+    body.page-agency .logout-btn {
         display: none !important;
-    
-}
-body.page-agency {
-
-        background: #ffffff;
-    
-}
-body.page-agency .dashboard-layout {
-
-        display: block;
-    
-}
-body.page-agency .main-content {
-
-        padding: 0;
-    
-}
-body.page-agency .section-card {
-
-        box-shadow: none;
-        border: 1px solid #ddd;
-        background: #ffffff;
-    
-}
-body.page-agency .section-card h3 {
-
-        background: none;
-        color: #000000;
-        border-bottom: 1px solid #999;
-    
-}
-body.page-agency table {
-
-        box-shadow: none;
-    
-}
+    }
+    body.page-agency {
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+    body.page-agency .dashboard-layout {
+        display: block !important;
+    }
+    body.page-agency .main-content {
+        padding: 0 !important;
+        background: #ffffff !important;
+    }
+    body.page-agency .section-card {
+        display: block !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-bottom: 2px solid #ccc !important;
+        background: #ffffff !important;
+        margin-bottom: 20px !important;
+        padding-bottom: 20px !important;
+        page-break-inside: avoid;
+    }
+    body.page-agency .section-card h3 {
+        background: none !important;
+        color: #000000 !important;
+        border-bottom: 2px solid #000 !important;
+        padding-bottom: 5px !important;
+        margin-bottom: 15px !important;
+    }
+    body.page-agency table {
+        box-shadow: none !important;
+        border-collapse: collapse !important;
+        width: 100% !important;
+        margin-bottom: 15px !important;
+    }
+    body.page-agency table th,
+    body.page-agency table td {
+        border: 1px solid #000 !important;
+        color: #000 !important;
+        background: transparent !important;
+        padding: 6px !important;
+    }
+    body.page-agency input,
+    body.page-agency select,
+    body.page-agency textarea {
+        border: 1px solid #ccc !important;
+        background: transparent !important;
+        color: #000 !important;
+        padding: 4px !important;
+        margin: 2px 0 !important;
+        font-family: inherit !important;
+        font-size: 11pt !important;
+        box-shadow: none !important;
+    }
+    body.page-agency label {
+        color: #333 !important;
+        font-weight: bold !important;
+    }
 }

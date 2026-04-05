@@ -6,6 +6,56 @@
     <title>Login System</title>
     <link rel="stylesheet" href="../css/app.css">
     <link rel="stylesheet" href="../css/glass-theme.css">
+    <style>
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        .password-wrapper input {
+            padding-right: 50px !important;
+        }
+        body.page-home .toggle-password,
+        .toggle-password {
+            position: absolute !important;
+            right: 14px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            background: none !important;
+            border: none !important;
+            cursor: pointer !important;
+            padding: 4px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: #7f8ea3 !important;
+            transition: color 0.2s ease !important;
+            width: 32px !important;
+            height: 32px !important;
+            min-width: 0 !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+            margin-top: 0 !important;
+            box-shadow: none !important;
+            border-radius: 6px !important;
+        }
+        body.page-home .toggle-password:hover,
+        .toggle-password:hover {
+            color: #2d5d98 !important;
+            transform: translateY(-50%) scale(1.1) !important;
+            filter: none !important;
+            background: rgba(45, 93, 152, 0.08) !important;
+        }
+        .toggle-password svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body class="page-home">
 
@@ -35,7 +85,12 @@
 
                 <div class="form-group">
                     <label for="loginPassword">Password</label>
-                    <input id="loginPassword" type="password" placeholder="Enter password">
+                    <div class="password-wrapper">
+                        <input id="loginPassword" type="password" placeholder="Enter password">
+                        <button type="button" class="toggle-password" onclick="togglePassword('loginPassword', this)" aria-label="Show password">
+                            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
                 </div>
 
                 <button onclick="login()">Login</button>
@@ -55,12 +110,22 @@
 
                 <div class="form-group">
                     <label for="regPassword">Password</label>
-                    <input id="regPassword" type="password" placeholder="Create password">
+                    <div class="password-wrapper">
+                        <input id="regPassword" type="password" placeholder="Create password">
+                        <button type="button" class="toggle-password" onclick="togglePassword('regPassword', this)" aria-label="Show password">
+                            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="confirmPassword">Confirm Password</label>
-                    <input id="confirmPassword" type="password" placeholder="Confirm password">
+                    <div class="password-wrapper">
+                        <input id="confirmPassword" type="password" placeholder="Confirm password">
+                        <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword', this)" aria-label="Show password">
+                            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -85,6 +150,18 @@
     </div>
 </div>
 
+<script>
+    function togglePassword(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        // Swap icon: open eye vs crossed eye
+        btn.innerHTML = isPassword
+            ? '<svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+            : '<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+        btn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+    }
+</script>
 <script src="../js/app.js?v=cache2"></script>
 </body>
 </html>

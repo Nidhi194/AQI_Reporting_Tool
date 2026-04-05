@@ -14,19 +14,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 const db = mysql.createConnection({
-<<<<<<< HEAD
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
-=======
     host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 3306,
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'user_db'
->>>>>>> 9249abc7634cc1d3a763726b54979c03501e901a
 });
 
 const dbPromise = db.promise();
@@ -348,12 +340,6 @@ app.post('/save-industry', (req, res) => {
         data.alt_phone ? String(data.alt_phone).trim() : '',
         String(data.monitoring_frequency).trim(),
         String(data.notification_pref).trim()
-<<<<<<< HEAD
-    ], (err) => {
-        if (err) {
-            console.log('Save Industry Error:', err.message);
-            return res.json({ error: err.message });
-=======
     ];
 
     const checkSql = 'SELECT id FROM industry_details WHERE user_email = ? LIMIT 1';
@@ -362,7 +348,6 @@ app.post('/save-industry', (req, res) => {
         if (checkErr) {
             console.log('Industry Profile Check Error:', checkErr.message);
             return res.json({ error: 'Database error' });
->>>>>>> 9249abc7634cc1d3a763726b54979c03501e901a
         }
 
         const hasExistingProfile = rows.length > 0;
@@ -406,9 +391,6 @@ app.post('/save-industry', (req, res) => {
     });
 });
 
-<<<<<<< HEAD
-// GET INDUSTRY NAMES
-=======
 // CHECK INDUSTRY PROFILE STATUS
 app.get('/industry-profile-status', async (req, res) => {
     const userEmail = String(req.query.user_email || '').trim();
@@ -479,7 +461,6 @@ app.post('/report-industry-issue', (req, res) => {
 });
 
 // GET INDUSTRY NAMES FOR AGENCY DROPDOWN
->>>>>>> 9249abc7634cc1d3a763726b54979c03501e901a
 app.get('/get-industries', (req, res) => {
     const sql = 'SELECT industry_name FROM industry_details';
 
@@ -644,7 +625,6 @@ app.post('/save-pm25', (req, res) => {
     });
 });
 
-<<<<<<< HEAD
 // GET USER REPORTS
 app.get('/api/reports', (req, res) => {
     const userEmail = req.query.user_email;
@@ -690,10 +670,6 @@ app.get('/api/reports', (req, res) => {
         checkDone();
     });
 });
-
-=======
-
-
 
 // AGENCY DASHBOARD DATA
 app.get('/agency-dashboard-data', async (req, res) => {
@@ -756,7 +732,6 @@ app.post('/save-agency-report', async (req, res) => {
 });
 
 // START SERVER
->>>>>>> 9249abc7634cc1d3a763726b54979c03501e901a
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });

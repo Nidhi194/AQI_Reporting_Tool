@@ -85,13 +85,34 @@ function bindRowActionMenu() {
 
     // We only want to add these document listeners ONCE.
     if (!window.hasBoundDocumentActions) {
-        actionMenu.addEventListener("click", (event) => {
+        actionMenu.addEventListener("click", async (event) => {
             const menuButton = event.target.closest("button");
             if (!menuButton) return;
             
-            if (menuButton.value === "generate_report") {
-                window.location.href = "agency.html";
-                return;
+            const action = menuButton.value;
+            
+            if (action === "view") {
+                alert("Viewing report: " + selectedReportId);
+            } else if (action === "download") {
+                alert("Downloading report: " + selectedReportId);
+            } else if (action === "delete") {
+                if (confirm("Are you sure you want to delete this report?")) {
+                    try {
+                        const res = await fetch(`http://localhost:3000/api/reports/${selectedReportId}`, {
+                            method: 'DELETE'
+                        });
+                        
+                        if (res.ok) {
+                            alert("Report deleted successfully.");
+                            AgencyDashboard.loadLiveReports(); // Need to access global loadLiveReports or call the loadLiveReports method which is locally defined.
+                        } else {
+                            alert("Failed to delete report.");
+                        }
+                    } catch(err) {
+                        console.error("Delete error:", err);
+                        alert("Error deleting report.");
+                    }
+                }
             }
             
             closeActionMenu();

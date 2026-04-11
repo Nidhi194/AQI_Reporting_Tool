@@ -667,6 +667,26 @@ app.get('/api/reports', async (req, res) => {
     }
 });
 
+// DELETE REPORT
+app.delete('/api/reports/:id', (req, res) => {
+    let rawId = req.params.id;
+    // Extract numeric ID (e.g., RPT-0001 -> 1, RPT-COMP-5 -> 5)
+    let id = rawId.replace(/\D/g, '');
+    
+    if (!id) {
+        return res.status(400).json({ error: 'Invalid report ID' });
+    }
+
+    // We assume reports are tied to pm10_data (and equivalently so2, no2, pm25 with same ID or monitoring date, but for simplicity we just delete from pm10_data to hide it from the list since the dashboard uses pm10_data to list reports)
+    db.query('DELETE FROM pm10_data WHERE id = ?', [id], (err, result) => {
+        if (err) {
+            console.log('Delete Report Error:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ success: true, message: 'Report deleted successfully' });
+    });
+});
+
 // AGENCY DASHBOARD DATA
 app.get('/agency-dashboard-data', async (req, res) => {
     try {

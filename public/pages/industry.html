@@ -10,11 +10,14 @@
 <body class="page-industry">
 
 <header class="top-navbar">
-    <div class="navbar-left">EnviroMonitor - Industry Profile Info</div>
-    <div class="navbar-right">
-        <span class="industry-name" id="industryNameDisplay">Industry User</span>
-        <button class="btn-logout" type="button" onclick="logout()">Logout</button>
-    </div>
+        <div class="navbar-left" style="display: flex; align-items: center; gap: 14px;">
+            <img src="../images/logo.png" alt="EnviroMonitor Logo" style="height: 54px; width: auto; object-fit: contain;">
+            <span style="font-size: 1.25rem; font-weight: 600; border-left: 2px solid rgba(0,0,0,0.15); padding-left: 14px; margin-left: 4px; display: inline-flex; align-items: center; height: 32px; color: var(--brand-900);">Industry Profile</span>
+        </div>
+        <div class="navbar-right">
+            <span class="industry-name" id="industryNameDisplay" style="color: var(--brand-900);">Industry User</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
 </header>
 
 <div class="dashboard-layout">

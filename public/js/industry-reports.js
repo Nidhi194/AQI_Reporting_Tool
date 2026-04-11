@@ -122,28 +122,19 @@ function findReportById(id) {
     return cachedReports.find((r) => String(r.id) === String(id));
 }
 
-function openPreview(report) {
-    const backdrop = document.getElementById("previewBackdrop");
-    const frame = document.getElementById("previewFrame");
-    const fallback = document.getElementById("previewFallback");
-    const titleEl = document.getElementById("previewTitle");
+async function openPreview(report) {
+    try {
+        const res = await fetch(`${API_BASE}/api/reports/summary/${report.id}`);
+        if (!res.ok) throw new Error("Failed to fetch report summary");
+        const data = await res.json();
+        
+        if (data.error) throw new Error(data.error);
 
-    titleEl.textContent = report.title || "Report preview";
-
-    const url = (report.previewUrl || "").trim();
-    if (url) {
-        frame.hidden = false;
-        fallback.hidden = true;
-        frame.src = url;
-    } else {
-        frame.hidden = true;
-        fallback.hidden = false;
-        frame.removeAttribute("src");
+        generatePDFFromData(data);
+    } catch (err) {
+        console.error("View report error:", err);
+        alert("Error opening report. Ensure it exists in the database.");
     }
-
-    backdrop.hidden = false;
-    backdrop.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
 }
 
 function closePreview() {
@@ -156,21 +147,7 @@ function closePreview() {
 }
 
 function downloadReport(report) {
-    const url = (report.downloadUrl || "").trim();
-    if (url) {
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "";
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        return;
-    }
-    alert(
-        "No download URL yet. Have your backend set downloadUrl on each report (e.g. signed file link from GET /industry-reports)."
-    );
+    openPreview(report); // Same flow, it triggers the print window
 }
 
 function updateComplianceGauge(reports) {
@@ -360,6 +337,153 @@ function init() {
     });
 
     loadReportsTable();
+}
+
+function generatePDFFromData(data) {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+        alert("Please allow popups to generate PDF reports.");
+        return;
+    }
+
+    const baseUrl = window.location.origin + window.location.pathname.replace(/\/pages\/.*$/, '');
+    const bgUrl = baseUrl + '/images/report-bg.jpg';
+
+    const cssStyles = `
+        <style>
+            @page { size: A4; margin: 0; }
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+            body { 
+                font-family: 'Inter', sans-serif; 
+                padding: 180px 60px 80px 60px; 
+                color: #1e293b; 
+                margin: 0; 
+                line-height: 1.6; 
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                height: 100%;
+                box-sizing: border-box;
+            }
+            .bg-image {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: -1;
+            }
+            .header { text-align: center; border-bottom: 2px solid #10b981; padding-bottom: 10px; margin-bottom: 30px; }
+            .header h1 { margin: 0; color: #0f172a; font-size: 24px; }
+            .header p { margin: 5px 0 0; color: #0f766e; font-size: 14px; }
+            .section { margin-bottom: 20px; text-shadow: 0 0 1px rgba(255,255,255,0.8); }
+            .section-title { font-size: 18px; color: #0f766e; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; margin-bottom: 15px; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+            table th, table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+            table th { background-color: #f8fafc; font-weight: 600; color: #334155; }
+            .overview-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
+            .overview-item { padding: 15px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
+            .overview-label { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 5px; }
+            .overview-value { font-size: 16px; font-weight: 700; color: #0f172a; }
+            .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 20px; background-color: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); }
+        </style>
+    `;
+
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>AQI Comprehensive Report - ${data.industryName}</title>
+            ${cssStyles}
+        </head>
+        <body>
+            <img src="${bgUrl}" class="bg-image" alt="background">
+            <div style="position: relative; z-index: 1;">
+                <div class="header" style="background-color: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); display: inline-block; padding: 10px 30px; border-radius: 8px;">
+                    <h1>Comprehensive AQI Monitoring Report</h1>
+                    <p style="margin-top:0px">Generated by EnviroMonitor Agency Panel</p>
+                </div>
+
+                <div class="overview-grid">
+                    <div class="overview-item">
+                        <div class="overview-label">Industry Name</div>
+                        <div class="overview-value">${data.industryName}</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-label">Location / Site</div>
+                        <div class="overview-value">${data.location}</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-label">Monitoring Date</div>
+                        <div class="overview-value">${data.monitoringDate}</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-label">Report Validity</div>
+                        <div class="overview-value">Verified & Finalized</div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">Table of Contents</h2>
+                    <ul>
+                        <li>1. Industry Overview</li>
+                        <li>2. PM10 Determination Results</li>
+                        <li>3. SO₂ Determination Results</li>
+                        <li>4. NO₂ Determination Results</li>
+                        <li>5. PM2.5 Determination Results</li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">Summary of Environmental Parameters</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Average Concentration (µg/m³)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>PM10</td>
+                                <td>${data.pm10Avg}</td>
+                                <td>Recorded</td>
+                            </tr>
+                            <tr>
+                                <td>Sulfur Dioxide (SO₂)</td>
+                                <td>${data.so2Avg}</td>
+                                <td>Recorded</td>
+                            </tr>
+                            <tr>
+                                <td>Nitrogen Dioxide (NO₂)</td>
+                                <td>${data.no2Avg}</td>
+                                <td>Recorded</td>
+                            </tr>
+                            <tr>
+                                <td>PM2.5</td>
+                                <td>${data.pm25Val}</td>
+                                <td>Recorded</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="footer">
+                    <p>This is a certified digital report generated via the AQI Reporting Interface.</p>
+                </div>
+            </div>
+            <script>
+                window.onload = () => {
+                    window.print();
+                    setTimeout(() => window.close(), 500);
+                }
+            </script>
+        </body>
+        </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
 }
 
 document.addEventListener("DOMContentLoaded", init);

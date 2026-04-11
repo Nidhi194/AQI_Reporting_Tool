@@ -10,10 +10,13 @@
 <body class="page-agency">
 
     <header class="top-navbar">
-        <div class="navbar-left">Monitoring Agency Report</div>
+        <div class="navbar-left" style="display: flex; align-items: center; gap: 14px;">
+            <img src="../images/logo.png" alt="EnviroMonitor Logo" style="height: 54px; width: auto; object-fit: contain;">
+            <span style="font-size: 1.25rem; font-weight: 600; border-left: 2px solid rgba(0,0,0,0.15); padding-left: 14px; margin-left: 4px; display: inline-flex; align-items: center; height: 32px; color: var(--brand-900);">Agency Report Builder</span>
+        </div>
         <div class="navbar-right">
-            <div class="agency-badge">Agency Panel</div>
-            <a href="agency-dash.html" style="color: white; margin-right: 15px; text-decoration: none; font-weight: 500;">Dashboard</a>
+            <div class="agency-badge" style="color: var(--brand-900);">Agency Panel</div>
+            <a href="agency-dash.html" style="color: var(--brand-900); margin-right: 15px; text-decoration: none; font-weight: 600;">Dashboard</a>
             <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
     </header>

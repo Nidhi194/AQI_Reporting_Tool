@@ -37,6 +37,7 @@ async function insertAgencyCombinedReport(data) {
     const industry_name = String(data.industry_name || '').trim();
     const location = String(data.location || '').trim();
     const monitoring_date = String(data.monitoring_date || '').trim();
+    const user_email = String(data.user_email || '').trim();
 
     const T_PM10 = 480;
     const q1_1 = toNumber(pm10.q1_1), q2_1 = toNumber(pm10.q2_1), w1_1 = toNumber(pm10.w1_1), w2_1 = toNumber(pm10.w2_1);
@@ -89,30 +90,33 @@ async function insertAgencyCombinedReport(data) {
     try {
         await dbPromise.query(`
             INSERT INTO pm10_data (
-                industry_name, location, monitoring_date,
+                user_email, industry_name, location, monitoring_date,
                 q1_1, q2_1, avg_1, volume_1, w1_1, w2_1, dust_1, pm10_1,
                 q1_2, q2_2, avg_2, volume_2, w1_2, w2_2, dust_2, pm10_2,
                 q1_3, q2_3, avg_3, volume_3, w1_3, w2_3, dust_3, pm10_3,
                 avg_pm10
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `, [
-            industry_name, location, monitoring_date,
+            user_email, industry_name, location, monitoring_date,
             q1_1, q2_1, avg_1, volume_1, w1_1, w2_1, dust_1, pm10_1,
             q1_2, q2_2, avg_2, volume_2, w1_2, w2_2, dust_2, pm10_2,
             q1_3, q2_3, avg_3, volume_3, w1_3, w2_3, dust_3, pm10_3,
             avg_pm10
         ]);
 
-        await dbPromise.query('INSERT INTO so2_data SET ?', [so2Record]);
-        await dbPromise.query('INSERT INTO no2_data SET ?', [no2Record]);
+        const so2RecordDb = { ...so2Record, user_email };
+        const no2RecordDb = { ...no2Record, user_email };
+
+        await dbPromise.query('INSERT INTO so2_data SET ?', [so2RecordDb]);
+        await dbPromise.query('INSERT INTO no2_data SET ?', [no2RecordDb]);
         await dbPromise.query(`
             INSERT INTO pm25_data (
-                industry_name, location, monitoring_date,
+                user_email, industry_name, location, monitoring_date,
                 q1, q2, avg, volume,
                 w1, w2, dust, pm25
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `, [
-            industry_name, location, monitoring_date,
+            user_email, industry_name, location, monitoring_date,
             q1_pm25, q2_pm25, avg_pm25_flow, volume_pm25,
             w1_pm25, w2_pm25, dust_pm25, pm25_value
         ]);
@@ -644,7 +648,7 @@ app.get('/api/reports', async (req, res) => {
             queryParams = [userEmail];
         }
 
-        db.query(`SELECT id, industry_name, monitoring_date as periodLabel, 'Comprehensive AQI Report' as reportType, 'Published' as status, monitoring_date as date FROM pm10_data ${whereClause} ORDER BY monitoring_date DESC`, queryParams, (err, results) => {
+        db.query(`SELECT id, industry_name, monitoring_date as periodLabel, 'Comprehensive AQI Report' as reportType, 'Published' as status, monitoring_date as date FROM pm10_data ${whereClause} ORDER BY id DESC`, queryParams, (err, results) => {
             if (err) {
                 console.log('Get Reports Error:', err.message);
                 return res.status(500).json({ error: err.message });
@@ -655,7 +659,9 @@ app.get('/api/reports', async (req, res) => {
                 title: `AQI monitoring summary – ${row.periodLabel}`,
                 reportType: row.reportType,
                 periodLabel: row.periodLabel,
+                industry_name: row.industry_name,
                 status: row.status,
+                date: row.date,
                 previewUrl: "",
                 downloadUrl: ""
             }));
@@ -687,13 +693,51 @@ app.delete('/api/reports/:id', (req, res) => {
     });
 });
 
+// GET FULL REPORT SUMMARY FOR VIEW/DOWNLOAD
+app.get('/api/reports/summary/:id', async (req, res) => {
+    let rawId = req.params.id;
+    let id = rawId.replace(/\D/g, '');
+    
+    if (!id) return res.status(400).json({ error: 'Invalid report ID' });
+
+    try {
+        const [pm10Rows] = await dbPromise.query(`SELECT * FROM pm10_data WHERE id = ?`, [id]);
+        if (pm10Rows.length === 0) return res.status(404).json({ error: 'Report not found' });
+        
+        const pm10Data = pm10Rows[0];
+        const industry_name = pm10Data.industry_name;
+        const monitoring_date = pm10Data.monitoring_date;
+        const location = pm10Data.location;
+
+        const [so2Rows] = await dbPromise.query(`SELECT avg_so2 FROM so2_data WHERE industry_name = ? AND monitoring_date = ? LIMIT 1`, [industry_name, monitoring_date]);
+        const [no2Rows] = await dbPromise.query(`SELECT avg_no2 FROM no2_data WHERE industry_name = ? AND monitoring_date = ? LIMIT 1`, [industry_name, monitoring_date]);
+        const [pm25Rows] = await dbPromise.query(`SELECT pm25 FROM pm25_data WHERE industry_name = ? AND monitoring_date = ? LIMIT 1`, [industry_name, monitoring_date]);
+
+        const toNumber = (val) => val !== null && val !== undefined ? Number(val) : 0;
+
+        res.json({
+            industryName: industry_name || 'N/A',
+            location: location || 'N/A',
+            monitoringDate: monitoring_date || 'N/A',
+            pm10Avg: pm10Data.avg_pm10 !== null ? toNumber(pm10Data.avg_pm10).toFixed(2) : '0.00',
+            so2Avg: (so2Rows.length > 0 && so2Rows[0].avg_so2 !== null) ? toNumber(so2Rows[0].avg_so2).toFixed(2) : '0.00',
+            no2Avg: (no2Rows.length > 0 && no2Rows[0].avg_no2 !== null) ? toNumber(no2Rows[0].avg_no2).toFixed(2) : '0.00',
+            pm25Val: (pm25Rows.length > 0 && pm25Rows[0].pm25 !== null) ? toNumber(pm25Rows[0].pm25).toFixed(2) : '0.00'
+        });
+
+    } catch (err) {
+        console.error('Fetch Summary Error:', err.message);
+        res.status(500).json({ error: 'Database error fetching report summary' });
+    }
+});
+
 // AGENCY DASHBOARD DATA
 app.get('/agency-dashboard-data', async (req, res) => {
     try {
         const [rows] = await dbPromise.query(`
             SELECT id, industry_name, location, monitoring_date
             FROM pm10_data
-            ORDER BY monitoring_date DESC, id DESC
+            ORDER BY id DESC
         `);
 
         const reports = rows.map((row, index) => ({

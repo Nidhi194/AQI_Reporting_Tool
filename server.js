@@ -626,49 +626,45 @@ app.post('/save-pm25', (req, res) => {
 });
 
 // GET USER REPORTS
-app.get('/api/reports', (req, res) => {
+app.get('/api/reports', async (req, res) => {
     const userEmail = req.query.user_email;
     if (!userEmail) return res.json({ error: 'user_email required' });
 
-    let pending = 4;
-    let allReports = [];
-    let hasError = false;
+    try {
+        const profile = await getIndustryProfileByUserEmail(userEmail);
+        
+        let whereClause = "";
+        let queryParams = [];
 
-    const checkDone = () => {
-        pending--;
-        if (pending === 0 && !hasError) {
-            res.json(allReports);
+        if (profile && profile.industry_name) {
+            whereClause = "WHERE industry_name = ?";
+            queryParams = [profile.industry_name];
+        } else {
+            whereClause = "WHERE user_email = ?";
+            queryParams = [userEmail];
         }
-    };
 
-    const handleError = (err) => {
-        if (!hasError) {
-            hasError = true;
-            console.log('Get Reports Error:', err.message);
-            res.status(500).json({ error: err.message });
-        }
-    };
-
-    db.query("SELECT id, industry_name, monitoring_date as date, 'PM10 Report' as type FROM pm10_data WHERE user_email = ?", [userEmail], (err, results) => {
-        if (err) return handleError(err);
-        allReports = allReports.concat(results);
-        checkDone();
-    });
-    db.query("SELECT id, industry_name, monitoring_date as date, 'SO2 Report' as type FROM so2_data WHERE user_email = ?", [userEmail], (err, results) => {
-        if (err) return handleError(err);
-        allReports = allReports.concat(results);
-        checkDone();
-    });
-    db.query("SELECT id, industry_name, monitoring_date as date, 'NO2 Report' as type FROM no2_data WHERE user_email = ?", [userEmail], (err, results) => {
-        if (err) return handleError(err);
-        allReports = allReports.concat(results);
-        checkDone();
-    });
-    db.query("SELECT id, industry_name, monitoring_date as date, 'PM2.5 Report' as type FROM pm25_data WHERE user_email = ?", [userEmail], (err, results) => {
-        if (err) return handleError(err);
-        allReports = allReports.concat(results);
-        checkDone();
-    });
+        db.query(`SELECT id, industry_name, monitoring_date as periodLabel, 'Comprehensive AQI Report' as reportType, 'Published' as status, monitoring_date as date FROM pm10_data ${whereClause} ORDER BY monitoring_date DESC`, queryParams, (err, results) => {
+            if (err) {
+                console.log('Get Reports Error:', err.message);
+                return res.status(500).json({ error: err.message });
+            }
+            // Add titles to make it look like the required schema
+            const formattedReports = results.map(row => ({
+                id: `RPT-COMP-${row.id}`,
+                title: `AQI monitoring summary – ${row.periodLabel}`,
+                reportType: row.reportType,
+                periodLabel: row.periodLabel,
+                status: row.status,
+                previewUrl: "",
+                downloadUrl: ""
+            }));
+            res.json(formattedReports);
+        });
+    } catch (err) {
+        console.log('Get Reports Error:', err.message);
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // AGENCY DASHBOARD DATA

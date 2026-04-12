@@ -156,21 +156,27 @@ EnviroMonitor follows a **multi-layered architecture**:
 ├── package.json
 ├── LICENSE
 └── README.md
-▶️ Getting Started
-📌 Prerequisites
-Node.js
-Python
-npm / pip
-⚙️ Setup
+## ▶️ Getting Started
+
+### 📌 Prerequisites
+- Node.js  
+- Python  
+- npm / pip  
+
+---
+
+### ⚙️ Setup
+
+```bash
 git clone https://github.com/your-username/enviro-monitor.git
 cd enviro-monitor
-Backend (Flask)
+🔹 Backend (Flask)
 pip install -r requirements.txt
 python app.py
-Node Server (Optional)
+🔹 Node Server (Optional)
 npm install
 node server.js
-Frontend
+🔹 Frontend
 Open login.html
 OR use Live Server
 🔄 Workflow
@@ -183,7 +189,7 @@ Reports generated & stored
 🔐 Security Features
 Backend authentication
 Server-side validation
-Role-based access
+Role-based access control
 No localStorage-based credential storage
 📊 Use Cases
 Environmental compliance tracking
@@ -210,5 +216,7 @@ Vedant Sawant
 Licensed under the MIT License.
 
 <div align="center">
+
 💚 Built with purpose, not just code.
+
 </div> ```

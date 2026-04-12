@@ -184,4 +184,4 @@ This project is licensed under the MIT License.
 
 ## 💡 Final Thought
 
-EnviroMonitor is more than a project — it’s a real-world solution prototype for environmental governance, combining technology, compliance, and data intelligence into one platform.
+EnviroMonitor is more than a project — it’s a real-world solution prototype for environmental governance, combining technology, compliance, and data intelligence into one platform..

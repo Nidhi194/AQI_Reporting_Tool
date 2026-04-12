@@ -1288,35 +1288,50 @@ body.page-agency .time-invalid {
 
 }
 body.page-agency .sampling-time-inline {
-
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: stretch;
+    justify-content: center;
     gap: 4px;
-    flex-wrap: nowrap;
     width: 100%;
-    min-width: 0;
-
+    margin-bottom: 4px;
 }
+
 body.page-agency .sampling-time-inline input[type="time"] {
-
     width: 100%;
-    min-width: 0;
-    min-height: 32px;
-    padding: 4px 5px;
-    font-size: 0.68rem;
+    max-width: 110px; /* Force enough width for HH:MM across all browsers */
+    min-height: 34px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    background: #e8eeec !important;
+    border: 1px solid #c4d8d0 !important;
+    color: #243854;
+    outline: none;
+    transition: all 0.2s ease;
+    text-align: center;
+}
 
+body.page-agency .sampling-time-inline input[type="time"]:focus {
+    border-color: #0F6E56 !important;
+    box-shadow: 0 0 0 3px rgba(15, 110, 86, 0.15) !important;
+    background: #ffffff !important;
+}
+
+body.page-agency .sampling-time-inline input[type="time"]:focus {
+    border-color: #0F6E56 !important;
+    box-shadow: 0 0 0 3px rgba(15, 110, 86, 0.15) !important;
+    background: #ffffff !important;
 }
 body.page-agency .sampling-time-label {
-
-    font-size: 0.62rem;
-    font-weight: 800;
-    color: #415775;
-    letter-spacing: 0.1px;
-    white-space: nowrap;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     line-height: 1;
-
+    margin: 2px 0;
+}
 }
 body.page-agency .location-sync-input {
 
@@ -1612,6 +1627,21 @@ body.page-agency .sampling-time-label {
     
 }
 }
+
+/* Global Logout Button Hover Effect */
+.logout-btn, .btn-logout, #btnLogout, [id^="logout"], .btn-exit {
+    transition: all 0.3s ease !important;
+}
+
+.logout-btn:hover, .btn-logout:hover, #btnLogout:hover, [id^="logout"]:hover, .btn-exit:hover {
+    background: #dc2626 !important;
+    color: #ffffff !important;
+    border-color: #dc2626 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(220, 38, 38, 0.35) !important;
+    filter: brightness(1.1);
+}
+
 @media print {
     body.page-agency .top-navbar,
     body.page-agency .step-nav-wrap,

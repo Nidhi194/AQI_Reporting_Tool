@@ -169,10 +169,19 @@ button:hover {
     box-shadow: 0 4px 10px rgba(0,0,0,0.03) !important;
 }
 
-.btn-logout:hover, .btn-secondary:hover, .btn-row-action:hover, .logout-btn:hover, .sidebar-link:hover, .nav-item:hover, .icon-button:hover {
+.btn-secondary:hover, .btn-row-action:hover, .sidebar-link:hover, .nav-item:hover, .icon-button:hover {
     background: rgba(255, 255, 255, 0.9) !important;
     color: var(--brand-700) !important;
     -webkit-text-fill-color: var(--brand-700) !important;
+}
+
+/* Specific Red Logout Hover to override standard glass hover */
+.btn-logout:hover, .logout-btn:hover, #btnLogout:hover {
+    background: #dc2626 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border-color: #dc2626 !important;
+    box-shadow: 0 8px 20px rgba(220, 38, 38, 0.35) !important;
 }
 
 .btn-logout::before, .btn-secondary::before, .btn-row-action::before, .logout-btn::before, .sidebar-link::before, .nav-item::before, .icon-button::before {

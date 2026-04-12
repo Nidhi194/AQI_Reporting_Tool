@@ -385,29 +385,45 @@ body.page-landing {
     display: flex;
     gap: 3rem;
     align-items: flex-start;
-    padding: 2rem;
-    border-radius: 12px;
-    transition: background 0.3s ease;
+    padding: 2.5rem;
+    border-radius: 20px;
+    background: rgba(15, 23, 42, 0.35); /* Premium semi-transparent base */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    opacity: 1 !important; /* Ensure it's never hidden by default */
+    transform: translateY(0) !important; /* Override entrance animation if it gets stuck */
 }
 .workflow-row:hover {
-    background: var(--bg-glass);
+    background: rgba(15, 23, 42, 0.6);
+    transform: translateX(15px) translateY(-5px) !important;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 15px rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.3);
 }
 .workflow-num {
-    font-family: 'Outfit', sans-serif;
-    font-size: 3rem;
-    font-weight: 900;
-    color: rgba(255,255,255,0.1);
-    line-height: 1;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 3.5rem !important;
+    font-weight: 900 !important;
+    color: var(--emerald-primary) !important;
+    opacity: 0.8 !important; /* Slightly more opaque */
+    line-height: 1 !important;
+    text-shadow: 0 0 20px rgba(16, 185, 129, 0.4) !important;
+    flex-shrink: 0;
 }
 .workflow-desc h3 {
-    font-size: 1.6rem;
-    margin-bottom: 0.8rem;
-    font-weight: 600;
+    font-size: 1.7rem !important;
+    margin-bottom: 0.8rem !important;
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.6) !important;
 }
 .workflow-desc p {
-    font-size: 1.1rem;
-    color: var(--text-secondary);
-    line-height: 1.6;
+    font-size: 1.15rem !important;
+    color: var(--text-secondary) !important;
+    line-height: 1.65 !important;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.4) !important;
 }
 
 /* Mega Footer */

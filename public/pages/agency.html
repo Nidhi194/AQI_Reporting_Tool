@@ -99,9 +99,9 @@
                             <td>
                                 <div class="time-range-group">
                                     <div class="sampling-time-inline">
-                                        <input id="pm_time_from_1" type="time" aria-label="From Time 1">
+                                        <input id="pm_time_from_1" type="time" step="60" aria-label="From Time 1">
                                         <span class="sampling-time-label">From</span>
-                                        <input id="pm_time_to_1" type="time" aria-label="To Time 1">
+                                        <input id="pm_time_to_1" type="time" step="60" aria-label="To Time 1">
                                     </div>
                                     <input id="pm_time_1" type="hidden">
                                     <div class="time-validation" id="pm_time_error_1"></div>
@@ -110,9 +110,9 @@
                             <td>
                                 <div class="time-range-group">
                                     <div class="sampling-time-inline">
-                                        <input id="pm_time_from_2" type="time" aria-label="From Time 2">
+                                        <input id="pm_time_from_2" type="time" step="60" aria-label="From Time 2">
                                         <span class="sampling-time-label">From</span>
-                                        <input id="pm_time_to_2" type="time" aria-label="To Time 2">
+                                        <input id="pm_time_to_2" type="time" step="60" aria-label="To Time 2">
                                     </div>
                                     <input id="pm_time_2" type="hidden">
                                     <div class="time-validation" id="pm_time_error_2"></div>
@@ -121,9 +121,9 @@
                             <td>
                                 <div class="time-range-group">
                                     <div class="sampling-time-inline">
-                                        <input id="pm_time_from_3" type="time" aria-label="From Time 3">
+                                        <input id="pm_time_from_3" type="time" step="60" aria-label="From Time 3">
                                         <span class="sampling-time-label">From</span>
-                                        <input id="pm_time_to_3" type="time" aria-label="To Time 3">
+                                        <input id="pm_time_to_3" type="time" step="60" aria-label="To Time 3">
                                     </div>
                                     <input id="pm_time_3" type="hidden">
                                     <div class="time-validation" id="pm_time_error_3"></div>
@@ -255,51 +255,69 @@
                             <td>1</td>
                             <td>Time of Sampling</td>
                             <td>
-                                <div class="sampling-time-inline">
-                                    <input id="so_time_start_1" type="time" aria-label="SO2 Time Start 1">
+                                <div class="time-range-group">
+                                    <div class="sampling-time-inline">
+                                    <input id="so_time_start_1" type="time" step="60" aria-label="SO2 Time Start 1">
                                     <span class="sampling-time-label">From</span>
-                                    <input id="so_time_end_1" type="time" aria-label="SO2 Time End 1">
+                                    <input id="so_time_end_1" type="time" step="60" aria-label="SO2 Time End 1">
+                                    </div>
                                     <input id="so_time_1" type="hidden">
+                                    <div class="time-validation" id="so_time_error_1"></div>
                                 </div>
                             </td>
                             <td>
-                                <div class="sampling-time-inline">
-                                    <input id="so_time_start_2" type="time" aria-label="SO2 Time Start 2">
-                                    <span class="sampling-time-label">From</span>
-                                    <input id="so_time_end_2" type="time" aria-label="SO2 Time End 2">
+                                <div class="time-range-group">
+                                    <div class="sampling-time-inline">
+                                        <input id="so_time_start_2" type="time" step="60" aria-label="SO2 Time Start 2">
+                                        <span class="sampling-time-label">From</span>
+                                        <input id="so_time_end_2" type="time" step="60" aria-label="SO2 Time End 2">
+                                    </div>
                                     <input id="so_time_2" type="hidden">
+                                    <div class="time-validation" id="so_time_error_2"></div>
                                 </div>
                             </td>
                             <td>
-                                <div class="sampling-time-inline">
-                                    <input id="so_time_start_3" type="time" aria-label="SO2 Time Start 3">
-                                    <span class="sampling-time-label">From</span>
-                                    <input id="so_time_end_3" type="time" aria-label="SO2 Time End 3">
+                                <div class="time-range-group">
+                                    <div class="sampling-time-inline">
+                                        <input id="so_time_start_3" type="time" step="60" aria-label="SO2 Time Start 3">
+                                        <span class="sampling-time-label">From</span>
+                                        <input id="so_time_end_3" type="time" step="60" aria-label="SO2 Time End 3">
+                                    </div>
                                     <input id="so_time_3" type="hidden">
+                                    <div class="time-validation" id="so_time_error_3"></div>
                                 </div>
                             </td>
                             <td>
-                                <div class="sampling-time-inline">
-                                    <input id="so_time_start_4" type="time" aria-label="SO2 Time Start 4">
-                                    <span class="sampling-time-label">From</span>
-                                    <input id="so_time_end_4" type="time" aria-label="SO2 Time End 4">
+                                <div class="time-range-group">
+                                    <div class="sampling-time-inline">
+                                        <input id="so_time_start_4" type="time" step="60" aria-label="SO2 Time Start 4">
+                                        <span class="sampling-time-label">From</span>
+                                        <input id="so_time_end_4" type="time" step="60" aria-label="SO2 Time End 4">
+                                    </div>
                                     <input id="so_time_4" type="hidden">
+                                    <div class="time-validation" id="so_time_error_4"></div>
                                 </div>
                             </td>
                             <td>
-                                <div class="sampling-time-inline">
-                                    <input id="so_time_start_5" type="time" aria-label="SO2 Time Start 5">
-                                    <span class="sampling-time-label">From</span>
-                                    <input id="so_time_end_5" type="time" aria-label="SO2 Time End 5">
+                                <div class="time-range-group">
+                                    <div class="sampling-time-inline">
+                                        <input id="so_time_start_5" type="time" step="60" aria-label="SO2 Time Start 5">
+                                        <span class="sampling-time-label">From</span>
+                                        <input id="so_time_end_5" type="time" step="60" aria-label="SO2 Time End 5">
+                                    </div>
                                     <input id="so_time_5" type="hidden">
+                                    <div class="time-validation" id="so_time_error_5"></div>
                                 </div>
                             </td>
                             <td>
-                                <div class="sampling-time-inline">
-                                    <input id="so_time_start_6" type="time" aria-label="SO2 Time Start 6">
-                                    <span class="sampling-time-label">From</span>
-                                    <input id="so_time_end_6" type="time" aria-label="SO2 Time End 6">
+                                <div class="time-range-group">
+                                    <div class="sampling-time-inline">
+                                        <input id="so_time_start_6" type="time" step="60" aria-label="SO2 Time Start 6">
+                                        <span class="sampling-time-label">From</span>
+                                        <input id="so_time_end_6" type="time" step="60" aria-label="SO2 Time End 6">
+                                    </div>
                                     <input id="so_time_6" type="hidden">
+                                    <div class="time-validation" id="so_time_error_6"></div>
                                 </div>
                             </td>
                         </tr>
@@ -450,51 +468,69 @@
                             <td>1</td>
                             <td>Time of Sampling</td>
                             <td>
-                                <div class="sampling-time-inline">
-                                    <input id="no_time_start_1" type="time" aria-label="NO2 Time Start 1">
+                                <div class="time-range-group">
+                                    <div class="sampling-time-inline">
+                                    <input id="no_time_start_1" type="time" step="60" aria-label="NO2 Time Start 1">
                                     <span class="sampling-time-label">From</span>
-                                    <input id="no_time_end_1" type="time" aria-label="NO2 Time End 1">
+                                    <input id="no_time_end_1" type="time" step="60" aria-label="NO2 Time End 1">
+                                    </div>
                                     <input id="no_time_1" type="hidden">
+                                    <div class="time-validation" id="no_time_error_1"></div>
                                 </div>
                             </td>
                             <td>
-                                <div class="sampling-time-inline">
-                                    <input id="no_time_start_2" type="time" aria-label="NO2 Time Start 2">
-                                    <span class="sampling-time-label">From</span>
-                                    <input id="no_time_end_2" type="time" aria-label="NO2 Time End 2">
+                                <div class="time-range-group">
+                                    <div class="sampling-time-inline">
+                                        <input id="no_time_start_2" type="time" step="60" aria-label="NO2 Time Start 2">
+                                        <span class="sampling-time-label">From</span>
+                                        <input id="no_time_end_2" type="time" step="60" aria-label="NO2 Time End 2">
+                                    </div>
                                     <input id="no_time_2" type="hidden">
+                                    <div class="time-validation" id="no_time_error_2"></div>
                                 </div>
                             </td>
                             <td>
-                                <div class="sampling-time-inline">
-                                    <input id="no_time_start_3" type="time" aria-label="NO2 Time Start 3">
-                                    <span class="sampling-time-label">From</span>
-                                    <input id="no_time_end_3" type="time" aria-label="NO2 Time End 3">
+                                <div class="time-range-group">
+                                    <div class="sampling-time-inline">
+                                        <input id="no_time_start_3" type="time" step="60" aria-label="NO2 Time Start 3">
+                                        <span class="sampling-time-label">From</span>
+                                        <input id="no_time_end_3" type="time" step="60" aria-label="NO2 Time End 3">
+                                    </div>
                                     <input id="no_time_3" type="hidden">
+                                    <div class="time-validation" id="no_time_error_3"></div>
                                 </div>
                             </td>
                             <td>
-                                <div class="sampling-time-inline">
-                                    <input id="no_time_start_4" type="time" aria-label="NO2 Time Start 4">
-                                    <span class="sampling-time-label">From</span>
-                                    <input id="no_time_end_4" type="time" aria-label="NO2 Time End 4">
+                                <div class="time-range-group">
+                                    <div class="sampling-time-inline">
+                                        <input id="no_time_start_4" type="time" step="60" aria-label="NO2 Time Start 4">
+                                        <span class="sampling-time-label">From</span>
+                                        <input id="no_time_end_4" type="time" step="60" aria-label="NO2 Time End 4">
+                                    </div>
                                     <input id="no_time_4" type="hidden">
+                                    <div class="time-validation" id="no_time_error_4"></div>
                                 </div>
                             </td>
                             <td>
-                                <div class="sampling-time-inline">
-                                    <input id="no_time_start_5" type="time" aria-label="NO2 Time Start 5">
-                                    <span class="sampling-time-label">From</span>
-                                    <input id="no_time_end_5" type="time" aria-label="NO2 Time End 5">
+                                <div class="time-range-group">
+                                    <div class="sampling-time-inline">
+                                        <input id="no_time_start_5" type="time" step="60" aria-label="NO2 Time Start 5">
+                                        <span class="sampling-time-label">From</span>
+                                        <input id="no_time_end_5" type="time" step="60" aria-label="NO2 Time End 5">
+                                    </div>
                                     <input id="no_time_5" type="hidden">
+                                    <div class="time-validation" id="no_time_error_5"></div>
                                 </div>
                             </td>
                             <td>
-                                <div class="sampling-time-inline">
-                                    <input id="no_time_start_6" type="time" aria-label="NO2 Time Start 6">
-                                    <span class="sampling-time-label">From</span>
-                                    <input id="no_time_end_6" type="time" aria-label="NO2 Time End 6">
+                                <div class="time-range-group">
+                                    <div class="sampling-time-inline">
+                                        <input id="no_time_start_6" type="time" step="60" aria-label="NO2 Time Start 6">
+                                        <span class="sampling-time-label">From</span>
+                                        <input id="no_time_end_6" type="time" step="60" aria-label="NO2 Time End 6">
+                                    </div>
                                     <input id="no_time_6" type="hidden">
+                                    <div class="time-validation" id="no_time_error_6"></div>
                                 </div>
                             </td>
                         </tr>
@@ -651,11 +687,14 @@
                             <td>1</td>
                             <td>Time of Sampling</td>
                             <td>
-                                <div class="sampling-time-inline">
-                                    <input id="pm25_time_start_1" type="time" aria-label="PM2.5 Time Start 1">
-                                    <span class="sampling-time-label">From</span>
-                                    <input id="pm25_time_end_1" type="time" aria-label="PM2.5 Time End 1">
+                                <div class="time-range-group">
+                                    <div class="sampling-time-inline">
+                                        <input id="pm25_time_start_1" type="time" step="60" aria-label="PM2.5 Time Start 1">
+                                        <span class="sampling-time-label">From</span>
+                                        <input id="pm25_time_end_1" type="time" step="60" aria-label="PM2.5 Time End 1">
+                                    </div>
                                     <input id="pm25_time_1" type="hidden">
+                                    <div class="time-validation" id="pm25_time_error_1"></div>
                                 </div>
                             </td>
                         </tr>

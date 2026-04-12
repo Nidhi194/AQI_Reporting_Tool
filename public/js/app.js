@@ -803,66 +803,66 @@ function calculatePM25() {
     document.getElementById("pm25_1").innerText = pm25.toFixed(2);
 }
 
-function syncSamplingTimeRange(index) {
-    const fromInput = document.getElementById(`pm_time_from_${index}`);
-    const toInput = document.getElementById(`pm_time_to_${index}`);
-    const hiddenInput = document.getElementById(`pm_time_${index}`);
-    const errorEl = document.getElementById(`pm_time_error_${index}`);
+function validateTimeRange(fromInput, toInput, errorElement) {
+    if (!fromInput || !toInput || !errorElement) return true;
 
-    if (!fromInput || !toInput || !hiddenInput || !errorEl) {
-        return true;
+    const fromVal = fromInput.value;
+    const toVal = toInput.value;
+
+    fromInput.classList.remove('time-invalid');
+    toInput.classList.remove('time-invalid');
+    errorElement.innerText = "";
+
+    if (!fromVal || !toVal) {
+        return true; 
     }
 
-    const fromValue = fromInput.value;
-    const toValue = toInput.value;
-
-    fromInput.classList.remove("time-invalid");
-    toInput.classList.remove("time-invalid");
-    errorEl.innerText = "";
-
-    if (!fromValue && !toValue) {
-        hiddenInput.value = "";
-        return true;
-    }
-
-    if (!fromValue || !toValue) {
-        hiddenInput.value = [fromValue, toValue].filter(Boolean).join(" - ");
-        errorEl.innerText = "Please select both From and To time.";
-        if (!fromValue) fromInput.classList.add("time-invalid");
-        if (!toValue) toInput.classList.add("time-invalid");
+    if (toVal <= fromVal) {
+        errorElement.innerText = "To time must be later than From time.";
+        fromInput.classList.add('time-invalid');
+        toInput.classList.add('time-invalid');
         return false;
     }
 
-    if (toValue <= fromValue) {
-        hiddenInput.value = `${fromValue} - ${toValue}`;
-        errorEl.innerText = "To time must be later than From time.";
-        fromInput.classList.add("time-invalid");
-        toInput.classList.add("time-invalid");
-        return false;
+    const group = fromInput.closest('.time-range-group');
+    if (group) {
+        const hiddenInput = group.querySelector('input[type="hidden"]');
+        if (hiddenInput) {
+            hiddenInput.value = `${fromVal} - ${toVal}`;
+        }
     }
 
-    hiddenInput.value = `${fromValue} - ${toValue}`;
     return true;
 }
 
 function validateAllSamplingTimeRanges() {
-    let isValid = true;
-    for (let i = 1; i <= 3; i++) {
-        if (!syncSamplingTimeRange(i)) {
-            isValid = false;
+    let allValid = true;
+    document.querySelectorAll('.time-range-group').forEach(group => {
+        const inputs = group.querySelectorAll('input[type="time"]');
+        const errorEl = group.querySelector('.time-validation');
+        if (inputs.length === 2 && errorEl) {
+            if (!validateTimeRange(inputs[0], inputs[1], errorEl)) {
+                allValid = false;
+            }
         }
-    }
-    return isValid;
+    });
+    return allValid;
 }
 
 function setupSamplingTimeRangeControls() {
-    for (let i = 1; i <= 3; i++) {
-        const fromInput = document.getElementById(`pm_time_from_${i}`);
-        const toInput = document.getElementById(`pm_time_to_${i}`);
-        if (fromInput) fromInput.addEventListener("input", () => syncSamplingTimeRange(i));
-        if (toInput) toInput.addEventListener("input", () => syncSamplingTimeRange(i));
-        syncSamplingTimeRange(i);
-    }
+    const groups = document.querySelectorAll('.time-range-group');
+    groups.forEach(group => {
+        const inputs = group.querySelectorAll('input[type="time"]');
+        const errorEl = group.querySelector('.time-validation');
+        if (inputs.length === 2 && errorEl) {
+            const runner = () => validateTimeRange(inputs[0], inputs[1], errorEl);
+            inputs.forEach(input => {
+                input.addEventListener('input', runner);
+                input.addEventListener('change', runner);
+            });
+            runner();
+        }
+    });
 }
 
 async function savePM10() {
@@ -916,6 +916,11 @@ async function savePM10() {
 
 async function saveSO2() {
     if (!validateCommonFields()) return;
+
+    if (!validateAllSamplingTimeRanges()) {
+        alert("Please correct invalid time ranges.");
+        return;
+    }
 
     calculateSO2();
 
@@ -1008,6 +1013,11 @@ async function saveSO2() {
 async function saveNO2() {
     if (!validateCommonFields()) return;
 
+    if (!validateAllSamplingTimeRanges()) {
+        alert("Please correct invalid time ranges.");
+        return;
+    }
+
     calculateNO2();
 
     const data = {
@@ -1098,6 +1108,11 @@ async function saveNO2() {
 
 async function savePM25() {
     if (!validateCommonFields()) return;
+
+    if (!validateAllSamplingTimeRanges()) {
+        alert("Please correct invalid time ranges.");
+        return;
+    }
 
     calculatePM25();
 
@@ -1475,6 +1490,11 @@ function generateProfessionalPDF() {
 
 async function generateReport() {
     if (!validateCommonFields()) return;
+
+    if (!validateAllSamplingTimeRanges()) {
+        alert("Please correct all invalid time ranges before generating the report.");
+        return;
+    }
     
     if (!checkAllSectionsFilled()) {
         alert("Fill full report: Ensure all input fields across PM10, SO2, NO2, and PM2.5 sections are completed.");

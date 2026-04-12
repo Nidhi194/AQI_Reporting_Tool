@@ -1,255 +1,184 @@
-<div align="center">
+# 🚀 EnviroMonitor System
 
-# 🌿 ENVIROMONITOR 🌫️
-### **Smart Environmental Monitoring & Compliance Platform**
+A scalable, full-stack environmental monitoring and compliance platform designed to digitize how industries and regulatory agencies track, analyze, and report environmental data.
 
-<p>
-  <img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JS-blue?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/Backend-Node.js-green?style=for-the-badge&logo=nodedotjs"/>
-  <img src="https://img.shields.io/badge/Database-MySQL-lightgrey?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge"/>
-</p>
-
-<p>
-A scalable, full-stack platform designed to digitize environmental monitoring, compliance tracking, and AQI-based reporting for industries and regulatory agencies.
-</p>
-
-</div>
-
----
-
-## 🌍 Overview
+## 🌍 Vision
 
 Environmental compliance today is **fragmented, manual, and inefficient**.
 
 **EnviroMonitor** solves this by creating a **centralized digital ecosystem** where:
 
-- 🏭 Industries submit environmental data
-- 🧪 Monitoring agencies validate and enforce compliance
-- ⚙️ Systems automatically compute AQI and generate reports
+- Industries can submit and manage environmental data
+- Monitoring agencies can verify, analyze, and enforce compliance
+- Systems can automatically calculate AQI and generate reports
 
----
+## ✨ Key Highlights
 
-## 💡 Problem
-
-- ❌ Manual and inconsistent data entry
-- ❌ Lack of centralized compliance systems
-- ❌ No real-time validation
-- ❌ Difficult auditing and reporting
-
----
-
-## ✨ Solution
-
-EnviroMonitor provides:
-
-- 📊 Centralized dashboards
-- 🧪 Structured AQI data entry
-- ⏱️ Time-based validation system
-- 📄 Automated report generation
-- ⚖️ Compliance monitoring system
-
----
-
-## 🔥 Key Features
-
-### 🔐 Role-Based Authentication
-
-- Secure login/signup
-- Role-based routing: Industry and Monitoring Agency
-
-### 📊 AQI Calculation Engine
-
-- Computes AQI from pollutant inputs
-- Classifies pollution levels (Good to Severe)
-- Detects dominant pollutant
-
-### ⚖️ Compliance Monitoring
-
-- Validates data against limits
-- Flags values as within limits or exceeding limits
-
-### 🧪 Monitoring Agency Dashboard
-
-- Select industry and monitoring date
-- Analyze pollution data
-- Validate compliance
-- Generate reports
-
-### 🏭 Industry Dashboard
-
-- Submit environmental readings
-- Track compliance status
-- Receive system feedback
-
-### 📄 Report Management
-
-- Auto-generated reports
-- Stored for auditing and export
-
----
+- 🔐 **Secure role-based authentication**
+- 📊 **Real-time Air Quality Index (AQI) calculation**
+- ⚖️ **Automatic compliance validation**
+- 🧪 **Dedicated dashboards for agencies & industries**
+- 📄 **Integrated report generation system**
+- 🗄️ **Persistent database storage**
+- 🔁 **Dynamic unit conversion (µg/m³ ↔ mg/m³)**
 
 ## 🧠 System Architecture
 
 EnviroMonitor follows a **multi-layered architecture**:
 
-- 🎨 **Frontend**: UI and user interaction
-- ⚙️ **Backend (Node.js + Express)**: APIs and business logic
-- 🗄️ **Database (MySQL)**: Persistent storage
-- 📄 **Reports Layer**: Generated outputs
-
----
+- 🎨 **Frontend** → UI & user interaction
+- ⚙️ **Backend (Flask + Node)** → APIs, business logic
+- 🗄️ **Database (SQLite)** → Persistent storage
+- 📄 **Reports Layer** → Generated outputs
 
 ## 🛠️ Tech Stack
 
 ### 🎨 Frontend
-
 - HTML5
 - CSS3
 - JavaScript (ES6)
 
 ### ⚙️ Backend
-
-- Node.js
-- Express.js
+- Python (Flask) – Core API & logic
+- Node.js – Supporting services / extensions
 
 ### 🗄️ Database
+- SQLite (`enviro.db`)
 
-- MySQL (`mysql2`)
+### 🔐 Authentication
+- Backend-based validation (secure, no localStorage)
 
-### 🔐 Security
+## 📁 Project Structure
 
-- Backend-based authentication
-- Role-based access control
-
----
-
-## 🗂️ Project Structure
-
-```plaintext
-/AQI_Reporting_Tool
+```text
+/enviro-monitor
 │
-├── public/
-│   ├── css/
-│   │   ├── agency-dash.css
-│   │   ├── agency-features.css
-│   │   ├── app.css
-│   │   ├── glass-theme.css
-│   │   ├── industry-features.css
-│   │   ├── industry-reports.css
-│   │   └── landing.css
-│   ├── images/
-│   ├── js/
-│   │   ├── agency-dash.js
-│   │   ├── agency-features.js
-│   │   ├── app.js
-│   │   ├── aqi-chart.js
-│   │   ├── industry-features.js
-│   │   └── industry-reports.js
-│   └── pages/
-│       ├── agency-dash.html
-│       ├── agency-info.html
-│       ├── agency.html
-│       ├── h.html
-│       ├── index.html
-│       ├── industry-reports.html
-│       └── industry.html
-├── check.js
-├── remove_bg.py
-├── server.js
-├── package.json
-├── package-lock.json
-├── requirements.txt
+├── reports/                 # Generated reports storage
+├── venv/                    # Python virtual environment
+│
+├── app.py                   # Flask backend (main logic)
+├── server.js                # Node backend (auxiliary services)
+├── enviro.db                # SQLite database
+│
+├── login.html
+├── signup.html
+├── agency-dashboard.html
+├── industry-dashboard.html
+├── agency.html
+├── industry.html
+├── index.html
+│
+├── script.js                # Frontend logic (AQI, validation)
+├── style.css                # UI styling
+│
+├── requirements.txt         # Python dependencies
+├── package.json             # Node dependencies
 ├── LICENSE
 └── README.md
 ```
 
----
+## ⚙️ Core Functionalities
 
-## ▶️ Getting Started
+### 🔐 Authentication & Authorization
+- Secure signup/login system
+- Role-based routing:
+  - 🏭 **Industry**
+  - 🧪 **Monitoring Agency**
 
-### 📌 Prerequisites
+### 📊 AQI Calculation Engine
+- Accepts pollutant inputs (PM2.5, PM10, etc.)
+- Performs:
+  - AQI computation
+  - Category classification (Good → Severe)
+  - Dominant pollutant detection
 
-- Node.js
-- npm
+### ⚖️ Compliance Monitoring
+- Validates data against permissible limits
+- Flags:
+  - ✅ Within limit
+  - ❌ Exceeds limit
 
-### ⚙️ Setup
+### 🧪 Monitoring Agency Dashboard
+- Select industry & monitoring date
+- Analyze pollution data
+- Validate compliance
+- Generate reports
 
+### 🏭 Industry Dashboard
+- Submit environmental readings
+- Track compliance status
+- View system feedback
+
+### 📄 Report Generation System
+- Reports stored in `/reports`
+- Designed for export & audit workflows
+
+## ▶️ Installation & Setup
+
+**1️⃣ Clone the Repository**
 ```bash
 git clone https://github.com/your-username/enviro-monitor.git
 cd enviro-monitor
+```
+
+**2️⃣ Setup Python Backend**
+```bash
+pip install -r requirements.txt
+python app.py
+```
+
+**3️⃣ (Optional) Start Node Server**
+```bash
 npm install
 node server.js
 ```
 
-### 🔹 Frontend
+**4️⃣ Run Frontend**
+- Open `login.html` in browser
+- **OR** Use VS Code Live Server
 
-- Open `public/pages/index.html`
-- Or use VS Code Live Server
-
----
-
-## 🔄 Workflow
+## 🔄 Application Workflow
 
 1. User registers and logs in
 2. Role-based dashboard access
-3. Industry submits data
-4. Agency validates data
-5. AQI is calculated instantly
-6. Reports are generated and stored
-
----
+3. Industry submits pollution data
+4. Agency reviews and validates
+5. System calculates AQI instantly
+6. Reports generated and stored
 
 ## 🔐 Security Features
 
-- Backend authentication
+- Backend authentication system
 - Server-side validation
 - Role-based access control
-- No localStorage-based credential storage
-
----
+- No reliance on localStorage for credentials
 
 ## 📊 Use Cases
 
 - Environmental compliance tracking
 - Industrial pollution monitoring
-- Regulatory audits
+- Government/regulatory audits
 - Data-driven environmental analysis
-
----
 
 ## 🚧 Future Enhancements
 
-- 📊 Advanced analytics dashboard
-- 📄 PDF/Excel exports
-- ☁️ Cloud deployment
+- 📊 Advanced analytics dashboards (charts & trends)
+- 📄 PDF/Excel report export
+- ☁️ Cloud deployment (AWS/Azure)
 - 📱 Mobile responsiveness
-- 🔔 Alerts and notifications
-- 💧 Water quality module
-
----
-
-## 📸 Screenshots
-
-Add dashboard, login, and report visuals here.
-
----
+- 🔔 Notification & alert system
+- 💧 Water quality monitoring module
 
 ## 🤝 Contributors
 
-- [Nidhi Vinod Nikam](https://github.com/Nidhi194)
-- [Vedant Sawant](https://github.com/vedantsawant2803-cloud)
-- [Yash Patil](https://github.com/YashPatil2307)
+- [NIDHI VINOD NIKAM](https://github.com/Nidhi194)
+- [YASH PATIL](https://github.com/YashPatil2307)
+- [VEDANT SAWANT](https://github.com/vedantsawant2803-cloud)
 
----
+## 📜 License
 
-## 📄 License
+This project is licensed under the MIT License.
 
-Licensed under the MIT License.
+## 💡 Final Thought
 
-<div align="center">
-
-**💚 Built with purpose, not just code.**
-
-</div>
+EnviroMonitor is more than a project — it’s a real-world solution prototype for environmental governance, combining technology, compliance, and data intelligence into one platform..

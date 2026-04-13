@@ -11,6 +11,22 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+    const privatePages = [
+        '/pages/h.html',
+        '/pages/agency-info.html',
+        '/pages/agency-dash.html',
+        '/pages/industry.html',
+        '/pages/industry-reports.html'
+    ];
+
+    if (privatePages.some(page => req.path.includes(page))) {
+        res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    }
+
+    next();
+});
 app.use(express.static(path.join(__dirname, 'public')));
 
 const db = mysql.createConnection({

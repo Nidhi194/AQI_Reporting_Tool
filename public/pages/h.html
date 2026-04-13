@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login System</title>
+    <meta name="description" content="Login and signup access for EnviroMonitor agencies and industries.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://enviromonitor.in/pages/h.html">
+    <link rel="icon" type="image/png" href="../images/logo.png">
     <link rel="stylesheet" href="../css/app.css">
     <link rel="stylesheet" href="../css/glass-theme.css">
     <style>
@@ -215,8 +219,8 @@
 
         /* COMPACT FRAME ADJUSTMENTS */
         body.page-home .main-wrapper {
-            height: 100vh !important;
-            max-height: 100vh !important;
+            height: min(96dvh, 96vh) !important;
+            max-height: min(96dvh, 96vh) !important;
             min-height: unset !important;
             background: transparent !important;
             border: none !important;
@@ -274,6 +278,9 @@
             margin-bottom: 15px !important;
             color: var(--brand-800) !important;
             font-weight: 800 !important;
+        }
+        body.page-home .right-panel > div:has(#registerForm[style*="display: flex"]) #title {
+            text-align: center !important;
         }
         .form-group {
             margin-bottom: 16px !important;
@@ -430,7 +437,7 @@
                     
                     <div class="info-strip" id="roleInfoStrip">
                         <div class="strip-accent"></div>
-                        <p id="stripText">As an Industry user you'll fill in facility details, submit pollutant data, and track your compliance status from your dashboard.</p>
+                        <p id="stripText">As an Industry user, you will view your company’s environmental data, track compliance status, and access reports from your dashboard.</p>
                     </div>
                     
                     <input type="hidden" id="role" name="role" value="Industry">
@@ -465,9 +472,9 @@
 
                 <button onclick="register()">Create Account</button>
 
-                <p>
+                <p style="color: #ffffff !important;">
                     Already have an account?
-                    <a href="#" onclick="showLogin(); return false;">Login</a>
+                    <a href="#" onclick="showLogin(); return false;" style="color: inherit !important;">Login</a>
                 </p>
             </div>
 
@@ -501,13 +508,13 @@
         if (role === 'Industry') {
             industryCard.classList.add('selected');
             agencyCard.classList.remove('selected');
-            stripText.innerText = "As an Industry user you'll fill in facility details, submit pollutant data, and track your compliance status from your dashboard.";
+            stripText.innerText = "As an Industry user, you will view your company’s environmental data, track compliance status, and access reports from your dashboard.";
             infoStrip.style.background = "rgba(16, 185, 129, 0.05)";
             infoStrip.style.borderColor = "rgba(16, 185, 129, 0.1)";
         } else {
             industryCard.classList.remove('selected');
             agencyCard.classList.add('selected');
-            stripText.innerText = "As an Agency user you'll review industry submissions, run AQI calculations, check compliance limits, and generate audit reports.";
+            stripText.innerText = "As a Monitoring Agency user, you will collect environmental data from sites, upload the readings, and generate reports based on the analysis.";
             infoStrip.style.background = "rgba(14, 165, 233, 0.05)";
             infoStrip.style.borderColor = "rgba(14, 165, 233, 0.1)";
         }

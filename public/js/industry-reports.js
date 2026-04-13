@@ -347,7 +347,7 @@ async function fetchUpcomingChecks(email) {
         if (data.checks && data.checks.length > 0) {
             container.innerHTML = data.checks.map(check => `
                 <div style="background: white; border: 1px solid #e2e8f0; border-left: 4px solid #f59e0b; padding: 12px; border-radius: 6px;">
-                    <div style="font-weight: 600; color: #0f172a; font-size: 14px;">Scheduled by: Environment Agency</div>
+                    <div style="font-weight: 600; color: #0f172a; font-size: 14px;">Scheduled by: ${check.agency_name || check.agency_email || 'Authorized Agency'}</div>
                     <div style="color: #64748b; font-size: 13px; margin-top: 4px;">
                         <i class="fa-regular fa-calendar" style="margin-right: 4px;"></i> 
                         ${new Date(check.scheduled_date).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}

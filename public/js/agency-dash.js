@@ -250,6 +250,7 @@ function bindLogoutButton() {
                 if (res.ok && data.success) {
                     alert("Check scheduled successfully!");
                     closeModal();
+                    if (typeof loadAgencySchedules === 'function') loadAgencySchedules();
                 } else {
                     alert(data.error || "Failed to schedule check.");
                 }
@@ -598,8 +599,93 @@ function initializeDashboard() {
     bindLogoutButton();
     bindGenerateButtons();
     bindExportCsv();
-    bindRowActionMenu();
     loadLiveReports();
+
+    if (typeof loadAgencySchedules === 'function') {
+        loadAgencySchedules();
+    }
+}
+
+async function loadAgencySchedules() {
+    const userEmail = localStorage.getItem("userEmail");
+    if (!userEmail) return;
+
+    const tbody = document.getElementById("tbodySchedules");
+    const emptyState = document.getElementById("tableSchedulesEmptyState");
+    if (!tbody || !emptyState) return;
+
+    try {
+        const res = await fetch(`http://localhost:3000/api/agency-schedules?agency_email=${encodeURIComponent(userEmail)}`);
+        const data = await res.json();
+
+        const schedules = data.schedules || [];
+        tbody.innerHTML = "";
+
+        if (schedules.length === 0) {
+            emptyState.hidden = false;
+            return;
+        }
+
+        emptyState.hidden = true;
+        let html = "";
+        schedules.forEach(sc => {
+            const dateStr = formatDate(sc.scheduled_date);
+            let statusColor = "#f59e0b"; // pending orange
+            let actions = `
+                <button class="btn btn-secondary btn-schedule-complete" data-id="${sc.id}" style="color:#10b981; font-size: 0.75rem; border: 1px solid #10b981; padding: 4px 8px;"><i class="fa-solid fa-check"></i> Complete</button>
+                <button class="btn btn-secondary btn-schedule-cancel" data-id="${sc.id}" style="color:#ef4444; font-size: 0.75rem; border: 1px solid #ef4444; padding: 4px 8px;"><i class="fa-solid fa-xmark"></i> Cancel</button>
+            `;
+            if (sc.status === "Completed") {
+                statusColor = "#10b981";
+                actions = `<span style="color:#10b981; font-size: 0.8rem; font-weight:800;"><i class="fa-solid fa-check-double"></i> Done</span>`;
+            } else if (sc.status === "Cancelled") {
+                statusColor = "#64748b";
+                actions = `<span style="color:#64748b; font-size: 0.8rem; font-weight:800;"><i class="fa-solid fa-ban"></i> Cancelled</span>`;
+            }
+
+            html += `
+                <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
+                    <td style="font-weight: 700; color: #1e293b;">${sc.industry_name}</td>
+                    <td><i class="fa-regular fa-calendar" style="color: #64748b; margin-right: 4px;"></i> ${dateStr}</td>
+                    <td><span class="status-badge" style="background: ${statusColor}15; color: ${statusColor}; padding: 4px 10px; border-radius: 6px;"><i class="fa-solid fa-circle" style="font-size:0.5rem; margin-right:4px; vertical-align:middle;"></i> ${sc.status}</span></td>
+                    <td style="display: flex; gap: 8px; align-items: center; min-height: 48px;">${actions}</td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+        bindScheduleActionButtons();
+    } catch (e) {
+        console.error("Failed to load schedules", e);
+    }
+}
+
+function bindScheduleActionButtons() {
+    document.querySelectorAll(".btn-schedule-complete").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+            await updateScheduleStatus(e.target.closest("button").dataset.id, "Completed");
+        });
+    });
+    document.querySelectorAll(".btn-schedule-cancel").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+            await updateScheduleStatus(e.target.closest("button").dataset.id, "Cancelled");
+        });
+    });
+}
+
+async function updateScheduleStatus(id, status) {
+    const agencyEmail = localStorage.getItem("userEmail");
+    try {
+        const res = await fetch(`http://localhost:3000/api/schedule-check/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status, agencyEmail })
+        });
+        if (res.ok) {
+            loadAgencySchedules(); // Reload table
+        }
+    } catch (e) {
+        console.error("Failed to update status", e);
+    }
 }
 
 window.AgencyDashboard = {

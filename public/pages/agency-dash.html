@@ -232,6 +232,33 @@
                     </div>
                 </footer>
             </section>
+
+            <!-- Scheduled Checks Management -->
+            <section class="reports-panel" aria-label="Scheduled Checks" style="margin-top: 24px;">
+                <div class="reports-panel-header">
+                    <h2>Active Dispatched Schedules</h2>
+                </div>
+                <div class="table-wrapper" style="margin-top: 16px;">
+                    <table class="reports-table">
+                        <thead>
+                            <tr>
+                                <th>Target Industry</th>
+                                <th>Schedule Date</th>
+                                <th>Status</th>
+                                <th style="width: 180px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodySchedules">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                    <div class="table-empty-state" id="tableSchedulesEmptyState" hidden>
+                        <i class="fa-regular fa-calendar-xmark" aria-hidden="true" style="font-size: 1.4rem; color: #8da2be;"></i>
+                        <p style="margin: 10px 0 3px; font-size: 0.95rem; font-weight: 700; color: #5f789a;">No active schedules</p>
+                        <span style="font-size: 0.8rem; color: #7c90ab;">You do not have any pending checks dispatched.</span>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 

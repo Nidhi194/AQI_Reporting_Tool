@@ -248,13 +248,56 @@ app.get('/api/upcoming-checks', (req, res) => {
     const userEmail = req.query.user_email;
     if (!userEmail) return res.status(400).json({ error: 'user_email is required' });
 
-    const sql = 'SELECT * FROM scheduled_checks WHERE industry_email = ? AND status = "Pending" AND scheduled_date >= CURDATE() ORDER BY scheduled_date ASC';
+    // Using a grouped subquery prevents duplicate rows if an agency saved their profile multiple times
+    const sql = `
+        SELECT sc.*, ad.agency_name 
+        FROM scheduled_checks sc 
+        LEFT JOIN (
+            SELECT user_email, MAX(agency_name) as agency_name 
+            FROM agency_details 
+            GROUP BY user_email
+        ) ad ON sc.agency_email = ad.user_email 
+        WHERE sc.industry_email = ? AND sc.status = "Pending" AND sc.scheduled_date >= CURDATE() 
+        ORDER BY sc.scheduled_date ASC
+    `;
     db.query(sql, [userEmail], (err, result) => {
         if (err) {
             console.log('Upcoming Checks Fetch Error:', err.message);
             return res.status(500).json({ error: 'Database error' });
         }
         res.json({ checks: result });
+    });
+});
+
+app.get('/api/agency-schedules', (req, res) => {
+    const agencyEmail = req.query.agency_email;
+    if (!agencyEmail) return res.status(400).json({ error: 'agency_email is required' });
+
+    const sql = 'SELECT * FROM scheduled_checks WHERE agency_email = ? ORDER BY scheduled_date DESC, id DESC';
+    db.query(sql, [agencyEmail], (err, result) => {
+        if (err) {
+            console.log('Agency Schedules Fetch Error:', err.message);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json({ schedules: result });
+    });
+});
+
+app.put('/api/schedule-check/:id', (req, res) => {
+    const id = req.params.id;
+    const { status, agencyEmail } = req.body;
+    
+    if (!status || !agencyEmail) {
+        return res.status(400).json({ error: 'status and agencyEmail are required' });
+    }
+
+    const sql = 'UPDATE scheduled_checks SET status = ? WHERE id = ? AND agency_email = ?';
+    db.query(sql, [status, id, agencyEmail], (err) => {
+        if (err) {
+            console.log('Update Schedule Error:', err.message);
+            return res.status(500).json({ error: 'Failed to update schedule status' });
+        }
+        res.json({ success: true, message: 'Status updated' });
     });
 });
 
@@ -822,12 +865,16 @@ app.get('/api/reports/summary/:id', async (req, res) => {
 
 // AGENCY DASHBOARD DATA
 app.get('/agency-dashboard-data', async (req, res) => {
+    const userEmail = req.query.user_email;
+    if (!userEmail) return res.status(400).json({ error: 'user_email required' });
+
     try {
         const [rows] = await dbPromise.query(`
             SELECT id, industry_name, location, monitoring_date, status
             FROM pm10_data
+            WHERE user_email = ?
             ORDER BY id DESC
-        `);
+        `, [userEmail]);
 
         let pendingCount = 0;
         let overdueCount = 0;

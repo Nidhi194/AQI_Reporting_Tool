@@ -76,8 +76,68 @@
                 <p id="aiInsightText">⚠️ Prediction: AQI will spike to 235 next month. Recommendation: Reduce plant output by at least 15% to remain compliant.</p>
             </div>
         </div>
+        <!-- Ecological Offset & Sensor Matrix (Innovative Component) -->
+        <div class="ecological-matrix-widget section-card" style="margin-bottom: 22px; padding: 24px; position: relative; overflow: hidden;">
+            <div class="matrix-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; font-size: 1.25rem; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-leaf" style="color: #10b981;"></i> Eco-Impact &amp; Sensor Matrix
+                </h3>
+                <span class="live-pulse" style="font-size: 0.75rem; font-weight: 800; color: #10b981; background: rgba(16, 185, 129, 0.15); padding: 4px 10px; border-radius: 999px; border: 1px solid rgba(16, 185, 129, 0.3); display: flex; align-items: center; gap: 6px;">
+                    <span class="pulse-dot"></span> LIVE SYNC
+                </span>
+            </div>
+            
+            <div class="matrix-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Left: Carbon Offset Stats -->
+                <div class="offset-stats-panel glass-panel" style="background: rgba(255, 255, 255, 0.4); border-radius: 12px; padding: 18px; border: 1px solid rgba(255, 255, 255, 0.6); position: relative;">
+                    <div class="offset-score" style="margin-bottom: 16px;">
+                        <h2 style="font-size: 2.8rem; font-weight: 800; margin: 0; line-height: 1; color: #0284c7; background: linear-gradient(135deg, #0284c7, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                            +24.5<span style="font-size: 1.2rem; margin-left: 4px;">t</span>
+                        </h2>
+                        <p style="margin: 4px 0 0; font-size: 0.85rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Carbon Credits Recovered</p>
+                    </div>
+                    <ul class="offset-metrics" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px;">
+                        <li style="font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 10px; color: #064e3b;"><i class="fa-solid fa-tree" style="color: #10b981; font-size: 1rem;"></i> Equivalent to 350 trees planted</li>
+                        <li style="font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 10px; color: #064e3b;"><i class="fa-solid fa-droplet" style="color: #0ea5e9; font-size: 1rem;"></i> 14k Liters of water preserved</li>
+                        <li style="font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 10px; color: #064e3b;"><i class="fa-solid fa-bolt" style="color: #f59e0b; font-size: 1rem;"></i> 12% Energy optimization baseline hit</li>
+                    </ul>
+                </div>
 
-
+                <!-- Right: Simulated Sensor Nodes with Micro Animations -->
+                <div class="sensor-nodes-panel glass-panel" style="background: rgba(4, 47, 46, 0.85); border-radius: 12px; padding: 18px; border: 1px solid rgba(255, 255, 255, 0.2); position: relative; display: flex; justify-content: space-around; align-items: center; box-shadow: inset 0 4px 20px rgba(0,0,0,0.4);">
+                    <div class="connection-line-x" style="position: absolute; top: 50%; left: 10%; right: 10%; height: 2px; background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.4), transparent); z-index: 1;"></div>
+                    
+                    <div class="node-wrapper" style="z-index: 2; text-align: center;">
+                        <div class="node-viz is-active" style="width: 48px; height: 48px; border-radius: 50%; position: relative; margin: 0 auto 10px; display: grid; place-items: center;">
+                            <div class="node-ring" style="position: absolute; inset: 0; border: 2px solid #10b981; border-radius: 50%; animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+                            <div class="node-core" style="width: 16px; height: 16px; background: #34d399; border-radius: 50%; box-shadow: 0 0 15px #10b981;"></div>
+                        </div>
+                        <p style="margin: 0; font-size: 0.75rem; color: #e2e8f0; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Stack A</p>
+                    </div>
+                    
+                    <div class="node-wrapper" style="z-index: 2; text-align: center;">
+                        <div class="node-viz is-warning" style="width: 48px; height: 48px; border-radius: 50%; position: relative; margin: 0 auto 10px; display: grid; place-items: center;">
+                            <div class="node-ring" style="position: absolute; inset: 0; border: 2px solid #f59e0b; border-radius: 50%; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite; animation-delay: 0.5s;"></div>
+                            <div class="node-core" style="width: 16px; height: 16px; background: #fbbf24; border-radius: 50%; box-shadow: 0 0 15px #f59e0b;"></div>
+                        </div>
+                        <p style="margin: 0; font-size: 0.75rem; color: #e2e8f0; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Perimeter</p>
+                    </div>
+                    
+                    <div class="node-wrapper" style="z-index: 2; text-align: center;">
+                        <div class="node-viz is-active" style="width: 48px; height: 48px; border-radius: 50%; position: relative; margin: 0 auto 10px; display: grid; place-items: center;">
+                            <div class="node-ring" style="position: absolute; inset: 0; border: 2px solid #10b981; border-radius: 50%; animation: ping 2.5s cubic-bezier(0, 0, 0.2, 1) infinite; animation-delay: 1s;"></div>
+                            <div class="node-core" style="width: 16px; height: 16px; background: #34d399; border-radius: 50%; box-shadow: 0 0 15px #10b981;"></div>
+                        </div>
+                        <p style="margin: 0; font-size: 0.75rem; color: #e2e8f0; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">Water S1</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Background particle aesthetic -->
+            <div style="position: absolute; right: -20px; bottom: -40px; opacity: 0.05; pointer-events: none; z-index: 0;">
+                <i class="fa-solid fa-fan fa-spin" style="font-size: 180px; animation-duration: 15s;"></i>
+            </div>
+        </div>
     </main>
 
     <aside class="reports-aside">

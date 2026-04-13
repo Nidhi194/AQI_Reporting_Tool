@@ -143,10 +143,10 @@ async function login() {
 window.logout = function() {
     localStorage.removeItem("userEmail");
     let basePath = (window.location.protocol.startsWith('http') && window.location.pathname === '/') ? 'pages/' : '';
-    window.location.href = basePath ? 'h.html' : '../h.html'; 
-    // Usually logout sends to h.html, if we are in /pages/ we should probably just use 'h.html' if it's in the same folder.
+    window.location.href = basePath ? 'index.html' : '../index.html'; 
+    // Usually logout sends to index.html, if we are in /pages/ we should probably just use 'index.html' if it's in the same folder.
     // Wait, in the original code it was window.location.href = "h.html". I will keep it the same.
-    window.location.href = "h.html";
+    window.location.href = "index.html";
 };
 
 window.openSection = function(sectionId, clickedItem) {
@@ -1507,6 +1507,7 @@ async function generateReport() {
     calculatePM25();
 
     const payload = collectAgencyReportPayload();
+    payload.status = 'Published';
 
     try {
         const res = await fetch("http://localhost:3000/save-agency-report", {
@@ -1534,10 +1535,48 @@ async function generateReport() {
     }
 }
 
+async function saveAsDraft() {
+    // Only basic common fields required for a draft
+    if (!validateCommonFields()) return;
+
+    // Run underlying math on whatever happens to be filled in right now
+    calculatePM10();
+    calculateSO2();
+    calculateNO2();
+    calculatePM25();
+
+    const payload = collectAgencyReportPayload();
+    payload.status = 'Pending'; // Mark as draft
+
+    try {
+        const res = await fetch("http://localhost:3000/save-agency-report", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+
+        if (!res.ok || result.error) {
+            alert(result.error || "Error saving draft report");
+            return;
+        }
+        
+        alert("Draft Saved Successfully! Marked as pending.");
+        window.location.href = "agency-dash.html";
+
+    } catch (error) {
+        console.error("Error saving draft:", error);
+        alert("Server connection error while saving draft.");
+    }
+}
+
 function logout() {
     localStorage.removeItem("loggedInUser");
     localStorage.removeItem("userRole");
-    window.location.href = "h.html";
+    window.location.href = "index.html";
 }
 
 function updateStepStates(activeItem) {
@@ -1597,4 +1636,5 @@ document.addEventListener("DOMContentLoaded", () => {
     window.savePM25 = savePM25;
     window.saveAgencyReport = saveAgencyReport;
     window.generateReport = generateReport;
+    window.saveAsDraft = saveAsDraft;
 })();

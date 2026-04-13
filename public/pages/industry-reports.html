@@ -18,7 +18,7 @@
         <span style="font-size: 1.25rem; font-weight: 600; border-left: 2px solid rgba(0,0,0,0.15); padding-left: 14px; margin-left: 4px; display: inline-flex; align-items: center; height: 32px; color: var(--brand-900);">Industry Reports</span>
     </div>
     <div class="navbar-right">
-        <a href="industry.html" class="nav-text-link" id="editProfileLink">Update profile</a>
+        <a href="industry.html?edit=1" class="nav-text-link" id="editProfileLink">Update profile</a>
         <div class="navbar-user-hint" aria-live="polite">
             <span class="navbar-user-label">Signed in as</span>
             <span class="navbar-user-email" id="industryNameDisplay">—</span>
@@ -29,10 +29,31 @@
 
 <div class="reports-shell">
     <main class="reports-main">
-        <section class="page-intro-card reports-intro">
+        <section class="page-intro-card reports-intro" style="padding-bottom: 24px;">
             <p class="intro-eyebrow">AQI reporting</p>
-            <h1 class="intro-title">Your generated reports</h1>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h1 class="intro-title" style="margin-bottom: 0;">Your generated reports</h1>
+                <button type="button" class="btn-secondary btn-refresh" id="btnRefreshReports">Refresh</button>
+            </div>
             <p class="intro-subtitle">Preview and download reports issued for your facility. New rows appear here when your monitoring agency publishes them.</p>
+            
+            <div class="table-wrap" style="margin-top: 24px;">
+                <table class="reports-table" id="reportsTable" style="background: rgba(255, 255, 255, 0.4); border-radius: 8px; overflow: hidden;">
+                    <thead>
+                        <tr>
+                            <th>Report title</th>
+                            <th>Type</th>
+                            <th>Period / date</th>
+                            <th>Status</th>
+                            <th class="col-actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportsTableBody">
+                        <!-- Filled by industry-reports.js -->
+                    </tbody>
+                </table>
+            </div>
+            <p class="empty-hint" id="emptyReportsHint" hidden style="margin-top: 16px;">No reports available yet. Once your agency publishes environmental records, they will automatically appear here.</p>
         </section>
 
         <!-- AQI Predictive Chart Section -->
@@ -56,72 +77,7 @@
             </div>
         </div>
 
-        <div class="section-card certificates-section">
-            <div class="section-heading">
-                <h3>Certified Emission Reports</h3>
-                <p class="section-support">Immutable blockchain-verified environmental records.</p>
-            </div>
-            
-            <div class="cert-grid">
-                <div class="cert-card">
-                    <div class="cert-inner">
-                        <div class="cert-front">
-                            <i class="fa-solid fa-file-shield cert-icon"></i>
-                            <p class="cert-title">Q1 Ambient Air Report</p>
-                            <p class="cert-date">Issued: March 2024</p>
-                            <span class="cert-status valid">Verified</span>
-                        </div>
-                        <div class="cert-back">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=AQI-VERIFIED-782" alt="QR Seal" class="qr-code">
-                            <button class="btn-primary btn-sm">Download Validated PDF</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="cert-card">
-                    <div class="cert-inner">
-                        <div class="cert-front">
-                            <i class="fa-solid fa-file-shield cert-icon"></i>
-                            <p class="cert-title">Weekly Emission Log</p>
-                            <p class="cert-date">Issued: Early March</p>
-                            <span class="cert-status valid">Verified</span>
-                        </div>
-                        <div class="cert-back">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=AQI-VERIFIED-910" alt="QR Seal" class="qr-code">
-                            <button class="btn-primary btn-sm">Download Validated PDF</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="section-card reports-table-card" style="display: none;">
-            <div class="section-heading reports-table-heading">
-                <div>
-                    <h3>Report library</h3>
-                    <p class="section-support">Sorted by most recent. Integrate <code>GET /industry-reports</code> to replace placeholder data.</p>
-                </div>
-                <button type="button" class="btn-secondary btn-refresh" id="btnRefreshReports">Refresh</button>
-            </div>
-
-            <div class="table-wrap">
-                <table class="reports-table" id="reportsTable">
-                    <thead>
-                        <tr>
-                            <th>Report title</th>
-                            <th>Type</th>
-                            <th>Period / date</th>
-                            <th>Status</th>
-                            <th class="col-actions">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="reportsTableBody">
-                        <!-- Filled by industry-reports.js -->
-                    </tbody>
-                </table>
-            </div>
-            <p class="empty-hint" id="emptyReportsHint" hidden>No reports yet. Your backend can return rows from <code>GET /industry-reports?user_email=...</code>.</p>
-        </div>
     </main>
 
     <aside class="reports-aside">
@@ -146,7 +102,17 @@
             </div>
         </div>
 
-        <div class="section-card issue-card">
+        <div class="section-card checks-card" style="margin-top: 1.5rem;">
+            <div class="section-heading">
+                <h3>Upcoming Ambient Checks</h3>
+                <p class="section-support">Scheduled monitoring checks assigned by your environmental agency.</p>
+            </div>
+            <div id="upcomingChecksContainer" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 10px;">
+                <p style="color: #64748b; font-size: 14px; font-style: italic;">Loading schedules...</p>
+            </div>
+        </div>
+
+        <div class="section-card issue-card" style="margin-top: 1.5rem;">
             <div class="section-heading">
                 <h3>Report an issue</h3>
                 <p class="section-support">Flag incorrect data, access problems, or other concerns. Submits to <code>POST /report-industry-issue</code>.</p>

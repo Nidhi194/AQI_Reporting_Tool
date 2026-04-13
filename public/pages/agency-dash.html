@@ -170,10 +170,7 @@
                     <h2>Reports Overview</h2>
 
                     <div class="panel-actions">
-                        <button id="btnGenerateReport" name="generate_report" value="generate_report" class="btn btn-secondary" type="button">
-                            <i class="fa-regular fa-file-lines"></i>
-                            <span>Generate Report</span>
-                        </button>
+                        <!-- Removed Generate Report button per request -->
                         <button id="btnScheduleReport" name="schedule_report" value="schedule_report" class="btn btn-secondary" type="button">
                             <i class="fa-regular fa-calendar"></i>
                             <span>Schedule</span>
@@ -191,7 +188,7 @@
                         <input id="inputSearchReports" name="search_reports" type="search" placeholder="Search reports..." autocomplete="off">
                     </label>
 
-                    <button id="btnNewReport" name="new_report" value="new_report" class="btn btn-primary" type="button">
+                    <button id="btnNewReport" name="new_report" value="new_report" class="btn btn-primary" type="button" style="background: linear-gradient(135deg, #f97316, #ea580c); border: none; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4); font-weight: 600;">
                         <i class="fa-solid fa-plus"></i>
                         <span>New Report</span>
                     </button>
@@ -240,9 +237,38 @@
 
     <!-- Shared row action menu. Backend can map actions using selected report id. -->
     <div id="reportActionMenu" class="action-menu" role="menu" hidden>
+        <button id="btnMenuComplete" name="menu_complete" value="complete" class="action-menu-item" type="button" style="color: #ea580c;"><i class="fa-solid fa-pen-to-square"></i><span>Complete Report</span></button>
         <button id="btnMenuView" name="menu_view" value="view" class="action-menu-item" type="button"><i class="fa-regular fa-eye"></i><span>View</span></button>
         <button id="btnMenuDownload" name="menu_download" value="download" class="action-menu-item" type="button"><i class="fa-solid fa-download"></i><span>Download</span></button>
         <button id="btnMenuDelete" name="menu_delete" value="delete" class="action-menu-item danger" type="button"><i class="fa-regular fa-trash-can"></i><span>Delete</span></button>
+    </div>
+
+    <style>
+        .schedule-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .schedule-modal[hidden] { display: none; }
+        .schedule-modal-content { background: white; width: 400px; border-radius: 12px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .schedule-modal-content h2 { margin-top: 0; margin-bottom: 20px; font-size: 20px; font-weight: 600; }
+        .schedule-modal-close { float: right; background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b; }
+    </style>
+
+    <div id="scheduleModal" class="schedule-modal" hidden>
+        <div class="schedule-modal-content">
+            <button type="button" class="schedule-modal-close" id="btnCloseScheduleModal">&times;</button>
+            <h2>Schedule Ambient Check</h2>
+            <form id="formScheduleCheck" style="display: flex; flex-direction: column; gap: 15px;">
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <label for="selectIndustry" style="font-size: 14px; font-weight: 500;">Select Industry <span style="color:red">*</span></label>
+                    <select id="selectIndustry" required style="padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 14px;">
+                        <option value="">Loading industries...</option>
+                    </select>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <label for="checkDate" style="font-size: 14px; font-weight: 500;">Check Date <span style="color:red">*</span></label>
+                    <input type="date" id="checkDate" required min="" style="padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 14px;">
+                </div>
+                <button type="submit" class="btn-primary" style="margin-top: 10px; padding: 12px; border-radius: 6px; background: #0f172a; color: white; font-weight: 500; border: none; cursor: pointer;">Confirm Schedule</button>
+            </form>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

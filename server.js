@@ -38,6 +38,7 @@ async function insertAgencyCombinedReport(data) {
     const location = String(data.location || '').trim();
     const monitoring_date = String(data.monitoring_date || '').trim();
     const user_email = String(data.user_email || '').trim();
+    const status = String(data.status || 'Published').trim();
 
     const T_PM10 = 480;
     const q1_1 = toNumber(pm10.q1_1), q2_1 = toNumber(pm10.q2_1), w1_1 = toNumber(pm10.w1_1), w2_1 = toNumber(pm10.w2_1);
@@ -88,16 +89,21 @@ async function insertAgencyCombinedReport(data) {
 
     await dbPromise.beginTransaction();
     try {
+        await dbPromise.query('DELETE FROM pm10_data WHERE user_email=? AND industry_name=? AND monitoring_date=?', [user_email, industry_name, monitoring_date]);
+        await dbPromise.query('DELETE FROM so2_data WHERE user_email=? AND industry_name=? AND monitoring_date=?', [user_email, industry_name, monitoring_date]);
+        await dbPromise.query('DELETE FROM no2_data WHERE user_email=? AND industry_name=? AND monitoring_date=?', [user_email, industry_name, monitoring_date]);
+        await dbPromise.query('DELETE FROM pm25_data WHERE user_email=? AND industry_name=? AND monitoring_date=?', [user_email, industry_name, monitoring_date]);
+
         await dbPromise.query(`
             INSERT INTO pm10_data (
-                user_email, industry_name, location, monitoring_date,
+                user_email, industry_name, location, monitoring_date, status,
                 q1_1, q2_1, avg_1, volume_1, w1_1, w2_1, dust_1, pm10_1,
                 q1_2, q2_2, avg_2, volume_2, w1_2, w2_2, dust_2, pm10_2,
                 q1_3, q2_3, avg_3, volume_3, w1_3, w2_3, dust_3, pm10_3,
                 avg_pm10
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `, [
-            user_email, industry_name, location, monitoring_date,
+            user_email, industry_name, location, monitoring_date, status,
             q1_1, q2_1, avg_1, volume_1, w1_1, w2_1, dust_1, pm10_1,
             q1_2, q2_2, avg_2, volume_2, w1_2, w2_2, dust_2, pm10_2,
             q1_3, q2_3, avg_3, volume_3, w1_3, w2_3, dust_3, pm10_3,
@@ -166,6 +172,21 @@ db.connect((err) => {
         addCol('so2_data');
         addCol('no2_data');
         addCol('pm25_data');
+        
+        db.query(`ALTER TABLE pm10_data ADD COLUMN status VARCHAR(50) DEFAULT 'Published'`, (err) => {
+            // Ignore error
+        });
+
+        db.query(`CREATE TABLE IF NOT EXISTS scheduled_checks (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            agency_email VARCHAR(255) NOT NULL,
+            industry_name VARCHAR(255) NOT NULL,
+            industry_email VARCHAR(255) NOT NULL,
+            scheduled_date DATE,
+            status VARCHAR(50) DEFAULT 'Pending'
+        )`, (err) => {
+            if (err) console.log("Scheduled Checks Table Creation Error: ", err.message);
+        });
     }
 });
 
@@ -193,6 +214,49 @@ function getIndustryProfileByUserEmail(userEmail) {
         });
     });
 }
+
+// API Routes for Scheduling
+app.get('/api/industries', (req, res) => {
+    const sql = 'SELECT industry_name, user_email FROM industry_details';
+    db.query(sql, (err, result) => {
+        if (err) {
+            console.log('Industries Fetch Error:', err.message);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json(result);
+    });
+});
+
+app.post('/api/schedule-check', (req, res) => {
+    const { agencyEmail, industryEmail, industryName, scheduledDate } = req.body;
+    
+    if (!agencyEmail || !industryEmail || !scheduledDate) {
+        return res.status(400).json({ error: 'Missing required parameters' });
+    }
+
+    const sql = 'INSERT INTO scheduled_checks (agency_email, industry_name, industry_email, scheduled_date) VALUES (?, ?, ?, ?)';
+    db.query(sql, [agencyEmail, industryName, industryEmail, scheduledDate], (err) => {
+        if (err) {
+            console.log('Schedule Check Error:', err.message);
+            return res.status(500).json({ error: 'Failed to save schedule' });
+        }
+        res.json({ success: true, message: 'Check scheduled successfully' });
+    });
+});
+
+app.get('/api/upcoming-checks', (req, res) => {
+    const userEmail = req.query.user_email;
+    if (!userEmail) return res.status(400).json({ error: 'user_email is required' });
+
+    const sql = 'SELECT * FROM scheduled_checks WHERE industry_email = ? AND status = "Pending" AND scheduled_date >= CURDATE() ORDER BY scheduled_date ASC';
+    db.query(sql, [userEmail], (err, result) => {
+        if (err) {
+            console.log('Upcoming Checks Fetch Error:', err.message);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json({ checks: result });
+    });
+});
 
 // REGISTER
 app.post('/register', (req, res) => {
@@ -527,27 +591,29 @@ app.post('/save-pm10', (req, res) => {
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(sql, [
-        data.user_email || '',
-        data.industry_name,
-        data.location,
-        data.monitoring_date,
-        q1_1, q2_1, avg_1, volume_1, w1_1, w2_1, dust_1, pm10_1,
-        q1_2, q2_2, avg_2, volume_2, w1_2, w2_2, dust_2, pm10_2,
-        q1_3, q2_3, avg_3, volume_3, w1_3, w2_3, dust_3, pm10_3,
-        avg_pm10
-    ], (err) => {
-        if (err) {
-            console.log('Save PM10 Error:', err.message);
-            return res.json({ error: 'PM10 save failed' });
-        }
-
-        res.json({
-            message: 'PM10 data saved successfully',
-            pm10_1,
-            pm10_2,
-            pm10_3,
+    db.query('DELETE FROM pm10_data WHERE user_email=? AND industry_name=? AND monitoring_date=?', [data.user_email || '', data.industry_name || '', data.monitoring_date || ''], () => {
+        db.query(sql, [
+            data.user_email || '',
+            data.industry_name,
+            data.location,
+            data.monitoring_date,
+            q1_1, q2_1, avg_1, volume_1, w1_1, w2_1, dust_1, pm10_1,
+            q1_2, q2_2, avg_2, volume_2, w1_2, w2_2, dust_2, pm10_2,
+            q1_3, q2_3, avg_3, volume_3, w1_3, w2_3, dust_3, pm10_3,
             avg_pm10
+        ], (err) => {
+            if (err) {
+                console.log('Save PM10 Error:', err.message);
+                return res.json({ error: 'PM10 save failed' });
+            }
+
+            res.json({
+                message: 'PM10 data saved successfully',
+                pm10_1,
+                pm10_2,
+                pm10_3,
+                avg_pm10
+            });
         });
     });
 });
@@ -555,24 +621,44 @@ app.post('/save-pm10', (req, res) => {
 // SAVE SO2 DATA
 app.post('/save-so2', (req, res) => {
     const data = req.body;
-    db.query('INSERT INTO so2_data SET ?', data, (err) => {
-        if (err) {
-            console.log('Save SO2 Error:', err.message);
-            return res.json({ error: err.message });
+    const cleanData = {};
+    for (const key in data) {
+        if (['industry_name', 'location', 'monitoring_date', 'user_email'].includes(key)) {
+            cleanData[key] = data[key];
+        } else {
+            cleanData[key] = toNumber(data[key]);
         }
-        res.json({ message: 'SO2 data saved successfully' });
+    }
+    db.query('DELETE FROM so2_data WHERE user_email=? AND industry_name=? AND monitoring_date=?', [cleanData.user_email || '', cleanData.industry_name || '', cleanData.monitoring_date || ''], () => {
+        db.query('INSERT INTO so2_data SET ?', cleanData, (err) => {
+            if (err) {
+                console.log('Save SO2 Error:', err.message);
+                return res.json({ error: err.message });
+            }
+            res.json({ message: 'SO2 data saved successfully' });
+        });
     });
 });
 
 // SAVE NO2 DATA
 app.post('/save-no2', (req, res) => {
     const data = req.body;
-    db.query('INSERT INTO no2_data SET ?', data, (err) => {
-        if (err) {
-            console.log('Save NO2 Error:', err.message);
-            return res.json({ error: err.message });
+    const cleanData = {};
+    for (const key in data) {
+        if (['industry_name', 'location', 'monitoring_date', 'user_email'].includes(key)) {
+            cleanData[key] = data[key];
+        } else {
+            cleanData[key] = toNumber(data[key]);
         }
-        res.json({ message: 'NO2 data saved successfully' });
+    }
+    db.query('DELETE FROM no2_data WHERE user_email=? AND industry_name=? AND monitoring_date=?', [cleanData.user_email || '', cleanData.industry_name || '', cleanData.monitoring_date || ''], () => {
+        db.query('INSERT INTO no2_data SET ?', cleanData, (err) => {
+            if (err) {
+                console.log('Save NO2 Error:', err.message);
+                return res.json({ error: err.message });
+            }
+            res.json({ message: 'NO2 data saved successfully' });
+        });
     });
 });
 
@@ -600,31 +686,33 @@ app.post('/save-pm25', (req, res) => {
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(sql, [
-        data.user_email || '',
-        data.industry_name,
-        data.location,
-        data.monitoring_date,
-        q1,
-        q2,
-        avg,
-        volume,
-        w1,
-        w2,
-        dust,
-        pm25
-    ], (err) => {
-        if (err) {
-            console.log('Save PM2.5 Error:', err.message);
-            return res.json({ error: 'PM2.5 save failed' });
-        }
-
-        res.json({
-            message: 'PM2.5 data saved successfully',
+    db.query('DELETE FROM pm25_data WHERE user_email=? AND industry_name=? AND monitoring_date=?', [data.user_email || '', data.industry_name || '', data.monitoring_date || ''], () => {
+        db.query(sql, [
+            data.user_email || '',
+            data.industry_name,
+            data.location,
+            data.monitoring_date,
+            q1,
+            q2,
             avg,
             volume,
+            w1,
+            w2,
             dust,
             pm25
+        ], (err) => {
+            if (err) {
+                console.log('Save PM2.5 Error:', err.message);
+                return res.json({ error: 'PM2.5 save failed' });
+            }
+
+            res.json({
+                message: 'PM2.5 data saved successfully',
+                avg,
+                volume,
+                dust,
+                pm25
+            });
         });
     });
 });
@@ -648,7 +736,7 @@ app.get('/api/reports', async (req, res) => {
             queryParams = [userEmail];
         }
 
-        db.query(`SELECT id, industry_name, monitoring_date as periodLabel, 'Comprehensive AQI Report' as reportType, 'Published' as status, monitoring_date as date FROM pm10_data ${whereClause} ORDER BY id DESC`, queryParams, (err, results) => {
+        db.query(`SELECT id, industry_name, avg_pm10, monitoring_date as periodLabel, 'Comprehensive AQI Report' as reportType, 'Published' as status, monitoring_date as date FROM pm10_data ${whereClause} ORDER BY id DESC`, queryParams, (err, results) => {
             if (err) {
                 console.log('Get Reports Error:', err.message);
                 return res.status(500).json({ error: err.message });
@@ -660,6 +748,7 @@ app.get('/api/reports', async (req, res) => {
                 reportType: row.reportType,
                 periodLabel: row.periodLabel,
                 industry_name: row.industry_name,
+                avg_pm10: row.avg_pm10,
                 status: row.status,
                 date: row.date,
                 previewUrl: "",
@@ -735,28 +824,45 @@ app.get('/api/reports/summary/:id', async (req, res) => {
 app.get('/agency-dashboard-data', async (req, res) => {
     try {
         const [rows] = await dbPromise.query(`
-            SELECT id, industry_name, location, monitoring_date
+            SELECT id, industry_name, location, monitoring_date, status
             FROM pm10_data
             ORDER BY id DESC
         `);
 
-        const reports = rows.map((row, index) => ({
-            reportId: `RPT-${String(row.id || index + 1).padStart(4, '0')}`,
-            companyName: row.industry_name,
-            reportType: 'AQI Monitoring Report',
-            generatedBy: 'Monitoring Agency',
-            status: 'Completed',
-            monitoringDate: row.monitoring_date,
-            location: row.location
-        }));
+        let pendingCount = 0;
+        let overdueCount = 0;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const reports = rows.map((row, index) => {
+            const rowStatus = row.status || 'Published';
+            const monDate = new Date(row.monitoring_date);
+            
+            if (rowStatus === 'Pending') {
+                pendingCount++;
+                if (!isNaN(monDate.getTime()) && monDate < today) {
+                    overdueCount++;
+                }
+            }
+
+            return {
+                reportId: `RPT-${String(row.id || index + 1).padStart(4, '0')}`,
+                companyName: row.industry_name,
+                reportType: 'AQI Monitoring Report',
+                generatedBy: 'Monitoring Agency',
+                status: rowStatus,
+                monitoringDate: row.monitoring_date,
+                location: row.location
+            };
+        });
 
         res.json({
             success: true,
             summary: {
                 totalReports: reports.length,
                 activeReports: reports.length,
-                pendingReports: 0,
-                overdueReports: 0
+                pendingReports: pendingCount,
+                overdueReports: overdueCount
             },
             reports
         });

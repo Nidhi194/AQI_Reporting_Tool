@@ -19,6 +19,14 @@ const generateButtons = [
     document.getElementById("btnMenuGenerateReport")
 ].filter(Boolean);
 
+const btnScheduleReport = document.getElementById("btnScheduleReport");
+const btnExportCsv = document.getElementById("btnExportCsv");
+const scheduleModal = document.getElementById("scheduleModal");
+const btnCloseScheduleModal = document.getElementById("btnCloseScheduleModal");
+const selectIndustry = document.getElementById("selectIndustry");
+const checkDate = document.getElementById("checkDate");
+const formScheduleCheck = document.getElementById("formScheduleCheck");
+
 window.reportRows = Array.from(reportsTableBody.querySelectorAll("tr[data-report-row]"));
 let rowActionButtons = Array.from(document.querySelectorAll(".btn-row-action"));
 let selectedReportId = null;
@@ -56,6 +64,13 @@ function openActionMenu(triggerButton) {
     const rect = triggerButton.getBoundingClientRect();
     selectedReportId = triggerButton.value;
 
+    const row = triggerButton.closest("tr");
+    const completeBtn = document.getElementById("btnMenuComplete");
+    if (completeBtn) {
+        const isPending = row.querySelector(".status-draft") !== null;
+        completeBtn.style.display = isPending ? "flex" : "none";
+    }
+
     actionMenu.style.top = `${rect.bottom + 6}px`;
     actionMenu.style.left = `${Math.max(12, rect.right - actionMenu.offsetWidth)}px`;
     actionMenu.hidden = false;
@@ -91,7 +106,9 @@ function bindRowActionMenu() {
             
             const action = menuButton.value;
             
-            if (action === "view" || action === "download") {
+            if (action === "complete") {
+                window.location.href = "agency.html";
+            } else if (action === "view" || action === "download") {
                 try {
                     const res = await fetch(`http://localhost:3000/api/reports/summary/${selectedReportId}`);
                     if (!res.ok) throw new Error("Failed to fetch report summary");
@@ -171,8 +188,77 @@ function bindLogoutButton() {
         
         // Clear local storage for real logout
         localStorage.removeItem("userEmail");
-        window.location.href = "h.html";
+        window.location.href = "index.html";
     });
+
+    if (btnScheduleReport && scheduleModal) {
+        btnScheduleReport.addEventListener("click", async () => {
+            scheduleModal.hidden = false;
+            // Set min date to today
+            const today = new Date().toISOString().split("T")[0];
+            checkDate.setAttribute("min", today);
+            
+            try {
+                selectIndustry.innerHTML = '<option value="">Loading industries...</option>';
+                const res = await fetch("http://localhost:3000/api/industries");
+                if (res.ok) {
+                    const industries = await res.json();
+                    selectIndustry.innerHTML = '<option value="">Select an industry</option>';
+                    industries.forEach(ind => {
+                        const opt = document.createElement("option");
+                        opt.value = JSON.stringify({ email: ind.user_email, name: ind.industry_name });
+                        opt.textContent = ind.industry_name;
+                        selectIndustry.appendChild(opt);
+                    });
+                }
+            } catch (err) {
+                console.error("Failed to load industries", err);
+                selectIndustry.innerHTML = '<option value="">Failed to load. Try again.</option>';
+            }
+        });
+
+        const closeModal = () => {
+            scheduleModal.hidden = true;
+            formScheduleCheck.reset();
+        };
+
+        btnCloseScheduleModal.addEventListener("click", closeModal);
+        scheduleModal.addEventListener("click", (e) => {
+            if (e.target === scheduleModal) closeModal();
+        });
+
+        formScheduleCheck.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const agencyEmail = localStorage.getItem("userEmail");
+            const selectedOpt = JSON.parse(selectIndustry.value);
+            const scheduledDate = checkDate.value;
+
+            const payload = {
+                agencyEmail,
+                industryEmail: selectedOpt.email,
+                industryName: selectedOpt.name,
+                scheduledDate
+            };
+
+            try {
+                const res = await fetch("http://localhost:3000/api/schedule-check", {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alert("Check scheduled successfully!");
+                    closeModal();
+                } else {
+                    alert(data.error || "Failed to schedule check.");
+                }
+            } catch (error) {
+                console.error("Schedule error:", error);
+                alert("Server error scheduling check.");
+            }
+        });
+    }
 }
 
 function bindGenerateButtons() {
@@ -198,7 +284,7 @@ async function loadLiveReports() {
     }
 
     try {
-        const res = await fetch(`http://localhost:3000/agency-dashboard-data`);
+        const res = await fetch(`http://localhost:3000/agency-dashboard-data?user_email=${encodeURIComponent(userEmail)}`);
         const data = await res.json();
         
         if (data.error) throw new Error(data.error);
@@ -236,12 +322,13 @@ async function loadLiveReports() {
             const dateStr = formatDate(rpt.monitoringDate);
             const title = rpt.reportType || 'AQI Monitoring Report';
             const company = rpt.companyName || 'N/A';
+            const statusBadgeClass = rpt.status === 'Pending' ? 'status-draft' : 'status-completed';
             html += `
                 <tr data-report-row data-report-id="${rptId}">
                     <td>${title}</td>
                     <td>Environmental</td>
                     <td>${company}</td>
-                    <td><span class="status-badge status-completed"><i class="fa-solid fa-circle"></i>${rpt.status || 'Completed'}</span></td>
+                    <td><span class="status-badge ${statusBadgeClass}"><i class="fa-solid fa-circle"></i>${rpt.status || 'Completed'}</span></td>
                     <td>${dateStr}</td>
                     <td class="sparkline-cell"><div class="sparkline-wrap"><canvas class="sparkline-canvas"></canvas></div></td>
                     <td class="actions-cell">
@@ -276,13 +363,14 @@ async function loadLiveReports() {
             }
         };
 
-        updateGauge('gauge-total', reports.length, Math.max(1, reports.length));
-        updateGauge('gauge-active', reports.length, Math.max(1, reports.length));
-        updateGauge('gauge-pending', 0, Math.max(1, reports.length));
-        updateGauge('gauge-overdue', 0, Math.max(1, reports.length));
+        updateGauge('gauge-total', summary.totalReports || reports.length, Math.max(1, summary.totalReports || reports.length));
+        updateGauge('gauge-active', summary.activeReports || reports.length, Math.max(1, summary.totalReports || reports.length));
+        updateGauge('gauge-pending', summary.pendingReports || 0, Math.max(1, summary.totalReports || reports.length));
+        updateGauge('gauge-overdue', summary.overdueReports || 0, Math.max(1, summary.totalReports || reports.length));
 
         updateTableSummary(reports.length, reports.length);
         bindRowActionMenu(); // rebind buttons
+        updateAlertTicker(reports, summary);
 
         // Initialize 7-day sparklines for newly injected rows
         if (typeof window.initSparklines === 'function') {
@@ -292,6 +380,35 @@ async function loadLiveReports() {
     } catch (err) {
         console.error("Failed to load reports:", err);
     }
+}
+
+function updateAlertTicker(reports, summary) {
+    const track = document.getElementById("alertTickerTrack");
+    if (!track) return;
+
+    let items = [];
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+    if (summary.pendingReports > 0) {
+        items.push(`<span><i class="fa-solid fa-triangle-exclamation" style="color:#f59e0b"></i> [${timeStr}] ACTION REQUIRED: You have ${summary.pendingReports} pending draft report(s) awaiting completion.</span>`);
+    }
+
+    if (summary.overdueReports > 0) {
+        items.push(`<span><i class="fa-solid fa-circle-exclamation" style="color:#ef4444"></i> [${timeStr}] CRITICAL: ${summary.overdueReports} reports are currently overdue for processing!</span>`);
+    }
+
+    const completed = reports.filter(r => r.status && r.status.toLowerCase() !== 'pending').slice(0, 3);
+    completed.forEach(r => {
+        items.push(`<span><i class="fa-solid fa-circle-check" style="color:#10b981"></i> [${timeStr}] VERIFIED: Environmental report for ${r.companyName} (${r.reportId}) successfully logged and finalized.</span>`);
+    });
+
+    if (items.length === 0) {
+        items.push(`<span><i class="fa-solid fa-shield-halved" style="color:#3b82f6"></i> [${timeStr}] SYSTEM CLEAR: All sensor networks operating within normal bounds. Database synchronized properly.</span>`);
+    }
+
+    // Duplicate elements implicitly to naturally allow CSS infinite track looping
+    track.innerHTML = items.concat(items).join("");
 }
 
 function generatePDFFromData(data) {
@@ -441,11 +558,46 @@ function generatePDFFromData(data) {
     printWindow.document.close();
 }
 
+function bindExportCsv() {
+    if (!btnExportCsv) return;
+    btnExportCsv.addEventListener("click", () => {
+        const visibleRows = Array.from(reportsTableBody.querySelectorAll("tr[data-report-row]")).filter(row => !row.hidden);
+        
+        if (visibleRows.length === 0) {
+            alert("No reports available to export.");
+            return;
+        }
+
+        const headers = ["Report Title", "Type", "Company", "Status", "Monitoring Date"];
+        let csvContent = headers.join(",") + "\n";
+
+        visibleRows.forEach(row => {
+            const title = row.cells[0].innerText.trim().replace(/,/g, " ");
+            const type = row.cells[1].innerText.trim().replace(/,/g, " ");
+            const company = row.cells[2].innerText.trim().replace(/,/g, " ");
+            const status = row.cells[3].innerText.trim().replace(/,/g, " ");
+            const date = row.cells[4].innerText.trim();
+
+            csvContent += `${title},${type},${company},${status},${date}\n`;
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Agency_Reports_Export_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+}
+
 function initializeDashboard() {
     bindSearchInput();
     bindSidebarToggle();
     bindLogoutButton();
     bindGenerateButtons();
+    bindExportCsv();
     bindRowActionMenu();
     loadLiveReports();
 }

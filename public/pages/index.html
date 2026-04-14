@@ -7,7 +7,7 @@
     <meta name="description" content="EnviroMonitor is a next-generation environmental compliance platform for agencies and industries to track AQI, publish reports, and improve regulatory workflows.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://enviromonitor.in/">
-    <link rel="icon" type="image/svg+xml" href="../images/logo.svg">
+    <link rel="icon" type="image/png" href="../images/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
     <header class="glass-header">
         <div class="header-content">
             <div class="header-logo">
-                <img src="../images/logo.svg" alt="EnviroMonitor Logo">
+                <img src="../images/logo.png" alt="EnviroMonitor Logo">
                 <span class="header-title">EnviroMonitor</span>
             </div>
             <nav class="header-nav">
@@ -84,20 +84,64 @@
 
             <div class="bento-grid">
                 <!-- Large Feature Box -->
-                <div class="bento-box bento-large observe-fade-up">
+                <div class="bento-box bento-large bento-analytics observe-fade-up">
                     <div class="bento-art">
                         <img src="../images/abstract_dash.svg" alt="Dashboard Illustration">
                     </div>
+                    <div class="bento-stats-rail" aria-hidden="true">
+                        <div class="stat-rail-tile">
+                            <span class="stat-rail-kicker">AQI snapshot</span>
+                            <span class="stat-rail-num">42</span>
+                            <span class="stat-rail-sub">Good range</span>
+                        </div>
+                        <div class="stat-rail-tile">
+                            <span class="stat-rail-kicker">PM2.5 · PM10</span>
+                            <span class="stat-rail-num">Tracked</span>
+                            <span class="stat-rail-sub">Side-by-side panels</span>
+                        </div>
+                        <div class="stat-rail-tile">
+                            <span class="stat-rail-kicker">Refresh</span>
+                            <span class="stat-rail-num">Live</span>
+                            <span class="stat-rail-sub">Streamed to dashboards</span>
+                        </div>
+                        <div class="stat-rail-tile">
+                            <span class="stat-rail-kicker">Alerts</span>
+                            <span class="stat-rail-num">Auto-flag</span>
+                            <span class="stat-rail-sub">Threshold-based triggers</span>
+                        </div>
+                        <div class="stat-rail-tile">
+                            <span class="stat-rail-kicker">Reports</span>
+                            <span class="stat-rail-num">Instant</span>
+                            <span class="stat-rail-sub">PDF-ready formatting</span>
+                        </div>
+                        <div class="stat-rail-tile">
+                            <span class="stat-rail-kicker">Audit trail</span>
+                            <span class="stat-rail-num">Logged</span>
+                            <span class="stat-rail-sub">Timestamped history</span>
+                        </div>
+                    </div>
                     <div class="bento-text">
+                        <div class="bento-topline" aria-hidden="true">
+                            <span class="bento-dot"></span>
+                            <span class="bento-topitem"><i class="fa-solid fa-wave-square"></i> Live AQI</span>
+                            <span class="bento-sep">•</span>
+                            <span class="bento-topitem"><i class="fa-solid fa-wind"></i> PM2.5 / PM10</span>
+                            <span class="bento-sep">•</span>
+                            <span class="bento-topitem"><i class="fa-solid fa-chart-line"></i> Insights</span>
+                        </div>
                         <h3>Hyper-Responsive Analytics</h3>
                         <p>Real-time sparklines, dynamic radial gauges, and complete PM10 / PM2.5 tracking integrated gracefully into one dashboard.</p>
                     </div>
                 </div>
 
                 <!-- Small Box 1 -->
-                <div class="bento-box bento-mini observe-fade-up" data-delay="100">
+                <div class="bento-box bento-mini bento-sync observe-fade-up" data-delay="100">
                     <div class="bento-art">
                         <img src="../images/report-bg.svg" alt="Instant Sync Visual">
+                    </div>
+                    <div class="bento-corner">
+                        <span class="corner-chip corner-chip-strong"><span class="corner-kpi">0.8s</span><span class="corner-label">median sync</span></span>
+                        <span class="corner-chip"><i class="fa-solid fa-shuffle"></i> Event stream</span>
                     </div>
                     <div class="bento-mini-text">
                         <div class="bento-icon"><i class="fa-solid fa-bolt"></i></div>
@@ -107,9 +151,13 @@
                 </div>
 
                 <!-- Small Box 2 -->
-                <div class="bento-box bento-mini observe-fade-up" data-delay="200">
+                <div class="bento-box bento-mini bento-pdf observe-fade-up" data-delay="200">
                     <div class="bento-art">
                         <img src="../images/abstract_dash.svg" alt="Automated PDF Visual">
+                    </div>
+                    <div class="bento-corner">
+                        <span class="corner-chip corner-chip-strong"><span class="corner-kpi">1</span><span class="corner-label">click export</span></span>
+                        <span class="corner-chip"><i class="fa-solid fa-circle-check"></i> Format-locked</span>
                     </div>
                     <div class="bento-mini-text">
                         <div class="bento-icon"><i class="fa-solid fa-file-pdf"></i></div>
@@ -175,7 +223,7 @@
 
             <div class="footer-base">
                 <div class="footer-logo">
-                    <img src="../images/logo.svg" alt="Logo">
+                    <img src="../images/logo.png" alt="Logo">
                     <span>EnviroMonitor &copy; 2026. Elevating Standards.</span>
                 </div>
                 <div class="footer-links">

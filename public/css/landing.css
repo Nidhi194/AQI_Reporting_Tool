@@ -401,6 +401,8 @@ html, body.page-landing {
 }
 
 .bento-box {
+    --bento-accent-a: rgba(16, 185, 129, 0.35);
+    --bento-accent-b: rgba(14, 165, 233, 0.28);
     background: var(--bg-glass);
     border: 1px solid var(--border-glass);
     border-radius: 20px;
@@ -408,19 +410,198 @@ html, body.page-landing {
     position: relative;
     overflow: hidden;
     backdrop-filter: blur(14px);
-    transition: transform 0.3s ease, border 0.3s ease;
+    transition: transform 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
 }
+.bento-box::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 18% 12%, var(--bento-accent-a), transparent 44%),
+        radial-gradient(circle at 86% 18%, var(--bento-accent-b), transparent 46%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0));
+    opacity: 1;
+    z-index: 0;
+    pointer-events: none;
+}
+.bento-box::after {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    background: linear-gradient(120deg, transparent 35%, rgba(255, 255, 255, 0.16) 50%, transparent 64%);
+    transform: translateX(-30%) rotate(8deg);
+    opacity: 0;
+    transition: opacity 0.35s ease, transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+}
 .bento-box:hover {
     transform: translateY(-5px);
     border: 1px solid rgba(255,255,255,0.2);
+    box-shadow:
+        0 22px 60px rgba(2, 6, 23, 0.18),
+        0 0 0 1px rgba(255,255,255,0.08) inset;
+}
+.bento-box:hover::after {
+    opacity: 1;
+    transform: translateX(18%) rotate(8deg);
 }
 
 .bento-large {
     grid-column: span 2;
     grid-row: span 2;
+}
+
+/* Large bento needs more structure/contrast */
+.bento-large {
+    background: rgba(244, 253, 247, 0.72);
+    border: 1px solid rgba(16, 74, 55, 0.16);
+    box-shadow:
+        0 20px 56px rgba(2, 6, 23, 0.10),
+        0 0 0 1px rgba(255,255,255,0.35) inset;
+}
+.bento-large .bento-art img {
+    opacity: 0.26;
+    filter: saturate(1.02) contrast(1.04);
+}
+.bento-large:hover .bento-art img {
+    opacity: 0.34;
+}
+.bento-large .bento-text {
+    background: linear-gradient(to top, rgba(244, 253, 247, 0.94), rgba(244, 253, 247, 0.62), rgba(244, 253, 247, 0));
+    border-top: 1px solid rgba(16, 74, 55, 0.12);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+.bento-large .bento-text h3 {
+    color: var(--text-primary) !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+}
+.bento-large .bento-text p {
+    color: rgba(19, 78, 74, 0.86) !important;
+    -webkit-text-fill-color: rgba(19, 78, 74, 0.86) !important;
+}
+
+/* Top fill: metric tiles (not a fake mini-browser) */
+.bento-stats-rail {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    pointer-events: none;
+}
+
+.stat-rail-tile {
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(16, 74, 55, 0.12);
+    box-shadow: 0 14px 36px rgba(2, 6, 23, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 104px;
+    justify-content: center;
+}
+
+.stat-rail-kicker {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(19, 78, 74, 0.55);
+}
+
+.stat-rail-num {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.65rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: rgba(19, 78, 74, 0.96);
+    line-height: 1.1;
+}
+
+.stat-rail-sub {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: rgba(19, 78, 74, 0.68);
+    line-height: 1.3;
+}
+
+@media (max-width: 1100px) {
+    .bento-stats-rail {
+        grid-template-columns: 1fr;
+        position: static;
+        margin: 0 0 12px 0;
+        padding: 0 4px;
+    }
+
+    .stat-rail-tile {
+        min-height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 8px 16px;
+        padding: 12px 14px;
+    }
+
+    .stat-rail-kicker {
+        width: 100%;
+    }
+
+    .stat-rail-num {
+        font-size: 1.35rem;
+    }
+}
+
+.bento-topline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.42rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.74);
+    border: 1px solid rgba(16, 74, 55, 0.12);
+    box-shadow: 0 12px 26px rgba(2, 6, 23, 0.05);
+    margin-bottom: 0.95rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.bento-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(16, 185, 129, 0.85);
+    box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.14);
+}
+
+.bento-topitem {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: rgba(19, 78, 74, 0.86);
+}
+
+.bento-topitem i {
+    color: rgba(16, 185, 129, 0.92);
+}
+
+.bento-sep {
+    color: rgba(19, 78, 74, 0.35);
+    font-weight: 800;
 }
 
 .bento-art {
@@ -430,27 +611,32 @@ html, body.page-landing {
 }
 .bento-art img {
     width: 100%; height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     object-position: center;
-    opacity: 0.6;
-    transition: opacity 0.5s ease;
+    opacity: 0.36;
+    transform: scale(1.06);
+    filter: saturate(1.08) contrast(1.06);
+    transition: opacity 0.5s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .bento-box:hover .bento-art img {
-    opacity: 1;
+    opacity: 0.52;
+    transform: scale(1.12);
 }
 
 .bento-text {
     position: relative;
-    z-index: 1;
-    background: linear-gradient(to top, rgba(15, 70, 56, 0.8), rgba(15, 70, 56, 0.08), transparent);
+    z-index: 2;
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.12), transparent);
     padding: 2rem;
     margin: -3rem; /* stretch to mask image */
     margin-top: auto;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
 }
 .bento-text h3,
 .bento-text p {
-    color: #f8fbff !important;
-    -webkit-text-fill-color: #f8fbff !important;
+    color: var(--text-primary) !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
 }
 .bento-box h3 {
     font-size: 1.5rem;
@@ -473,7 +659,7 @@ html, body.page-landing {
 
 .bento-mini .bento-art img {
     object-fit: cover;
-    opacity: 0.48;
+    opacity: 0.34;
     transform: scale(1.05);
 }
 
@@ -481,44 +667,126 @@ html, body.page-landing {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(10, 28, 24, 0.78), rgba(10, 28, 24, 0.22), transparent);
+    background:
+        radial-gradient(circle at 14% 18%, var(--bento-accent-a), transparent 54%),
+        radial-gradient(circle at 84% 24%, var(--bento-accent-b), transparent 56%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0));
     z-index: 0;
 }
 
 .bento-mini-text {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     padding: 1.6rem;
     border-radius: 18px;
-    background: rgba(8, 30, 24, 0.42);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(244, 253, 247, 0.74);
+    border: 1px solid rgba(16, 74, 55, 0.12);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 }
 
 .bento-mini .bento-icon {
-    width: 52px;
-    height: 52px;
-    margin-bottom: 1rem;
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    font-size: 1.4rem;
-    color: #ecfeff;
-    background: rgba(255, 255, 255, 0.14);
-    border: 1px solid rgba(255, 255, 255, 0.28);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    width: auto;
+    height: auto;
+    margin-bottom: 0.85rem;
+    border-radius: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 1.65rem;
+    color: #052e2b;
+    background: none;
+    border: none;
+    box-shadow: none;
 }
+
+.bento-mini .bento-icon i {
+    color: inherit !important;
+    -webkit-text-fill-color: inherit !important;
+}
+
+.bento-sync .bento-icon {
+    color: #065f46;
+}
+
+.bento-pdf .bento-icon {
+    color: #9f1239;
+}
+
+.bento-analytics { --bento-accent-a: rgba(14, 165, 233, 0.32); --bento-accent-b: rgba(16, 185, 129, 0.26); }
+.bento-sync { --bento-accent-a: rgba(16, 185, 129, 0.42); --bento-accent-b: rgba(52, 211, 153, 0.26); }
+.bento-pdf { --bento-accent-a: rgba(244, 63, 94, 0.28); --bento-accent-b: rgba(14, 165, 233, 0.22); }
 
 .bento-mini h3,
 .bento-mini p {
-    color: #f0fdf8 !important;
-    -webkit-text-fill-color: #f0fdf8 !important;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+    color: var(--text-primary) !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+    text-shadow: none;
 }
 
 .bento-mini p {
-    opacity: 0.92;
+    opacity: 0.88;
+}
+
+/* Mini-card corner badges (fills the empty top area) */
+.bento-corner {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    max-width: calc(100% - 36px);
+    pointer-events: none;
+}
+
+.corner-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.44rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 650;
+    letter-spacing: 0.2px;
+    color: rgba(19, 78, 74, 0.92);
+    background: rgba(244, 253, 247, 0.78);
+    border: 1px solid rgba(16, 74, 55, 0.14);
+    box-shadow: 0 12px 22px rgba(2, 6, 23, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.corner-chip i {
+    color: rgba(16, 185, 129, 0.95);
+}
+
+.bento-pdf .corner-chip i {
+    color: rgba(225, 29, 72, 0.92);
+}
+
+.corner-chip-strong {
+    padding: 0.5rem 0.85rem;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(15, 39, 73, 0.10);
+}
+
+.corner-kpi {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: rgba(19, 78, 74, 0.98);
+    line-height: 1;
+}
+
+.corner-label {
+    font-size: 0.74rem;
+    font-weight: 650;
+    color: rgba(19, 78, 74, 0.78);
+    line-height: 1;
+    text-transform: lowercase;
 }
 
 /* Workflow Architecture */

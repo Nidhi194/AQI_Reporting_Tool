@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "body-parser": "^2.2.2",
     "cors": "^2.8.6",
     "dotenv": "^16.6.1",
@@ -12,11 +13,17 @@
   "description": "A scalable, full-stack environmental monitoring and compliance platform designed to digitize how industries and regulatory agencies track, analyze, and report environmental data.",
   "main": "check.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "migrate": "node scripts/migrate.js",
+    "lint": "eslint .",
+    "test": "node scripts/smoke.js",
     "start": "node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "commonjs",
+  "devDependencies": {
+    "eslint": "^10.2.0",
+    "globals": "^17.5.0"
+  }
 }

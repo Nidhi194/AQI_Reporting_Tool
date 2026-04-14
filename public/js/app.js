@@ -145,7 +145,7 @@ async function login() {
                     } else {
                         window.location.href = basePath + "agency-info.html";
                     }
-                } catch (e) {
+                } catch {
                     window.location.href = basePath + "agency-info.html";
                 }
             } else {
@@ -242,7 +242,9 @@ function populateIndustryProfile(profile = {}) {
         nameDisplay.textContent = profile.industry_name || localStorage.getItem("userEmail") || "Industry User";
     }
 
-    updateProgress();
+    if (typeof window.updateProgress === "function") {
+        window.updateProgress();
+    }
 }
 
 async function handleIndustryEntryFlow() {
@@ -368,6 +370,8 @@ function updateProgress() {
     document.getElementById("progressFill").style.width = percent + "%";
     document.getElementById("progressText").innerText = percent + "%";
 }
+
+window.updateProgress = updateProgress;
 
 document.querySelectorAll("input, select, textarea").forEach(el => {
     el.addEventListener("input", updateProgress);
@@ -1379,7 +1383,7 @@ function generateProfessionalPDF() {
     const pm25Val = document.getElementById("pm25_1").innerText || "0.00";
 
     const baseUrl = window.location.origin + window.location.pathname.replace(/\/pages\/.*$/, '');
-    const bgUrl = baseUrl + '/images/report-bg.jpg';
+    const bgUrl = baseUrl + '/images/report-bg.svg';
 
     const cssStyles = `
         <style>

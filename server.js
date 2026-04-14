@@ -4,6 +4,7 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const path = require('path');
+const bcrypt = require('bcrypt');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,6 +12,38 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+function getClientIp(req) {
+    const xff = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+    return xff || req.socket?.remoteAddress || 'unknown';
+}
+
+function createRateLimiter({ windowMs, maxRequests }) {
+    const hits = new Map();
+
+    return function rateLimiter(req, res, next) {
+        const now = Date.now();
+        const ip = getClientIp(req);
+        const key = `${ip}:${req.path}`;
+        const entry = hits.get(key) || { count: 0, resetAt: now + windowMs };
+
+        if (now > entry.resetAt) {
+            entry.count = 0;
+            entry.resetAt = now + windowMs;
+        }
+
+        entry.count += 1;
+        hits.set(key, entry);
+
+        if (entry.count > maxRequests) {
+            return res.status(429).json({ error: 'Too many requests. Please try again shortly.' });
+        }
+
+        next();
+    };
+}
+
+const authLimiter = createRateLimiter({ windowMs: 60_000, maxRequests: 20 });
 app.use((req, res, next) => {
     const privatePages = [
         '/pages/h.html',
@@ -171,53 +204,16 @@ db.getConnection((err, connection) => {
     } else {
         console.log('✅ Connected to Railway MySQL');
         connection.release();
-        
-        // Ensure agency_details table exists
-        const createTableSql = `
-            CREATE TABLE IF NOT EXISTS agency_details (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                user_email VARCHAR(255) NOT NULL,
-                agency_name VARCHAR(255),
-                owner_name VARCHAR(255),
-                email VARCHAR(255),
-                phone VARCHAR(50)
-            )
-        `;
-        db.query(createTableSql, (err) => {
-            if (err) console.log("Agency Details Table Creation Error: ", err.message);
-        });
-
-        // Add user_email to report tables if they don't have it
-        const addCol = (table) => {
-            db.query(`ALTER TABLE ${table} ADD COLUMN user_email VARCHAR(255)`, (err) => {
-                // Ignore error as it usually means column exists
-            });
-        };
-        addCol('pm10_data');
-        addCol('so2_data');
-        addCol('no2_data');
-        addCol('pm25_data');
-        
-        db.query(`ALTER TABLE pm10_data ADD COLUMN status VARCHAR(50) DEFAULT 'Published'`, (err) => {
-            // Ignore error
-        });
-
-        db.query(`CREATE TABLE IF NOT EXISTS scheduled_checks (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            agency_email VARCHAR(255) NOT NULL,
-            industry_name VARCHAR(255) NOT NULL,
-            industry_email VARCHAR(255) NOT NULL,
-            scheduled_date DATE,
-            status VARCHAR(50) DEFAULT 'Pending'
-        )`, (err) => {
-            if (err) console.log("Scheduled Checks Table Creation Error: ", err.message);
-        });
     }
 });
 
 // Landing Page Routes
 app.get(['/', '/index.html'], (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'pages', 'index.html'));
+});
+
+app.get('/api/health', (req, res) => {
+    res.json({ ok: true });
 });
 
 function getIndustryProfileByUserEmail(userEmail) {
@@ -327,12 +323,18 @@ app.put('/api/schedule-check/:id', (req, res) => {
 });
 
 // REGISTER
-app.post('/register', (req, res) => {
+app.post('/register', authLimiter, async (req, res) => {
     const { email, password, role } = req.body;
+
+    if (!String(email || '').trim() || !String(password || '').trim() || !String(role || '').trim()) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
 
     const sql = 'INSERT INTO users (email, password, role) VALUES (?, ?, ?)';
 
-    db.query(sql, [email, password, role], (err) => {
+    try {
+        const hashed = await bcrypt.hash(String(password), 12);
+        db.query(sql, [String(email).trim(), hashed, String(role).trim()], (err) => {
         if (err) {
             console.log('Register Error:', err.message);
             return res.json({ error: 'User already exists or database error' });
@@ -340,15 +342,23 @@ app.post('/register', (req, res) => {
 
         res.json({ message: 'Registered successfully' });
     });
+    } catch (e) {
+        console.log('Register Hash Error:', e.message);
+        res.status(500).json({ error: 'Registration failed' });
+    }
 });
 
 // LOGIN
-app.post('/login', (req, res) => {
+app.post('/login', authLimiter, (req, res) => {
     const { email, password } = req.body;
 
-    const sql = 'SELECT * FROM users WHERE email = ? AND password = ?';
+    if (!String(email || '').trim() || !String(password || '').trim()) {
+        return res.status(400).json({ error: 'Email and password are required' });
+    }
 
-    db.query(sql, [email, password], async (err, result) => {
+    const sql = 'SELECT * FROM users WHERE email = ? LIMIT 1';
+
+    db.query(sql, [String(email).trim()], async (err, result) => {
         if (err) {
             console.log('Login Error:', err.message);
             return res.json({ error: 'Database error' });
@@ -362,6 +372,32 @@ app.post('/login', (req, res) => {
         }
 
         const user = result[0];
+        const stored = String(user.password || '');
+        const provided = String(password);
+
+        let ok = false;
+        try {
+            if (stored.startsWith('$2a$') || stored.startsWith('$2b$') || stored.startsWith('$2y$')) {
+                ok = await bcrypt.compare(provided, stored);
+            } else {
+                // Legacy plaintext password support (upgrades on successful login)
+                ok = stored === provided;
+                if (ok) {
+                    const upgraded = await bcrypt.hash(provided, 12);
+                    db.query('UPDATE users SET password = ? WHERE email = ?', [upgraded, user.email], () => {});
+                }
+            }
+        } catch (cmpErr) {
+            console.log('Login Verify Error:', cmpErr.message);
+            ok = false;
+        }
+
+        if (!ok) {
+            return res.json({
+                success: false,
+                error: 'Invalid email or password'
+            });
+        }
 
         try {
             const industryProfile = user.role === 'Industry'
@@ -841,7 +877,7 @@ app.delete('/api/reports/:id', (req, res) => {
     }
 
     // We assume reports are tied to pm10_data (and equivalently so2, no2, pm25 with same ID or monitoring date, but for simplicity we just delete from pm10_data to hide it from the list since the dashboard uses pm10_data to list reports)
-    db.query('DELETE FROM pm10_data WHERE id = ?', [id], (err, result) => {
+    db.query('DELETE FROM pm10_data WHERE id = ?', [id], (err, _result) => {
         if (err) {
             console.log('Delete Report Error:', err.message);
             return res.status(500).json({ error: err.message });

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="1754" viewBox="0 0 1240 1754">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8fbff"/>
+      <stop offset="1" stop-color="#eef4fa"/>
+    </linearGradient>
+    <radialGradient id="accent1" cx="15%" cy="12%" r="55%">
+      <stop offset="0" stop-color="rgba(16,185,129,0.18)"/>
+      <stop offset="1" stop-color="rgba(16,185,129,0)"/>
+    </radialGradient>
+    <radialGradient id="accent2" cx="88%" cy="18%" r="55%">
+      <stop offset="0" stop-color="rgba(14,165,233,0.14)"/>
+      <stop offset="1" stop-color="rgba(14,165,233,0)"/>
+    </radialGradient>
+  </defs>
+  <rect width="1240" height="1754" fill="url(#paper)"/>
+  <rect width="1240" height="1754" fill="url(#accent1)"/>
+  <rect width="1240" height="1754" fill="url(#accent2)"/>
+  <path d="M0 260h1240" stroke="rgba(23,55,97,0.08)" stroke-width="2"/>
+  <path d="M0 1480h1240" stroke="rgba(23,55,97,0.08)" stroke-width="2"/>
+  <circle cx="1060" cy="260" r="140" fill="rgba(16,185,129,0.06)"/>
+  <circle cx="180" cy="1480" r="160" fill="rgba(14,165,233,0.05)"/>
+</svg>
+

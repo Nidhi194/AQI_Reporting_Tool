@@ -488,6 +488,12 @@ html, body.page-landing {
 .bento-mini-text {
     position: relative;
     z-index: 1;
+    padding: 1.6rem;
+    border-radius: 18px;
+    background: rgba(8, 30, 24, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .bento-mini .bento-icon {
@@ -508,6 +514,11 @@ html, body.page-landing {
 .bento-mini p {
     color: #f0fdf8 !important;
     -webkit-text-fill-color: #f0fdf8 !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.bento-mini p {
+    opacity: 0.92;
 }
 
 /* Workflow Architecture */

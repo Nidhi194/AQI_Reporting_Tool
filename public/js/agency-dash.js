@@ -420,7 +420,7 @@ function generatePDFFromData(data) {
     }
 
     const baseUrl = window.location.origin + window.location.pathname.replace(/\/pages\/.*$/, '');
-    const bgUrl = baseUrl + '/images/report-bg.jpg';
+    const bgUrl = baseUrl + '/images/report-bg.svg';
 
     const cssStyles = `
         <style>

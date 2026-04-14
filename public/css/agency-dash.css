@@ -607,6 +607,19 @@ body {
 }
 
 @media (max-width: 768px) {
+    .main-panel {
+        padding: 0 10px 16px;
+    }
+    .sidebar {
+        padding: 10px;
+    }
+    .sidebar-brand img {
+        max-height: 56px;
+    }
+    .sidebar-link {
+        font-size: 0.78rem;
+        padding: 9px 10px;
+    }
     .top-header {
         flex-direction: column;
         height: auto;
@@ -617,6 +630,22 @@ body {
     }
     .header-left, .header-right {
         justify-content: center;
+    }
+    .header-right {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .header-right .nav-text-link {
+        width: 100%;
+        margin-right: 0 !important;
+        text-align: center;
+    }
+    .alert-ticker {
+        padding: 8px 10px;
+    }
+    .alert-ticker-track {
+        font-size: 0.74rem;
+        gap: 24px;
     }
     .reports-panel-header {
         flex-direction: column;
@@ -632,6 +661,31 @@ body {
 }
 
 @media (max-width: 480px) {
+    .app-layout {
+        display: block;
+    }
+    .top-header h1 {
+        font-size: 1rem;
+    }
+    .reports-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .search-box {
+        min-height: 38px;
+    }
+    .btn-primary,
+    .btn-secondary,
+    .btn-logout {
+        width: 100%;
+        justify-content: center;
+    }
+    .table-wrapper {
+        border-radius: 8px;
+    }
+    .reports-table {
+        min-width: 620px;
+    }
     .stats-grid {
         grid-template-columns: 1fr;
     }

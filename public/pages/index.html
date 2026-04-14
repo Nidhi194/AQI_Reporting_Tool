@@ -212,12 +212,15 @@
 
         // Slight Parallax on Hero Graphic based on mouse move
         const heroGraphic = document.getElementById('heroGraphic');
-        document.addEventListener('mousemove', (e) => {
-            if(!heroGraphic) return;
+        const isFinePointer = window.matchMedia('(pointer: fine)').matches;
+        if (isFinePointer) {
+            document.addEventListener('mousemove', (e) => {
+                if(!heroGraphic) return;
             const x = (e.clientX / window.innerWidth - 0.5) * 20; // max 20px movement
             const y = (e.clientY / window.innerHeight - 0.5) * 20;
             heroGraphic.style.transform = `translate(${x}px, ${y}px) rotateY(${x*0.5}deg)`;
-        });
+            });
+        }
 
         // Header scroll effect
         const header = document.querySelector('.glass-header');

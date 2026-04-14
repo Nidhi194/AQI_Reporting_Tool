@@ -119,6 +119,19 @@ body.page-landing {
     .header-nav {
         display: none; /* Hide nav on mobile/tablet unless hamburger is implemented */
     }
+    .header-logo {
+        gap: 0.6rem;
+    }
+    .header-title {
+        font-size: 1.08rem;
+    }
+    .header-actions {
+        gap: 0.5rem;
+    }
+    .header-actions .btn {
+        padding: 0.5rem 0.85rem;
+        font-size: 0.78rem;
+    }
 }
 .header-logo {
     display: flex; align-items: center; gap: 1rem;
@@ -522,9 +535,35 @@ body.page-landing {
 @media (max-width: 768px) {
     .hero-section {
         padding: 8rem 1.5rem 5rem;
+        min-height: auto;
     }
     .bento-section, .workflow-section, .mega-footer {
         padding: 5rem 1.5rem;
+    }
+    .hero-subtitle {
+        margin-left: auto;
+        margin-right: auto;
+        font-size: 1.1rem;
+    }
+    .hero-graphic {
+        max-width: 92%;
+    }
+    .pill-badge {
+        margin-bottom: 1.2rem;
+    }
+    .bento-box {
+        padding: 1.4rem;
+        min-height: 220px;
+    }
+    .bento-text {
+        padding: 1.25rem;
+        margin: -1.4rem;
+    }
+    .bento-box h3 {
+        font-size: 1.25rem;
+    }
+    .workflow-header {
+        margin-bottom: 2.5rem;
     }
     .workflow-row {
         flex-direction: column;
@@ -537,15 +576,88 @@ body.page-landing {
 }
 
 @media (max-width: 480px) {
+    .glass-header {
+        background: var(--bg-glass-heavy);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-bottom: 1px solid var(--border-glass);
+    }
+    .header-content {
+        padding: 0.85rem 0.9rem;
+    }
+    .header-actions .btn-ghost {
+        display: none;
+    }
+    .header-actions .btn-emerald {
+        padding: 0.5rem 0.75rem;
+    }
+    .orb-1 {
+        width: 320px;
+        height: 320px;
+        filter: blur(70px);
+    }
+    .orb-2 {
+        width: 280px;
+        height: 280px;
+        filter: blur(70px);
+    }
     .pill-badge {
         font-size: 0.75rem;
+        letter-spacing: 0.6px;
+        padding: 0.35rem 0.75rem;
+    }
+    .hero-section {
+        padding: 7rem 1rem 4rem;
+    }
+    .mega-title {
+        font-size: clamp(2rem, 10vw, 2.6rem);
+        line-height: 1.15;
     }
     .hero-subtitle {
-        font-size: 1.1rem;
+        font-size: 0.98rem;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+    }
+    .hero-actions {
+        gap: 0.75rem;
     }
     .btn-mega {
         padding: 1rem 1.5rem;
-        font-size: 1rem;
+        font-size: 0.95rem;
         width: 100%;
+    }
+    .bento-section, .workflow-section {
+        padding: 3.5rem 1rem;
+    }
+    .bento-header {
+        margin-bottom: 2rem;
+    }
+    .bento-grid {
+        gap: 1rem;
+    }
+    .bento-box {
+        border-radius: 16px;
+    }
+    .workflow-row {
+        border-radius: 14px;
+    }
+    .workflow-desc h3 {
+        font-size: 1.2rem !important;
+    }
+    .workflow-desc p {
+        font-size: 0.98rem !important;
+    }
+    .mega-footer {
+        padding: 3.5rem 1rem 2rem;
+    }
+    .footer-base {
+        margin-top: 2rem;
+    }
+    .footer-logo {
+        flex-direction: column;
+        gap: 0.65rem;
+    }
+    .footer-logo span {
+        font-size: 0.85rem;
     }
 }

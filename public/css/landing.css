@@ -12,6 +12,66 @@
     --cyan-glow: rgba(14, 165, 233, 0.4);
 }
 
+/* Isolate landing page from aggressive global glass-theme overrides */
+html body.page-landing {
+    background: var(--bg-deep) !important;
+    color: var(--text-primary) !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+body.page-landing h1,
+body.page-landing h2,
+body.page-landing h3,
+body.page-landing h4,
+body.page-landing p,
+body.page-landing span,
+body.page-landing a,
+body.page-landing li {
+    color: inherit !important;
+    -webkit-text-fill-color: unset !important;
+    background: none !important;
+}
+
+body.page-landing .gradient-text {
+    background: linear-gradient(to right, var(--emerald-primary), var(--cyan-primary)) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+body.page-landing .btn,
+body.page-landing button.btn {
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    box-shadow: none !important;
+}
+
+body.page-landing .btn-emerald {
+    background: var(--text-primary) !important;
+    color: var(--bg-deep) !important;
+    -webkit-text-fill-color: var(--bg-deep) !important;
+}
+
+body.page-landing .btn-emerald:hover {
+    background: var(--emerald-primary) !important;
+    color: var(--bg-deep) !important;
+    -webkit-text-fill-color: var(--bg-deep) !important;
+    box-shadow: 0 0 30px var(--emerald-glow) !important;
+}
+
+body.page-landing .btn-ghost {
+    background: transparent !important;
+    color: var(--text-secondary) !important;
+    -webkit-text-fill-color: var(--text-secondary) !important;
+    border: none !important;
+}
+
+body.page-landing .btn-ghost:hover {
+    color: var(--text-primary) !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+    background: rgba(255,255,255,0.05) !important;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -678,6 +738,12 @@ html, body.page-landing {
 }
 
 @supports (-webkit-touch-callout: none) {
+    html body.page-landing {
+        background-attachment: scroll !important;
+    }
+    .noise-overlay {
+        opacity: 0.015;
+    }
     .glow-orb {
         filter: blur(80px);
     }

@@ -832,32 +832,42 @@ app.get('/api/reports', async (req, res) => {
         let whereClause = "";
         let queryParams = [];
 
-        if (profile && profile.industry_name) {
+        const industryName = profile && String(profile.industry_name || '').trim();
+        if (industryName) {
             whereClause = "WHERE industry_name = ?";
-            queryParams = [profile.industry_name];
+            queryParams = [industryName];
         } else {
             whereClause = "WHERE user_email = ?";
             queryParams = [userEmail];
         }
 
-        db.query(`SELECT id, industry_name, avg_pm10, monitoring_date as periodLabel, 'Comprehensive AQI Report' as reportType, 'Published' as status, monitoring_date as date FROM pm10_data ${whereClause} ORDER BY id DESC`, queryParams, (err, results) => {
+        db.query(
+            `SELECT id, industry_name, avg_pm10, monitoring_date as periodLabel, 'Comprehensive AQI Report' as reportType, 'Published' as status, monitoring_date as date
+             FROM pm10_data ${whereClause}
+             AND monitoring_date IS NOT NULL
+             AND TRIM(CAST(monitoring_date AS CHAR)) <> ''
+             ORDER BY id DESC`,
+            queryParams,
+            (err, results) => {
             if (err) {
                 console.log('Get Reports Error:', err.message);
                 return res.status(500).json({ error: err.message });
             }
-            // Add titles to make it look like the required schema
-            const formattedReports = results.map(row => ({
-                id: `RPT-COMP-${row.id}`,
-                title: `AQI monitoring summary – ${row.periodLabel}`,
-                reportType: row.reportType,
-                periodLabel: row.periodLabel,
-                industry_name: row.industry_name,
-                avg_pm10: row.avg_pm10,
-                status: row.status,
-                date: row.date,
-                previewUrl: "",
-                downloadUrl: ""
-            }));
+            // Add titles to make it look like the required schema (skip malformed rows)
+            const formattedReports = (results || [])
+                .filter((row) => row && row.id != null && row.periodLabel)
+                .map((row) => ({
+                    id: `RPT-COMP-${row.id}`,
+                    title: `AQI monitoring summary – ${row.periodLabel}`,
+                    reportType: row.reportType,
+                    periodLabel: row.periodLabel,
+                    industry_name: row.industry_name,
+                    avg_pm10: row.avg_pm10,
+                    status: row.status,
+                    date: row.date,
+                    previewUrl: '',
+                    downloadUrl: ''
+                }));
             res.json(formattedReports);
         });
     } catch (err) {

@@ -63,15 +63,40 @@ async function fetchIndustryReports(userEmail) {
     const res = await fetch(url);
     if (!res.ok) throw new Error("Failed to load reports");
     const data = await res.json();
-    if (Array.isArray(data.reports)) return data.reports;
-    if (Array.isArray(data)) return data;
+    if (data && data.error && !Array.isArray(data.reports)) {
+        return [];
+    }
+    if (Array.isArray(data.reports)) return sanitizeReportRows(data.reports);
+    if (Array.isArray(data)) return sanitizeReportRows(data);
     return [];
+}
+
+/**
+ * Drop placeholder / malformed rows (shows up as a "ghost" row of dashes or broken preview).
+ */
+function sanitizeReportRows(rows) {
+    if (!Array.isArray(rows)) return [];
+    const seen = new Set();
+    const out = [];
+    for (const row of rows) {
+        if (!row || typeof row !== "object") continue;
+        const id = row.id != null ? String(row.id).trim() : "";
+        if (!id || id === "undefined" || id === "null" || /RPT-COMP-(undefined|null)$/i.test(id)) continue;
+        const period = row.periodLabel || row.generatedAt || row.date;
+        if (period == null || String(period).trim() === "" || String(period).toLowerCase() === "null") continue;
+        if (seen.has(id)) continue;
+        seen.add(id);
+        out.push(row);
+    }
+    return out;
 }
 
 function renderReports(reports, usedFallbackDemo) {
     const tbody = document.getElementById("reportsTableBody");
     const emptyHint = document.getElementById("emptyReportsHint");
     tbody.innerHTML = "";
+
+    reports = sanitizeReportRows(reports);
 
     if (!reports.length) {
         emptyHint.textContent =

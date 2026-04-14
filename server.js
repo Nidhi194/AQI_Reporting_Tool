@@ -29,12 +29,15 @@ app.use((req, res, next) => {
 });
 app.use(express.static(path.join(__dirname, 'public')));
 
-const db = mysql.createConnection({
+const db = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 3306,
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'user_db'
+    database: process.env.DB_NAME || 'user_db',
+    connectionLimit: 10,
+    waitForConnections: true,
+    queueLimit: 0
 });
 
 const dbPromise = db.promise();
@@ -103,14 +106,15 @@ async function insertAgencyCombinedReport(data) {
     const dust_pm25 = w2_pm25 - w1_pm25;
     const pm25_value = volume_pm25 !== 0 ? (dust_pm25 * Math.pow(10, 6)) / volume_pm25 : 0;
 
-    await dbPromise.beginTransaction();
+    const connection = await dbPromise.getConnection();
+    await connection.beginTransaction();
     try {
-        await dbPromise.query('DELETE FROM pm10_data WHERE user_email=? AND industry_name=? AND monitoring_date=?', [user_email, industry_name, monitoring_date]);
-        await dbPromise.query('DELETE FROM so2_data WHERE user_email=? AND industry_name=? AND monitoring_date=?', [user_email, industry_name, monitoring_date]);
-        await dbPromise.query('DELETE FROM no2_data WHERE user_email=? AND industry_name=? AND monitoring_date=?', [user_email, industry_name, monitoring_date]);
-        await dbPromise.query('DELETE FROM pm25_data WHERE user_email=? AND industry_name=? AND monitoring_date=?', [user_email, industry_name, monitoring_date]);
+        await connection.query('DELETE FROM pm10_data WHERE user_email=? AND industry_name=? AND monitoring_date=?', [user_email, industry_name, monitoring_date]);
+        await connection.query('DELETE FROM so2_data WHERE user_email=? AND industry_name=? AND monitoring_date=?', [user_email, industry_name, monitoring_date]);
+        await connection.query('DELETE FROM no2_data WHERE user_email=? AND industry_name=? AND monitoring_date=?', [user_email, industry_name, monitoring_date]);
+        await connection.query('DELETE FROM pm25_data WHERE user_email=? AND industry_name=? AND monitoring_date=?', [user_email, industry_name, monitoring_date]);
 
-        await dbPromise.query(`
+        await connection.query(`
             INSERT INTO pm10_data (
                 user_email, industry_name, location, monitoring_date, status,
                 q1_1, q2_1, avg_1, volume_1, w1_1, w2_1, dust_1, pm10_1,
@@ -129,9 +133,9 @@ async function insertAgencyCombinedReport(data) {
         const so2RecordDb = { ...so2Record, user_email };
         const no2RecordDb = { ...no2Record, user_email };
 
-        await dbPromise.query('INSERT INTO so2_data SET ?', [so2RecordDb]);
-        await dbPromise.query('INSERT INTO no2_data SET ?', [no2RecordDb]);
-        await dbPromise.query(`
+        await connection.query('INSERT INTO so2_data SET ?', [so2RecordDb]);
+        await connection.query('INSERT INTO no2_data SET ?', [no2RecordDb]);
+        await connection.query(`
             INSERT INTO pm25_data (
                 user_email, industry_name, location, monitoring_date,
                 q1, q2, avg, volume,
@@ -143,7 +147,8 @@ async function insertAgencyCombinedReport(data) {
             w1_pm25, w2_pm25, dust_pm25, pm25_value
         ]);
 
-        await dbPromise.commit();
+        await connection.commit();
+        connection.release();
 
         return {
             avg_pm10,
@@ -152,16 +157,20 @@ async function insertAgencyCombinedReport(data) {
             pm25: pm25_value
         };
     } catch (error) {
-        await dbPromise.rollback();
+        if (connection) {
+            await connection.rollback();
+            connection.release();
+        }
         throw error;
     }
 }
 
-db.connect((err) => {
+db.getConnection((err, connection) => {
     if (err) {
         console.log('❌ DB Error:', err.message);
     } else {
         console.log('✅ Connected to Railway MySQL');
+        connection.release();
         
         // Ensure agency_details table exists
         const createTableSql = `

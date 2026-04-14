@@ -1,11 +1,11 @@
 /* ELITE LANDING PAGE STYLES (Vercel/Apple Aesthetic) */
 :root {
-    --bg-deep: #0b1322;
-    --bg-glass: rgba(15, 23, 42, 0.4);
-    --bg-glass-heavy: rgba(15, 23, 42, 0.7);
-    --border-glass: rgba(255, 255, 255, 0.08);
-    --text-primary: #ffffff;
-    --text-secondary: #94a3b8;
+    --bg-deep: #eaf1f8;
+    --bg-glass: rgba(255, 255, 255, 0.68);
+    --bg-glass-heavy: rgba(245, 250, 255, 0.84);
+    --border-glass: rgba(15, 39, 73, 0.12);
+    --text-primary: #173761;
+    --text-secondary: #5f789a;
     --emerald-primary: #10b981;
     --emerald-glow: rgba(16, 185, 129, 0.4);
     --cyan-primary: #0ea5e9;
@@ -81,9 +81,9 @@ body.page-landing .btn-ghost:hover {
 
 body.page-landing {
     background:
-        radial-gradient(circle at 15% 15%, rgba(36, 94, 170, 0.18), transparent 34%),
-        radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.12), transparent 36%),
-        linear-gradient(165deg, #0f1a2d 0%, var(--bg-deep) 58%, #101b2f 100%);
+        radial-gradient(circle at 15% 15%, rgba(56, 104, 161, 0.2), transparent 34%),
+        radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.13), transparent 36%),
+        linear-gradient(160deg, #f4f8fd 0%, var(--bg-deep) 58%, #e2edf9 100%);
     color: var(--text-primary);
     font-family: 'Inter', sans-serif;
     overflow: hidden; /* We scroll the inner container */
@@ -103,7 +103,7 @@ html, body.page-landing {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
     background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
-    opacity: 0.03;
+    opacity: 0.012;
     pointer-events: none;
     z-index: 1;
 }
@@ -120,12 +120,12 @@ html, body.page-landing {
 .orb-1 {
     top: -10%; left: -10%;
     width: 600px; height: 600px;
-    background: var(--emerald-primary);
+    background: rgba(16, 185, 129, 0.35);
 }
 .orb-2 {
     bottom: -10%; right: -10%;
     width: 500px; height: 500px;
-    background: var(--cyan-primary);
+    background: rgba(14, 165, 233, 0.3);
     animation-delay: -10s;
 }
 
@@ -244,13 +244,13 @@ html, body.page-landing {
     background: rgba(255,255,255,0.05);
 }
 .btn-emerald {
-    background: var(--text-primary);
-    color: var(--bg-deep);
-    box-shadow: 0 0 20px rgba(255,255,255,0.1);
+    background: linear-gradient(130deg, #1b3e74, #2f629d);
+    color: #ffffff;
+    box-shadow: 0 10px 22px rgba(29, 74, 129, 0.26);
 }
 .btn-emerald:hover {
     background: var(--emerald-primary);
-    color: var(--bg-deep);
+    color: #0f172a;
     box-shadow: 0 0 30px var(--emerald-glow);
     transform: translateY(-1px);
 }
@@ -447,6 +447,11 @@ html, body.page-landing {
     margin: -3rem; /* stretch to mask image */
     margin-top: auto;
 }
+.bento-text h3,
+.bento-text p {
+    color: #eef6ff !important;
+    -webkit-text-fill-color: #eef6ff !important;
+}
 .bento-box h3 {
     font-size: 1.5rem;
     font-weight: 700;
@@ -496,8 +501,8 @@ html, body.page-landing {
     align-items: flex-start;
     padding: 2.5rem;
     border-radius: 20px;
-    background: rgba(15, 23, 42, 0.35); /* Premium semi-transparent base */
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.64); /* Premium semi-transparent base */
+    border: 1px solid rgba(15, 39, 73, 0.08);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -506,9 +511,9 @@ html, body.page-landing {
     transform: translateY(0) !important; /* Override entrance animation if it gets stuck */
 }
 .workflow-row:hover {
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(255, 255, 255, 0.88);
     transform: translateX(15px) translateY(-5px) !important;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 15px rgba(16, 185, 129, 0.1);
+    box-shadow: 0 18px 36px rgba(17, 40, 73, 0.14), 0 0 15px rgba(16, 185, 129, 0.1);
     border-color: rgba(16, 185, 129, 0.3);
 }
 .workflow-num {
@@ -526,13 +531,13 @@ html, body.page-landing {
     margin-bottom: 0.8rem !important;
     font-weight: 700 !important;
     color: var(--text-primary) !important;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.6) !important;
+    text-shadow: none !important;
 }
 .workflow-desc p {
     font-size: 1.15rem !important;
     color: var(--text-secondary) !important;
     line-height: 1.65 !important;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.4) !important;
+    text-shadow: none !important;
 }
 
 /* Mega Footer */

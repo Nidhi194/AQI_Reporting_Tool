@@ -13,28 +13,21 @@ html, body {
     width: 100%;
 }
 
-/* Smooth visual transitions between pages */
+/* Lightweight cross-page transition */
 body {
-    animation: pageFadeIn 260ms ease both;
+    animation: pageFadeIn 220ms ease both;
 }
 
 body.page-transitioning {
     opacity: 0;
-    transform: translateY(4px);
-    filter: brightness(0.95);
-    transition: opacity 220ms ease, transform 220ms ease, filter 220ms ease;
+    transition: opacity 170ms ease;
 }
 
 @keyframes pageFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(4px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
+
 
 /* Home Page Styles */
 body.page-home {
@@ -1700,93 +1693,3 @@ body.page-agency .sampling-time-label {
     }
 }
 
-/* Mobile hardening for login, industry, and agency pages */
-@media (max-width: 900px) {
-    body.page-home .main-wrapper {
-        height: auto !important;
-        max-height: none !important;
-        min-height: 100dvh !important;
-        display: flex !important;
-        flex-direction: column !important;
-        overflow: visible !important;
-    }
-    body.page-home .left-panel,
-    body.page-home .right-panel {
-        width: 100% !important;
-        height: auto !important;
-        overflow: visible !important;
-        padding: 20px 16px !important;
-    }
-    body.page-home .form-row {
-        grid-template-columns: 1fr !important;
-    }
-    body.page-home .right-panel > div {
-        max-width: 100% !important;
-    }
-}
-
-@media (max-width: 768px) {
-    body.page-industry .top-navbar,
-    body.page-agency .top-navbar {
-        position: relative !important;
-        top: auto !important;
-    }
-    body.page-industry .navbar-left,
-    body.page-agency .navbar-left {
-        width: 100%;
-        justify-content: center;
-        text-align: center;
-        flex-wrap: wrap;
-    }
-    body.page-industry .navbar-left span,
-    body.page-agency .navbar-left span {
-        border-left: none !important;
-        padding-left: 0 !important;
-        margin-left: 0 !important;
-        height: auto !important;
-    }
-    body.page-industry .navbar-right,
-    body.page-agency .navbar-right {
-        width: 100%;
-        justify-content: center !important;
-        gap: 10px !important;
-    }
-    body.page-industry .main-content,
-    body.page-agency .main-content {
-        padding: 14px !important;
-    }
-    body.page-industry .section-card,
-    body.page-agency .section-card {
-        padding: 16px !important;
-    }
-    body.page-agency .table-wrap {
-        padding-left: 0;
-        overflow-x: auto !important;
-    }
-    body.page-agency table {
-        min-width: 780px !important;
-    }
-}
-
-@media (max-width: 480px) {
-    body.page-home {
-        padding: 10px 8px !important;
-    }
-    body.page-home .left-panel h1 {
-        font-size: 1.75rem !important;
-    }
-    body.page-home h2 {
-        font-size: 1.5rem !important;
-        text-align: center;
-    }
-    body.page-industry .btn-primary,
-    body.page-industry .btn-secondary,
-    body.page-agency button,
-    body.page-agency .logout-btn {
-        width: 100% !important;
-    }
-    body.page-industry .button-row,
-    body.page-agency .btn-row {
-        flex-direction: column !important;
-    }
-}

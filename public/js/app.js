@@ -1,8 +1,8 @@
 /* Merged from h, industry, and agency files for cleaner structure */
 
-/* Smooth navigation fade for cross-page transitions */
+/* Lightweight same-origin page transition */
 (() => {
-    const FADE_MS = 190;
+    const FADE_MS = 170;
 
     function smoothNavigate(url) {
         if (!url) return;
@@ -22,6 +22,7 @@
 
         const url = new URL(link.href, window.location.href);
         if (url.origin !== window.location.origin) return;
+        if (url.href === window.location.href) return;
 
         event.preventDefault();
         smoothNavigate(url.href);
@@ -1606,10 +1607,6 @@ async function saveAsDraft() {
 function logout() {
     localStorage.removeItem("loggedInUser");
     localStorage.removeItem("userRole");
-    if (typeof window.smoothNavigate === "function") {
-        window.smoothNavigate("index.html");
-        return;
-    }
     window.location.href = "index.html";
 }
 

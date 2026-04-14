@@ -220,7 +220,7 @@
                 <p class="section-support">Directly reach out to your assigned environmental monitoring officers.</p>
             </div>
             <div class="contact-methods" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;">
-                <button class="btn-secondary" type="button" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600;">
+                <button class="btn-secondary" type="button" id="btnComposeAgencyMessage" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600;">
                     <i class="fa-solid fa-envelope"></i> Compose Auto-Message
                 </button>
                 <div style="background: rgba(255,255,255,0.4); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.6); text-align: center; font-size: 0.9rem;">
@@ -236,6 +236,24 @@
         </div>
     </aside>
 </div>
+
+    <div id="composeMessageModal" class="schedule-modal" hidden style="z-index: 1200;">
+        <div class="schedule-modal-content" style="width: min(480px, 92vw); max-height: 85vh; overflow: auto;">
+            <button type="button" class="schedule-modal-close" id="btnCloseComposeModal" aria-label="Close">&times;</button>
+            <h2 style="margin-top: 0;">Message to your agency</h2>
+            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 12px;">Edit the text below, then copy or open your email client. EnviroMonitor does not send mail on your behalf.</p>
+            <label for="composeMessageBody" style="font-size: 14px; font-weight: 500;">Message</label>
+            <textarea id="composeMessageBody" rows="12" style="width: 100%; margin-top: 6px; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 14px; font-family: inherit; box-sizing: border-box;"></textarea>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px;">
+                <button type="button" class="btn-primary" id="btnCopyComposeMessage" style="padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600;">Copy to clipboard</button>
+                <button type="button" class="btn-secondary" id="btnMailtoCompose" style="padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 600;">Open email app</button>
+            </div>
+        </div>
+    </div>
+    <style>
+        .schedule-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; }
+        .schedule-modal[hidden] { display: none !important; }
+    </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="../js/app.js"></script>

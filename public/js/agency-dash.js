@@ -7,6 +7,14 @@ const reportsTableBody = document.getElementById("tbodyReports");
 const tableSummaryText = document.getElementById("textTableSummary");
 const tableEmptyState = document.getElementById("tableEmptyState");
 const actionMenu = document.getElementById("reportActionMenu");
+const btnNotifications = document.getElementById("btnNotifications");
+const btnProfileMenu = document.getElementById("btnProfileMenu");
+const btnHeaderProfile = document.getElementById("btnHeaderProfile");
+const btnPagePrev = document.getElementById("btnPagePrev");
+const btnPageNext = document.getElementById("btnPageNext");
+const notificationsPanel = document.getElementById("notificationsPanel");
+const profileDropdownPanel = document.getElementById("profileDropdownPanel");
+const profileMenuLogout = document.getElementById("profileMenuLogout");
 
 const totalReportsElement = document.getElementById("statTotalReports");
 const activeReportsElement = document.getElementById("statActiveReports");
@@ -31,25 +39,54 @@ window.reportRows = Array.from(reportsTableBody.querySelectorAll("tr[data-report
 let rowActionButtons = Array.from(document.querySelectorAll(".btn-row-action"));
 let selectedReportId = null;
 
-function updateTableSummary(visibleRows, totalRows) {
-    tableSummaryText.textContent = `Showing ${visibleRows} of ${totalRows} reports`;
-    tableEmptyState.hidden = visibleRows !== 0;
+const PAGE_SIZE = 10;
+let currentPage = 0;
+let lastDashboardSummary = { pendingReports: 0, overdueReports: 0, totalReports: 0 };
+
+function syncReportTableView() {
+    if (!tableSummaryText || !tableEmptyState) return;
+    const allRows = window.reportRows || [];
+    const query = (searchInput?.value || "").toLowerCase().trim();
+    const matchingRows = allRows.filter((row) => query === "" || row.textContent.toLowerCase().includes(query));
+    const totalMatching = matchingRows.length;
+    const totalRows = allRows.length;
+    const safeTotalPages = totalMatching === 0 ? 1 : Math.max(1, Math.ceil(totalMatching / PAGE_SIZE));
+    if (currentPage >= safeTotalPages) currentPage = safeTotalPages - 1;
+    if (currentPage < 0) currentPage = 0;
+
+    const start = currentPage * PAGE_SIZE;
+    const pageRows = matchingRows.slice(start, start + PAGE_SIZE);
+    const pageSet = new Set(pageRows);
+
+    allRows.forEach((row) => {
+        const matchesSearch = query === "" || row.textContent.toLowerCase().includes(query);
+        row.hidden = !matchesSearch || !pageSet.has(row);
+    });
+
+    if (totalMatching === 0) {
+        tableEmptyState.hidden = totalRows !== 0;
+        if (totalRows === 0) {
+            tableSummaryText.textContent = "Showing 0 of 0 reports";
+        } else {
+            tableSummaryText.textContent = `No reports match your search (${totalRows} total)`;
+        }
+    } else {
+        tableEmptyState.hidden = true;
+        const end = start + pageRows.length;
+        if (safeTotalPages > 1) {
+            tableSummaryText.textContent = `Showing ${start + 1}–${end} of ${totalMatching} reports · Page ${currentPage + 1} of ${safeTotalPages}`;
+        } else {
+            tableSummaryText.textContent = `Showing ${totalMatching} of ${totalRows} reports`;
+        }
+    }
+
+    if (btnPagePrev) btnPagePrev.disabled = currentPage <= 0 || totalMatching === 0;
+    if (btnPageNext) btnPageNext.disabled = currentPage >= safeTotalPages - 1 || totalMatching === 0;
 }
 
 function filterReportRows() {
-    const query = (searchInput?.value || "").toLowerCase().trim();
-    let visibleRows = 0;
-
-    window.reportRows.forEach((row) => {
-        const rowText = row.textContent.toLowerCase();
-        const isVisible = rowText.includes(query);
-        row.hidden = !isVisible;
-        if (isVisible) {
-            visibleRows += 1;
-        }
-    });
-
-    updateTableSummary(visibleRows, window.reportRows.length);
+    currentPage = 0;
+    syncReportTableView();
 }
 
 function closeActionMenu() {
@@ -296,7 +333,14 @@ async function loadLiveReports() {
         reportsTableBody.innerHTML = ""; // Clear mock data
 
         if (reports.length === 0) {
-            updateTableSummary(0, 0);
+            lastDashboardSummary = {
+                pendingReports: summary.pendingReports || 0,
+                overdueReports: summary.overdueReports || 0,
+                totalReports: summary.totalReports || 0
+            };
+            window.reportRows = [];
+            currentPage = 0;
+            syncReportTableView();
             if(totalReportsElement) totalReportsElement.textContent = "0";
             if(activeReportsElement) activeReportsElement.textContent = "0";
             if(pendingReportsElement) pendingReportsElement.textContent = "0";
@@ -369,7 +413,13 @@ async function loadLiveReports() {
         updateGauge('gauge-pending', summary.pendingReports || 0, Math.max(1, summary.totalReports || reports.length));
         updateGauge('gauge-overdue', summary.overdueReports || 0, Math.max(1, summary.totalReports || reports.length));
 
-        updateTableSummary(reports.length, reports.length);
+        lastDashboardSummary = {
+            pendingReports: summary.pendingReports || 0,
+            overdueReports: summary.overdueReports || 0,
+            totalReports: summary.totalReports || reports.length
+        };
+        currentPage = 0;
+        syncReportTableView();
         bindRowActionMenu(); // rebind buttons
         updateAlertTicker(reports, summary);
 
@@ -593,12 +643,124 @@ function bindExportCsv() {
     });
 }
 
+function positionDropdown(anchor, panel) {
+    if (!anchor || !panel) return;
+    const r = anchor.getBoundingClientRect();
+    const approxWidth = Math.max(panel.offsetWidth || 260, 200);
+    const left = Math.min(window.innerWidth - approxWidth - 12, Math.max(12, r.right - approxWidth));
+    panel.style.position = "fixed";
+    panel.style.top = `${r.bottom + 6}px`;
+    panel.style.left = `${left}px`;
+}
+
+function closeAllHeaderDropdowns() {
+    if (notificationsPanel) notificationsPanel.hidden = true;
+    if (profileDropdownPanel) profileDropdownPanel.hidden = true;
+}
+
+function fillNotificationsPanel() {
+    const body = document.getElementById("notificationsPanelBody");
+    if (!body) return;
+    const p = lastDashboardSummary.pendingReports || 0;
+    const o = lastDashboardSummary.overdueReports || 0;
+    const t = lastDashboardSummary.totalReports ?? 0;
+    const parts = [
+        `<p><strong>${t}</strong> report(s) in your workspace.</p>`
+    ];
+    if (p > 0) {
+        parts.push(`<p><i class="fa-solid fa-triangle-exclamation" style="color:#f59e0b"></i> <strong>${p}</strong> draft report(s) pending completion.</p>`);
+    }
+    if (o > 0) {
+        parts.push(`<p><i class="fa-solid fa-circle-exclamation" style="color:#ef4444"></i> <strong>${o}</strong> report(s) flagged overdue.</p>`);
+    }
+    if (p === 0 && o === 0) {
+        parts.push("<p>No urgent items. Alerts also scroll in the ticker above.</p>");
+    }
+    body.innerHTML = parts.join("");
+}
+
+function bindNotificationsAndProfileMenus() {
+    if (btnNotifications && notificationsPanel) {
+        btnNotifications.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const willShow = notificationsPanel.hidden;
+            closeAllHeaderDropdowns();
+            if (willShow) {
+                fillNotificationsPanel();
+                notificationsPanel.hidden = false;
+                positionDropdown(btnNotifications, notificationsPanel);
+            }
+        });
+    }
+
+    function openProfileFrom(anchor) {
+        closeAllHeaderDropdowns();
+        profileDropdownPanel.hidden = false;
+        positionDropdown(anchor, profileDropdownPanel);
+    }
+
+    if (btnProfileMenu && profileDropdownPanel) {
+        btnProfileMenu.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (!profileDropdownPanel.hidden) {
+                closeAllHeaderDropdowns();
+            } else {
+                openProfileFrom(btnProfileMenu);
+            }
+        });
+    }
+
+    if (btnHeaderProfile && profileDropdownPanel) {
+        btnHeaderProfile.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (!profileDropdownPanel.hidden) {
+                closeAllHeaderDropdowns();
+            } else {
+                openProfileFrom(btnHeaderProfile);
+            }
+        });
+    }
+
+    if (profileMenuLogout) {
+        profileMenuLogout.addEventListener("click", (e) => {
+            e.stopPropagation();
+            closeAllHeaderDropdowns();
+            logoutButton?.click();
+        });
+    }
+
+    document.addEventListener("click", (ev) => {
+        if (ev.target.closest("#notificationsPanel, #btnNotifications, #profileDropdownPanel, #btnProfileMenu, #btnHeaderProfile")) return;
+        closeAllHeaderDropdowns();
+    });
+    window.addEventListener("resize", closeAllHeaderDropdowns);
+}
+
+function bindPaginationControls() {
+    if (btnPagePrev) {
+        btnPagePrev.addEventListener("click", () => {
+            if (currentPage > 0) {
+                currentPage -= 1;
+                syncReportTableView();
+            }
+        });
+    }
+    if (btnPageNext) {
+        btnPageNext.addEventListener("click", () => {
+            currentPage += 1;
+            syncReportTableView();
+        });
+    }
+}
+
 function initializeDashboard() {
     bindSearchInput();
     bindSidebarToggle();
     bindLogoutButton();
     bindGenerateButtons();
     bindExportCsv();
+    bindNotificationsAndProfileMenus();
+    bindPaginationControls();
     loadLiveReports();
 
     if (typeof loadAgencySchedules === 'function') {
@@ -692,7 +854,8 @@ window.AgencyDashboard = {
     clearReports: () => {
         reportsTableBody.innerHTML = "";
         window.reportRows = [];
-        updateTableSummary(0, 0);
+        currentPage = 0;
+        syncReportTableView();
     },
     loadLiveReports
 };

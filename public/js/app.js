@@ -474,8 +474,77 @@ async function saveData() {
     }
 }
 
+async function submitForReview() {
+    let userEmail = localStorage.getItem("userEmail");
+
+    let data = {
+        user_email: userEmail,
+        industry_name: document.getElementById("industry_name").value.trim(),
+        industry_type: document.getElementById("industry_type").value.trim(),
+        industry_id: document.getElementById("industry_id").value.trim(),
+        address: document.getElementById("address").value.trim(),
+        contact_name: document.getElementById("contact_name").value.trim(),
+        role_designation: document.getElementById("role_designation").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        alt_phone: document.getElementById("alt_phone").value.trim(),
+        monitoring_frequency: document.getElementById("monitoring_frequency").value.trim(),
+        notification_pref: document.getElementById("notification_pref").value.trim()
+    };
+
+    let missingFields = [];
+
+    if (!data.user_email) missingFields.push({ key: "user_email", label: "User Login Email" });
+    if (!data.industry_name) missingFields.push({ key: "industry_name", label: "Industry Name" });
+    if (!data.industry_type) missingFields.push({ key: "industry_type", label: "Industry Type" });
+    if (!data.industry_id) missingFields.push({ key: "industry_id", label: "Industry ID / Registration Number" });
+    if (!data.address) missingFields.push({ key: "address", label: "Location / Address" });
+    if (!data.contact_name) missingFields.push({ key: "contact_name", label: "Contact Person Name" });
+    if (!data.role_designation) missingFields.push({ key: "role_designation", label: "Role / Designation" });
+    if (!data.email) missingFields.push({ key: "email", label: "Email ID" });
+    if (!data.phone) missingFields.push({ key: "phone", label: "Primary Phone Number" });
+    if (!data.monitoring_frequency) missingFields.push({ key: "monitoring_frequency", label: "AQI Monitoring Frequency" });
+    if (!data.notification_pref) missingFields.push({ key: "notification_pref", label: "Notification Preference" });
+
+    if (missingFields.length > 0) {
+        highlightSectionByField(missingFields[0].key);
+        alert("Please fill the following required fields before submitting for review:\n\n" + missingFields.map(field => field.label).join("\n"));
+        return;
+    }
+
+    try {
+        let res = await fetch("/submit-industry-review", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        let result = await res.json();
+        if (result.error) {
+            alert(result.error);
+            return;
+        }
+
+        alert(result.message || "Profile submitted for review.");
+
+        if (result.redirectPage) {
+            let basePath = (window.location.protocol.startsWith('http') && window.location.pathname === '/') ? 'pages/' : '';
+            window.location.href = basePath + result.redirectPage;
+        } else {
+            let basePath = (window.location.protocol.startsWith('http') && window.location.pathname === '/') ? 'pages/' : '';
+            window.location.href = basePath + "industry-reports.html";
+        }
+    } catch (error) {
+        console.log(error);
+        alert("Server connection error");
+    }
+}
+
 
     window.saveData = saveData;
+    window.submitForReview = submitForReview;
 })();
 
 /* Agency Page Logic */

@@ -47,7 +47,7 @@
                     <i class="fa-solid fa-grid-2"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="#" class="sidebar-link">
+                <a href="#sectionReportsOverview" class="sidebar-link">
                     <i class="fa-regular fa-file-lines"></i>
                     <span>Reports</span>
                 </a>
@@ -55,7 +55,7 @@
                     <i class="fa-solid fa-file-circle-plus"></i>
                     <span>Generate Report</span>
                 </a>
-                <a href="#" class="sidebar-link">
+                <a href="#sectionSchedules" class="sidebar-link">
                     <i class="fa-regular fa-calendar-check"></i>
                     <span>Schedules</span>
                 </a>
@@ -63,7 +63,7 @@
                     <i class="fa-solid fa-gear"></i>
                     <span>Update Profile</span>
                 </a>
-                <a href="#" class="sidebar-link">
+                <a href="#sectionAuditLogs" class="sidebar-link">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                     <span>Audit Logs</span>
                 </a>
@@ -180,7 +180,7 @@
             </section>
 
             <!-- Reports overview -->
-            <section class="reports-panel" aria-label="Reports overview">
+            <section class="reports-panel" id="sectionReportsOverview" aria-label="Reports overview">
                 <div class="reports-panel-header">
                     <h2>Reports Overview</h2>
 
@@ -249,7 +249,7 @@
             </section>
 
             <!-- Scheduled Checks Management -->
-            <section class="reports-panel" aria-label="Scheduled Checks" style="margin-top: 24px;">
+            <section class="reports-panel" id="sectionSchedules" aria-label="Scheduled Checks" style="margin-top: 24px;">
                 <div class="reports-panel-header">
                     <h2>Active Dispatched Schedules</h2>
                 </div>
@@ -274,7 +274,25 @@
                     </div>
                 </div>
             </section>
+
+            <section class="reports-panel" id="sectionAuditLogs" aria-label="Audit logs" style="margin-top: 24px;">
+                <div class="reports-panel-header">
+                    <h2>Audit &amp; activity</h2>
+                </div>
+                <p style="margin: 12px 0 0; font-size: 0.9rem; color: #64748b; line-height: 1.5;">
+                    Row actions on reports (view, download, delete) and scheduled checks are recorded in your agency workspace.
+                    For long-term audit exports, use <strong>Export CSV</strong> from the reports overview and retain copies per your retention policy.
+                </p>
+            </section>
         </main>
+    </div>
+
+    <div id="notificationsPanel" class="dash-dropdown action-menu" role="dialog" aria-label="Notifications" hidden>
+        <div id="notificationsPanelBody" class="dash-dropdown-body" style="max-width: 280px;"></div>
+    </div>
+    <div id="profileDropdownPanel" class="dash-dropdown action-menu" role="menu" aria-label="Account menu" hidden>
+        <a href="agency-info.html" class="action-menu-item" style="text-decoration: none; color: inherit;"><i class="fa-solid fa-gear"></i><span>Update profile</span></a>
+        <button type="button" class="action-menu-item" id="profileMenuLogout"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></button>
     </div>
 
     <!-- Shared row action menu. Backend can map actions using selected report id. -->
@@ -286,6 +304,9 @@
     </div>
 
     <style>
+        .dash-dropdown { z-index: 1001; }
+        .dash-dropdown-body p { margin: 0 0 10px; font-size: 0.82rem; color: #314f77; line-height: 1.45; }
+        .dash-dropdown-body p:last-child { margin-bottom: 0; }
         .schedule-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .schedule-modal[hidden] { display: none; }
         .schedule-modal-content { background: white; width: 400px; border-radius: 12px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }

@@ -59,6 +59,12 @@ async function createTables() {
 }
 
 async function ensureColumns() {
+  try {
+    await addColumnIfMissing('industry_details', 'review_submitted_at DATETIME NULL');
+  } catch {
+    // Table may not exist in minimal environments; skip.
+  }
+
   // These columns are used by app logic; add them if missing.
   // Ignore if tables don't exist in this DB (those are created elsewhere).
   const tables = ['pm10_data', 'so2_data', 'no2_data', 'pm25_data'];

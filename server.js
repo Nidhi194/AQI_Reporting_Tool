@@ -80,6 +80,29 @@ function toNumber(value) {
     return Number.isFinite(num) ? num : 0;
 }
 
+/** Normalize MySQL DATE/DATETIME (mysql2 may return Date) to YYYY-MM-DD for API + UI. */
+function formatMonitoringDateForApi(val) {
+    if (val == null || val === '') return null;
+    if (val instanceof Date) {
+        if (Number.isNaN(val.getTime())) return null;
+        const y = val.getFullYear();
+        const m = String(val.getMonth() + 1).padStart(2, '0');
+        const d = String(val.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+    const s = String(val).trim();
+    const isoDay = s.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (isoDay) return isoDay[1];
+    const parsed = new Date(s);
+    if (!Number.isNaN(parsed.getTime())) {
+        const y = parsed.getFullYear();
+        const m = String(parsed.getMonth() + 1).padStart(2, '0');
+        const d = String(parsed.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+    return s;
+}
+
 async function insertAgencyCombinedReport(data) {
     const pm10 = data.pm10 || {};
     const so2 = data.so2 || {};
@@ -563,6 +586,94 @@ app.post('/save-industry', (req, res) => {
     });
 });
 
+// SUBMIT INDUSTRY PROFILE FOR REVIEW (same validation as save + review timestamp)
+app.post('/submit-industry-review', (req, res) => {
+    const data = req.body;
+
+    const missingFields = [];
+
+    if (!data.user_email || !String(data.user_email).trim()) missingFields.push('User Login Email');
+    if (!data.industry_name || !String(data.industry_name).trim()) missingFields.push('Industry Name');
+    if (!data.industry_type || !String(data.industry_type).trim()) missingFields.push('Industry Type');
+    if (!data.industry_id || !String(data.industry_id).trim()) missingFields.push('Industry ID / Registration Number');
+    if (!data.address || !String(data.address).trim()) missingFields.push('Location / Address');
+    if (!data.contact_name || !String(data.contact_name).trim()) missingFields.push('Contact Person Name');
+    if (!data.role_designation || !String(data.role_designation).trim()) missingFields.push('Role / Designation');
+    if (!data.email || !String(data.email).trim()) missingFields.push('Email ID');
+    if (!data.phone || !String(data.phone).trim()) missingFields.push('Primary Phone Number');
+    if (!data.monitoring_frequency || !String(data.monitoring_frequency).trim()) missingFields.push('AQI Monitoring Frequency');
+    if (!data.notification_pref || !String(data.notification_pref).trim()) missingFields.push('Notification Preference');
+
+    if (missingFields.length > 0) {
+        return res.json({
+            error: 'These required fields are missing: ' + missingFields.join(', ')
+        });
+    }
+
+    const payload = [
+        String(data.user_email).trim(),
+        String(data.industry_name).trim(),
+        String(data.industry_type).trim(),
+        String(data.industry_id).trim(),
+        String(data.address).trim(),
+        String(data.contact_name).trim(),
+        String(data.role_designation).trim(),
+        String(data.email).trim(),
+        String(data.phone).trim(),
+        data.alt_phone ? String(data.alt_phone).trim() : '',
+        String(data.monitoring_frequency).trim(),
+        String(data.notification_pref).trim()
+    ];
+
+    const checkSql = 'SELECT id FROM industry_details WHERE user_email = ? LIMIT 1';
+
+    db.query(checkSql, [payload[0]], (checkErr, rows) => {
+        if (checkErr) {
+            console.log('Industry Profile Check Error:', checkErr.message);
+            return res.json({ error: 'Database error' });
+        }
+
+        const hasExistingProfile = rows.length > 0;
+
+        const sql = hasExistingProfile
+            ? `
+                UPDATE industry_details
+                SET industry_name = ?, industry_type = ?, address = ?,
+                    contact_name = ?, role_designation = ?, email = ?, phone = ?, alt_phone = ?,
+                    monitoring_frequency = ?, notification_pref = ?, review_submitted_at = NOW()
+                WHERE user_email = ?
+            `
+            : `
+                INSERT INTO industry_details
+                (user_email, industry_name, industry_type, industry_id, address,
+                 contact_name, role_designation, email, phone, alt_phone,
+                 monitoring_frequency, notification_pref, review_submitted_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+            `;
+
+        const queryParams = hasExistingProfile
+            ? [
+                payload[1], payload[2], payload[4], payload[5], payload[6],
+                payload[7], payload[8], payload[9], payload[10], payload[11], payload[0]
+            ]
+            : payload;
+
+        db.query(sql, queryParams, (err) => {
+            if (err) {
+                console.log('Submit Industry Review Error:', err.message);
+                return res.json({ error: 'Database error' });
+            }
+
+            res.json({
+                success: true,
+                hasIndustryProfile: true,
+                redirectPage: 'industry-reports.html',
+                message: 'Your profile has been submitted for review.'
+            });
+        });
+    });
+});
+
 // CHECK INDUSTRY PROFILE STATUS
 app.get('/industry-profile-status', async (req, res) => {
     const userEmail = String(req.query.user_email || '').trim();
@@ -841,11 +952,18 @@ app.get('/api/reports', async (req, res) => {
             queryParams = [userEmail];
         }
 
+        // Industry users only see published reports. Drafts use status = 'Pending' (see saveAsDraft in app.js).
         db.query(
-            `SELECT id, industry_name, avg_pm10, monitoring_date as periodLabel, 'Comprehensive AQI Report' as reportType, 'Published' as status, monitoring_date as date
+            `SELECT id, industry_name, avg_pm10,
+                    monitoring_date AS periodLabel,
+                    'Comprehensive AQI Report' AS reportType,
+                    IFNULL(NULLIF(TRIM(status), ''), 'Published') AS status,
+                    monitoring_date AS date
              FROM pm10_data ${whereClause}
              AND monitoring_date IS NOT NULL
              AND TRIM(CAST(monitoring_date AS CHAR)) <> ''
+             AND avg_pm10 IS NOT NULL
+             AND IFNULL(NULLIF(TRIM(status), ''), 'Published') = 'Published'
              ORDER BY id DESC`,
             queryParams,
             (err, results) => {
@@ -853,21 +971,26 @@ app.get('/api/reports', async (req, res) => {
                 console.log('Get Reports Error:', err.message);
                 return res.status(500).json({ error: err.message });
             }
-            // Add titles to make it look like the required schema (skip malformed rows)
+            // Add titles to make it look like the required schema (skip malformed / incomplete rows)
             const formattedReports = (results || [])
-                .filter((row) => row && row.id != null && row.periodLabel)
-                .map((row) => ({
-                    id: `RPT-COMP-${row.id}`,
-                    title: `AQI monitoring summary – ${row.periodLabel}`,
-                    reportType: row.reportType,
-                    periodLabel: row.periodLabel,
-                    industry_name: row.industry_name,
-                    avg_pm10: row.avg_pm10,
-                    status: row.status,
-                    date: row.date,
-                    previewUrl: '',
-                    downloadUrl: ''
-                }));
+                .filter((row) => row && row.id != null && row.periodLabel != null)
+                .map((row) => {
+                    const dayLabel = formatMonitoringDateForApi(row.periodLabel);
+                    if (!dayLabel) return null;
+                    return {
+                        id: `RPT-COMP-${row.id}`,
+                        title: `AQI monitoring summary – ${dayLabel}`,
+                        reportType: row.reportType,
+                        periodLabel: dayLabel,
+                        industry_name: row.industry_name,
+                        avg_pm10: row.avg_pm10,
+                        status: row.status,
+                        date: dayLabel,
+                        previewUrl: '',
+                        downloadUrl: ''
+                    };
+                })
+                .filter(Boolean);
             res.json(formattedReports);
         });
     } catch (err) {

@@ -74,6 +74,21 @@ async function fetchIndustryReports(userEmail) {
 /**
  * Drop placeholder / malformed rows (shows up as a "ghost" row of dashes or broken preview).
  */
+function formatPeriodLabelForDisplay(val) {
+    if (val == null || val === "") return "";
+    const s = String(val);
+    const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (m) return m[1];
+    const d = new Date(s);
+    if (!Number.isNaN(d.getTime())) {
+        const y = d.getFullYear();
+        const mo = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        return `${y}-${mo}-${day}`;
+    }
+    return s;
+}
+
 function sanitizeReportRows(rows) {
     if (!Array.isArray(rows)) return [];
     const seen = new Set();
@@ -110,10 +125,11 @@ function renderReports(reports, usedFallbackDemo) {
     reports.forEach((row) => {
         const tr = document.createElement("tr");
         const statusClass = String(row.status || "").toLowerCase() === "draft" ? "status-draft" : "";
+        const periodDisplay = formatPeriodLabelForDisplay(row.periodLabel || row.generatedAt || row.date) || "—";
         tr.innerHTML = `
             <td>${escapeHtml(row.title || "—")}</td>
             <td>${escapeHtml(row.reportType || "—")}</td>
-            <td>${escapeHtml(row.periodLabel || row.generatedAt || "—")}</td>
+            <td>${escapeHtml(periodDisplay)}</td>
             <td><span class="status-pill ${statusClass}">${escapeHtml(row.status || "—")}</span></td>
             <td class="cell-actions">
                 <button type="button" class="btn-table btn-table-primary" data-action="preview" data-id="${escapeAttr(row.id)}">Preview</button>
@@ -389,6 +405,80 @@ async function fetchUpcomingChecks(email) {
     }
 }
 
+function initComposeMessageModal() {
+    const modal = document.getElementById("composeMessageModal");
+    const btnClose = document.getElementById("btnCloseComposeModal");
+    const btnCompose = document.getElementById("btnComposeAgencyMessage");
+    const btnCopy = document.getElementById("btnCopyComposeMessage");
+    const btnMailto = document.getElementById("btnMailtoCompose");
+    const ta = document.getElementById("composeMessageBody");
+    if (!modal || !btnCompose || !ta) return;
+
+    const close = () => {
+        modal.hidden = true;
+        document.body.style.overflow = "";
+    };
+
+    btnCompose.addEventListener("click", async () => {
+        const email = getUserEmail();
+        if (!email) return;
+        let facilityName = email;
+        try {
+            const res = await fetch(`/industry-profile-status?user_email=${encodeURIComponent(email)}`);
+            const data = await res.json();
+            if (data.profile && data.profile.industry_name) {
+                facilityName = String(data.profile.industry_name).trim() || facilityName;
+            }
+        } catch {
+            /* keep fallback */
+        }
+        ta.value = `Subject: EnviroMonitor – Agency inquiry
+
+Dear Environmental Monitoring Team,
+
+We are writing regarding our facility's environmental reporting on EnviroMonitor.
+
+[Please add your question or request here]
+
+Facility: ${facilityName}
+Account email: ${email}
+
+Regards`;
+        modal.hidden = false;
+        document.body.style.overflow = "hidden";
+    });
+
+    if (btnClose) btnClose.addEventListener("click", close);
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) close();
+    });
+
+    if (btnCopy) {
+        btnCopy.addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText(ta.value);
+                const prev = btnCopy.textContent;
+                btnCopy.textContent = "Copied!";
+                setTimeout(() => {
+                    btnCopy.textContent = prev;
+                }, 2000);
+            } catch {
+                alert("Could not copy automatically. Select the text and copy manually.");
+            }
+        });
+    }
+
+    if (btnMailto) {
+        btnMailto.addEventListener("click", () => {
+            const raw = String(ta.value || "");
+            const lines = raw.split("\n");
+            const firstLine = lines[0] || "";
+            const subject = firstLine.replace(/^Subject:\s*/i, "").trim() || "EnviroMonitor inquiry";
+            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(raw)}`;
+        });
+    }
+}
+
 function init() {
     const email = requireAuth();
     if (!email) return;
@@ -397,6 +487,7 @@ function init() {
     if (emailEl) emailEl.textContent = email;
 
     document.getElementById("btnLogout").addEventListener("click", logout);
+    initComposeMessageModal();
     document.getElementById("btnRefreshReports").addEventListener("click", () => {
         loadReportsTable();
         fetchUpcomingChecks(email);
@@ -422,7 +513,14 @@ function init() {
         });
     }
     document.addEventListener("keydown", (ev) => {
-        if (ev.key === "Escape") closePreview();
+        if (ev.key !== "Escape") return;
+        const composeModal = document.getElementById("composeMessageModal");
+        if (composeModal && !composeModal.hidden) {
+            composeModal.hidden = true;
+            document.body.style.overflow = "";
+            return;
+        }
+        closePreview();
     });
 
     // Ensure preview shell is never visible on first load.

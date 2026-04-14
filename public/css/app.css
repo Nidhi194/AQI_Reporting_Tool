@@ -13,6 +13,29 @@ html, body {
     width: 100%;
 }
 
+/* Smooth visual transitions between pages */
+body {
+    animation: pageFadeIn 260ms ease both;
+}
+
+body.page-transitioning {
+    opacity: 0;
+    transform: translateY(4px);
+    filter: brightness(0.95);
+    transition: opacity 220ms ease, transform 220ms ease, filter 220ms ease;
+}
+
+@keyframes pageFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Home Page Styles */
 body.page-home {
 

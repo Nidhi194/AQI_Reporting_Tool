@@ -1,6 +1,6 @@
 /* ELITE LANDING PAGE STYLES (Vercel/Apple Aesthetic) */
 :root {
-    --bg-deep: #000000;
+    --bg-deep: #0b1322;
     --bg-glass: rgba(15, 23, 42, 0.4);
     --bg-glass-heavy: rgba(15, 23, 42, 0.7);
     --border-glass: rgba(255, 255, 255, 0.08);
@@ -80,7 +80,10 @@ body.page-landing .btn-ghost:hover {
 }
 
 body.page-landing {
-    background-color: var(--bg-deep);
+    background:
+        radial-gradient(circle at 15% 15%, rgba(36, 94, 170, 0.18), transparent 34%),
+        radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.12), transparent 36%),
+        linear-gradient(165deg, #0f1a2d 0%, var(--bg-deep) 58%, #101b2f 100%);
     color: var(--text-primary);
     font-family: 'Inter', sans-serif;
     overflow: hidden; /* We scroll the inner container */

@@ -1,5 +1,35 @@
 /* Merged from h, industry, and agency files for cleaner structure */
 
+/* Smooth navigation fade for cross-page transitions */
+(() => {
+    const FADE_MS = 190;
+
+    function smoothNavigate(url) {
+        if (!url) return;
+        document.body.classList.add("page-transitioning");
+        setTimeout(() => {
+            window.location.href = url;
+        }, FADE_MS);
+    }
+
+    document.addEventListener("click", (event) => {
+        const link = event.target.closest("a[href]");
+        if (!link) return;
+
+        const href = (link.getAttribute("href") || "").trim();
+        if (!href || href.startsWith("#") || href.startsWith("javascript:")) return;
+        if (link.target === "_blank" || link.hasAttribute("download")) return;
+
+        const url = new URL(link.href, window.location.href);
+        if (url.origin !== window.location.origin) return;
+
+        event.preventDefault();
+        smoothNavigate(url.href);
+    });
+
+    window.smoothNavigate = smoothNavigate;
+})();
+
 /* Home Page Logic */
 (() => {
     if (!document.getElementById('loginForm')) {
@@ -1576,6 +1606,10 @@ async function saveAsDraft() {
 function logout() {
     localStorage.removeItem("loggedInUser");
     localStorage.removeItem("userRole");
+    if (typeof window.smoothNavigate === "function") {
+        window.smoothNavigate("index.html");
+        return;
+    }
     window.location.href = "index.html";
 }
 

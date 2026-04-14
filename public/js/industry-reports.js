@@ -140,6 +140,7 @@ async function openPreview(report) {
 function closePreview() {
     const backdrop = document.getElementById("previewBackdrop");
     const frame = document.getElementById("previewFrame");
+    if (!backdrop || !frame) return;
     backdrop.hidden = true;
     backdrop.setAttribute("aria-hidden", "true");
     frame.removeAttribute("src");
@@ -387,13 +388,20 @@ function init() {
         if (btn.getAttribute("data-action") === "download") downloadReport(report);
     });
 
-    document.getElementById("btnClosePreview").addEventListener("click", closePreview);
-    document.getElementById("previewBackdrop").addEventListener("click", (ev) => {
-        if (ev.target.id === "previewBackdrop") closePreview();
-    });
+    const btnClosePreview = document.getElementById("btnClosePreview");
+    const previewBackdrop = document.getElementById("previewBackdrop");
+    if (btnClosePreview) btnClosePreview.addEventListener("click", closePreview);
+    if (previewBackdrop) {
+        previewBackdrop.addEventListener("click", (ev) => {
+            if (ev.target.id === "previewBackdrop") closePreview();
+        });
+    }
     document.addEventListener("keydown", (ev) => {
         if (ev.key === "Escape") closePreview();
     });
+
+    // Ensure preview shell is never visible on first load.
+    closePreview();
 
     loadReportsTable();
     fetchUpcomingChecks(email);

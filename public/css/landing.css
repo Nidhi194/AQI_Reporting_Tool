@@ -467,6 +467,49 @@ html, body.page-landing {
     margin-bottom: auto; /* push to top */
 }
 
+.bento-mini {
+    justify-content: flex-end;
+}
+
+.bento-mini .bento-art img {
+    object-fit: cover;
+    opacity: 0.48;
+    transform: scale(1.05);
+}
+
+.bento-mini::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(10, 28, 24, 0.78), rgba(10, 28, 24, 0.22), transparent);
+    z-index: 0;
+}
+
+.bento-mini-text {
+    position: relative;
+    z-index: 1;
+}
+
+.bento-mini .bento-icon {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 1rem;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    font-size: 1.4rem;
+    color: #ecfeff;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+}
+
+.bento-mini h3,
+.bento-mini p {
+    color: #f0fdf8 !important;
+    -webkit-text-fill-color: #f0fdf8 !important;
+}
+
 /* Workflow Architecture */
 .workflow-section {
     max-width: 1400px;

@@ -30,6 +30,11 @@ body.page-landing {
     -moz-osx-font-smoothing: grayscale;
 }
 
+html, body.page-landing {
+    min-height: 100%;
+    min-height: -webkit-fill-available;
+}
+
 /* Background Atmosphere */
 .noise-overlay {
     position: fixed;
@@ -71,9 +76,12 @@ body.page-landing {
     position: relative;
     z-index: 2;
     height: 100vh;
+    height: 100dvh;
+    min-height: -webkit-fill-available;
     overflow-y: auto;
     overflow-x: hidden;
     scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Transition out */
@@ -533,6 +541,13 @@ body.page-landing {
 }
 
 @media (max-width: 768px) {
+    body.page-landing {
+        overflow-y: auto;
+    }
+    .scroll-container {
+        height: auto;
+        min-height: 100dvh;
+    }
     .hero-section {
         padding: 8rem 1.5rem 5rem;
         min-height: auto;
@@ -583,7 +598,7 @@ body.page-landing {
         border-bottom: 1px solid var(--border-glass);
     }
     .header-content {
-        padding: 0.85rem 0.9rem;
+        padding: calc(0.75rem + env(safe-area-inset-top, 0px)) 0.9rem 0.75rem;
     }
     .header-actions .btn-ghost {
         display: none;
@@ -607,7 +622,7 @@ body.page-landing {
         padding: 0.35rem 0.75rem;
     }
     .hero-section {
-        padding: 7rem 1rem 4rem;
+        padding: calc(6.2rem + env(safe-area-inset-top, 0px)) 1rem 4rem;
     }
     .mega-title {
         font-size: clamp(2rem, 10vw, 2.6rem);
@@ -648,7 +663,7 @@ body.page-landing {
         font-size: 0.98rem !important;
     }
     .mega-footer {
-        padding: 3.5rem 1rem 2rem;
+        padding: 3.5rem 1rem calc(2rem + env(safe-area-inset-bottom, 0px));
     }
     .footer-base {
         margin-top: 2rem;
@@ -659,5 +674,18 @@ body.page-landing {
     }
     .footer-logo span {
         font-size: 0.85rem;
+    }
+}
+
+@supports (-webkit-touch-callout: none) {
+    .glow-orb {
+        filter: blur(80px);
+    }
+    .hero-graphic {
+        animation: none;
+    }
+    .bento-box:hover,
+    .workflow-row:hover {
+        transform: none !important;
     }
 }

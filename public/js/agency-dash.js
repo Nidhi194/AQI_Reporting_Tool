@@ -110,7 +110,7 @@ function bindRowActionMenu() {
                 window.location.href = "agency.html";
             } else if (action === "view" || action === "download") {
                 try {
-                    const res = await fetch(`http://localhost:3000/api/reports/summary/${selectedReportId}`);
+                    const res = await fetch(`/api/reports/summary/${selectedReportId}`);
                     if (!res.ok) throw new Error("Failed to fetch report summary");
                     const data = await res.json();
                     
@@ -124,7 +124,7 @@ function bindRowActionMenu() {
             } else if (action === "delete") {
                 if (confirm("Are you sure you want to delete this report?")) {
                     try {
-                        const res = await fetch(`http://localhost:3000/api/reports/${selectedReportId}`, {
+                        const res = await fetch(`/api/reports/${selectedReportId}`, {
                             method: 'DELETE'
                         });
                         
@@ -200,7 +200,7 @@ function bindLogoutButton() {
             
             try {
                 selectIndustry.innerHTML = '<option value="">Loading industries...</option>';
-                const res = await fetch("http://localhost:3000/api/industries");
+                const res = await fetch("/api/industries");
                 if (res.ok) {
                     const industries = await res.json();
                     selectIndustry.innerHTML = '<option value="">Select an industry</option>';
@@ -241,7 +241,7 @@ function bindLogoutButton() {
             };
 
             try {
-                const res = await fetch("http://localhost:3000/api/schedule-check", {
+                const res = await fetch("/api/schedule-check", {
                     method: "POST",
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -285,7 +285,7 @@ async function loadLiveReports() {
     }
 
     try {
-        const res = await fetch(`http://localhost:3000/agency-dashboard-data?user_email=${encodeURIComponent(userEmail)}`);
+        const res = await fetch(`/agency-dashboard-data?user_email=${encodeURIComponent(userEmail)}`);
         const data = await res.json();
         
         if (data.error) throw new Error(data.error);
@@ -615,7 +615,7 @@ async function loadAgencySchedules() {
     if (!tbody || !emptyState) return;
 
     try {
-        const res = await fetch(`http://localhost:3000/api/agency-schedules?agency_email=${encodeURIComponent(userEmail)}`);
+        const res = await fetch(`/api/agency-schedules?agency_email=${encodeURIComponent(userEmail)}`);
         const data = await res.json();
 
         const schedules = data.schedules || [];
@@ -675,7 +675,7 @@ function bindScheduleActionButtons() {
 async function updateScheduleStatus(id, status) {
     const agencyEmail = localStorage.getItem("userEmail");
     try {
-        const res = await fetch(`http://localhost:3000/api/schedule-check/${id}`, {
+        const res = await fetch(`/api/schedule-check/${id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ status, agencyEmail })

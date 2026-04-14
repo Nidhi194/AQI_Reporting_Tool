@@ -41,7 +41,7 @@ async function register() {
     }
 
     try {
-        let res = await fetch("http://localhost:3000/register", {
+        let res = await fetch("/register", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -85,7 +85,7 @@ async function login() {
     }
 
     try {
-        let res = await fetch("http://localhost:3000/login", {
+        let res = await fetch("/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -103,7 +103,7 @@ async function login() {
                 window.location.href = basePath + (data.redirectPage || "industry.html");
             } else if (data.role === "Monitoring Agency") {
                 try {
-                    let profileRes = await fetch("http://localhost:3000/check-agency-profile", {
+                    let profileRes = await fetch("/check-agency-profile", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ email: data.email })
@@ -225,7 +225,7 @@ async function handleIndustryEntryFlow() {
     const editing = isIndustryEditMode();
 
     try {
-        const res = await fetch(`http://localhost:3000/industry-profile-status?user_email=${encodeURIComponent(userEmail)}`);
+        const res = await fetch(`/industry-profile-status?user_email=${encodeURIComponent(userEmail)}`);
         const result = await res.json();
 
         if (!res.ok) {
@@ -280,7 +280,7 @@ window.saveAgencyProfile = async function() {
     }
 
     try {
-        let res = await fetch("http://localhost:3000/save-agency-profile", {
+        let res = await fetch("/save-agency-profile", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -410,7 +410,7 @@ async function saveData() {
     }
 
     try {
-        let res = await fetch("http://localhost:3000/save-industry", {
+        let res = await fetch("/save-industry", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -451,7 +451,7 @@ async function saveData() {
 
 async function loadIndustries() {
     try {
-        let res = await fetch("http://localhost:3000/get-industries");
+        let res = await fetch("/get-industries");
         let data = await res.json();
 
         let dropdown = document.getElementById("industry_name");
@@ -898,7 +898,7 @@ async function savePM10() {
     };
 
     try {
-        const res = await fetch("http://localhost:3000/save-pm10", {
+        const res = await fetch("/save-pm10", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -994,7 +994,7 @@ async function saveSO2() {
     };
 
     try {
-        const res = await fetch("http://localhost:3000/save-so2", {
+        const res = await fetch("/save-so2", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -1090,7 +1090,7 @@ async function saveNO2() {
     };
 
     try {
-        const res = await fetch("http://localhost:3000/save-no2", {
+        const res = await fetch("/save-no2", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -1129,7 +1129,7 @@ async function savePM25() {
     };
 
     try {
-        const res = await fetch("http://localhost:3000/save-pm25", {
+        const res = await fetch("/save-pm25", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -1299,7 +1299,7 @@ async function saveAgencyReport() {
     const payload = collectAgencyReportPayload();
 
     try {
-        const res = await fetch("http://localhost:3000/save-agency-report", {
+        const res = await fetch("/save-agency-report", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -1510,7 +1510,7 @@ async function generateReport() {
     payload.status = 'Published';
 
     try {
-        const res = await fetch("http://localhost:3000/save-agency-report", {
+        const res = await fetch("/save-agency-report", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -1549,7 +1549,7 @@ async function saveAsDraft() {
     payload.status = 'Pending'; // Mark as draft
 
     try {
-        const res = await fetch("http://localhost:3000/save-agency-report", {
+        const res = await fetch("/save-agency-report", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

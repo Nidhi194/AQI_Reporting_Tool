@@ -1,14 +1,14 @@
 /**
  * Industry reports hub — wire to backend:
- *   GET  http://localhost:3000/industry-reports?user_email=<email>
- *   POST http://localhost:3000/report-industry-issue
+ *   GET  /industry-reports?user_email=<email>
+ *   POST /report-industry-issue
  *
  * Each report object: { id, title, reportType, periodLabel, status, previewUrl?, downloadUrl? }
  * previewUrl: optional PDF or HTML URL for iframe preview
  * downloadUrl: optional direct file URL for download
  */
 
-const API_BASE = "http://localhost:3000";
+const API_BASE = "";
 
 const DEMO_REPORTS = [
     {
@@ -341,7 +341,7 @@ async function fetchUpcomingChecks(email) {
     if (!container) return;
 
     try {
-        const res = await fetch(`http://localhost:3000/api/upcoming-checks?user_email=${encodeURIComponent(email)}`);
+        const res = await fetch(`/api/upcoming-checks?user_email=${encodeURIComponent(email)}`);
         const data = await res.json();
         
         if (data.checks && data.checks.length > 0) {
